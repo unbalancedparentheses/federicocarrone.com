@@ -564,20 +564,6 @@ article {
   background: var(--color-accent-darker);
   background-size: 100px auto;
 
-  &[data-character="comte"] ~ &[data-character="comte"],
-  &[data-character="factotum"] ~ &[data-character="factotum"],
-  &[data-character="procureur"] ~ &[data-character="procureur"] {
-    .conversation--character {
-      picture {
-        margin-block-end: 0;
-      }
-
-      span {
-        display: none;
-      }
-    }
-  }
-
   > .conversation--character {
     position: relative;
     min-width: 80px;
