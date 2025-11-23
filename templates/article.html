@@ -1,0 +1,23 @@
+{% import "macros/article.html" as article %}
+
+{% extends "base.html" %}
+
+{% block title -%}
+  {{ page.title }}
+{%- endblock title %}
+
+{% block long_title -%}
+  {{ page.title }}
+{%- endblock long_title %}
+
+{% block body %}
+  <article class="article" typeof="Article">
+    <header>
+      <h1 property="name">{{ page.title | markdown(inline = true) | safe }}</h1>
+
+      {{ article::metadata(page = page, full = true) }}
+    </header>
+
+    {{ page.content | safe }}
+  </article>
+{% endblock body %}

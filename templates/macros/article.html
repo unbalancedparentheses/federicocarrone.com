@@ -1,0 +1,54 @@
+{% macro poster(page) %}
+  <a href="{{ page.permalink | safe }}" class="h2" property="url"><span property="name">{{ page.title | markdown(inline = true) | safe }}</span></a>
+  {{ self::metadata(page = page, full = false) }}
+  {% if page.description %}
+  <div property="description">
+    {{ page.description | markdown(inline = false) | safe }}
+  </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro metadata(page, full) %}
+  <div class="metadata">
+    <time title="Published date" datetime="{{ page.date }}" property="datePublished">
+      {{- page.date | date(format = "%B %d, %Y") -}}
+    </time>
+    <span title="Reading time" property="timeRequired" content="PT{{ page.reading_time }}M">
+      {{- page.reading_time ~ " minutes read" -}}
+    </span>
+    {% if page.taxonomies.keywords %}
+    <span title="Keywords" property="keywords" content="{{ page.taxonomies.keywords | join(sep = ", ") }}">
+      Keywords:&nbsp;
+      {%- for keyword in page.taxonomies.keywords -%}
+        <a href="/keywords/{{ keyword | slugify }}">{{ keyword }}</a> 
+
+        {%- if not loop.last -%}, {% endif %}
+      {%- endfor -%}
+    </span>
+    {% endif -%}
+    {%- if full %}
+      <span><a href="https://github.com/unbalancedparentheses/federicocarrone.com/edit/main/content/{{ page.relative_path }}" title="Submit a patch for this page">Edit</a> this page</span>
+      {% if page.description %}
+      <meta property="description" content="{{ page.description }}" />
+      {% endif %}
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro table_of_content(page) %}
+  {#
+  {% if page.toc %}
+  <nav>
+    <details>
+      <summary><h2>Content</h2></summary>
+
+      <ul title="Jump to the following section in this page">
+      {% for h1 in page.toc -%}
+        <li><a href="#{{ h1.permalink | split(pat = "#") | last }}">{{ h1.title }}</a></li>
+      {% endfor %}
+      </ul>
+    </details>
+  </nav>
+  {% endif %}
+  #}
+{% endmacro %}

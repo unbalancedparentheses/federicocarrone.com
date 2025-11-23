@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title -%}
+  All the keywords
+{%- endblock title %}
+
+{% block long_title -%}
+  All the keywords
+{%- endblock long_title %}
+
+{% block body %}
+  <h1>All the keywords</h1>
+
+  <p>All terms, alphabetically sorted, for the <em>{{ taxonomy.name }}</em>
+  taxonomy:</p>
+
+  <div class="find-keywords">
+    <input id="find_keywords" type="text" list="keywords" placeholder="Find a keyword…" autofocus>
+
+    <datalist id="keywords">
+    {% for term in terms -%}
+      <option value="{{ term.name | slugify }}"><a href="/keywords/{{ term.name | slugify }}">{{ term.name }}</a></option>
+    {% endfor %}
+    </datalist>
+  </form>
+
+  <style>
+  .find-keywords {
+    text-align: center;
+
+    input {
+      margin-block-end: var(--space);
+    }
+
+    datalist {
+      display: list-item;
+      list-style: none;
+      text-wrap: balance;
+
+      > option {
+        display: inline-block;
+      }
+
+      > option:has(+ option)::after {
+        content: " •";
+      }
+    }
+  }
+
+  </style>
+
+  <script>
+  document.getElementById("find_keywords").addEventListener(
+    'input',
+    new function () {
+      const options = Array
+        .from(document.querySelectorAll('#keywords > option'))
+        .map((option) => option.value);
+
+
+      return (event) => {
+        // If it autocompletes to an existing option.
+        if (event.data && options.includes(event.data)) {
+          document.location.pathname = `/keywords/${event.data}`;
+        }
+      };
+    },
+    false
+  );
+  </script>
+{% endblock %}
