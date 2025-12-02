@@ -26,16 +26,20 @@ p, h1, h2, h3, h4, h5, h6 {
    * in `oklch(from var(…) …)`, the `var(…)` is not supported by
    * `postcss-relative-color-syntax`, so we need to copy the colours
    */
-  --color-white: #fff;
-  --color-dark: oklch(26.42% .017 285.2);
-  --color-dark-lighter: oklch(from oklch(26.42% .017 285.2) calc(l + .1) c h);
-  --color-dark-blue: oklch(27.23% 0.024 264.05);
-  --color-light: oklch(85% .004 360);
-  --color-lighter: oklch(from oklch(85% .004 360) calc(l + .05) c h);
-  --color-light-darker: oklch(from oklch(85% .004 360) calc(l - 0.21) c h);
-  --color-accent: oklch(84.83% .114 76.18);
-  --color-accent-darker: oklch(from oklch(84.83% .114 76.18) calc(l - .04) c h);
-  --color-accent2: oklch(59.1% .236 10.25);
+
+  /* Light, editorial palette */
+  --color-white: #ffffff;
+  --color-light: #faf8f4;          /* page background */
+  --color-lighter: #ffffff;        /* cards, figures */
+  --color-light-darker: #8f8777;   /* metadata, secondary text */
+
+  --color-dark: #222222;           /* main text */
+  --color-dark-lighter: #cfc6b6;   /* borders, subtle accents */
+  --color-dark-blue: #f1ede5;      /* code blocks / pre background */
+
+  --color-accent: #af2a2b;         /* links, accent */
+  --color-accent-darker: #8c1c21;  /* hover accent, conversation bg */
+  --color-accent2: #8b1e23;        /* header bar, labels */
 
   --space-very-very-small: .2rem;
   --space-very-small: .25rem;
@@ -48,11 +52,11 @@ p, h1, h2, h3, h4, h5, h6 {
   --border-color: var(--color-dark-lighter);
 
   --text-size: 1.05rem;
-  --text-line-height: 1.5;
+  --text-line-height: 1.65;
 }
 
 body {
-  --_background-color: var(--color-dark);
+  --_background-color: var(--color-light);
 
   /* Thanks https://modernfontstacks.com/! */
   font-size: var(--text-size);
@@ -61,7 +65,7 @@ body {
   font-variant: diagonal-fractions slashed-zero;
   line-height: var(--text-line-height);
 
-  color: var(--color-light);
+  color: var(--color-dark);
   accent-color: var(--color-accent);
   background: var(--_background-color);
 
@@ -196,7 +200,7 @@ code {
   font-size: .85em;
   hyphens: auto;
   padding: var(--space-very-small);
-  background: var(--color-dark-lighter);
+  background: #f3eee5;
 }
 
 pre {
@@ -251,10 +255,10 @@ figure {
   }
 
   &:has(img, picture, .youtube-player) {
-    --_figcaption-color: var(--color-dark-lighter);
+    --_figcaption-color: var(--color-light-darker);
 
     padding: var(--_block-space) var(--_inline-space);
-    background: var(--color-white);
+    background: var(--color-lighter);
 
     code {
       background: none;
@@ -497,12 +501,12 @@ article {
 
 .button {
   padding: var(--space-small) var(--space);
-  color: var(--color-dark);
+  color: var(--color-white);
   background: var(--color-accent);
 
   a&:hover, a&:focus {
     outline: var(--border-width) var(--color-accent) solid;
-    color: unset;
+    color: var(--color-accent);
     text-decoration: none;
     background: transparent;
   }
@@ -621,11 +625,11 @@ article {
   margin-inline: var(--space-very-very-small);
 
   &:before {
-    content: '( ';
+    content: '( ';
   }
 
   &:after {
-    content: ' )';
+    content: ' )';
   }
 }
 
