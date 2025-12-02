@@ -1,7 +1,7 @@
 +++
 title = "Crypto doctrine"
 date = "2025-09-25"
-description = "Crypto doctrine"
+description = "We believe crypto has been incredibly successful at providing a trustless financial layer for the 21st century. In particular it has found product market fit in two main areas: In developing countries providing aids and tools to individuals that need to fight against inflation, censorship and for companies and individuals to be able to business. Internet native communities that need a financial layer in the web that allows them to express and coordinate at a scale that wasn’t possible before. They have created new financial assets and markets that seem absurd from outside. Many times they are also absurd from the inside. People that don’t live in a developing country or that didn’t grow up with the internet have enormous difficulties understanding crypto because they don’t have skin in its game. They believe crypto doesn’t have any “real” use case or that is not serious enough. They are right. The thing is that we are living in a world that’s is becoming more absurd. Memes do not only make you laugh anymore, memes are now winning elections."
 [taxonomies]
 keywords=["crypto"] 
 [extra]
