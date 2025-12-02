@@ -1,0 +1,41 @@
+{% import "macros/article.html" as article %}
+
+{% extends "base.html" %}
+
+{% block title -%}
+  {{ section.title }}
+{%- endblock title %}
+
+{% block long_title -%}
+  {{ section.title }}
+{%- endblock long_title %}
+
+{% block body %}
+  <section typeof="CreativeWorkSeries">
+    <h1 property="name">{{ section.title }}</h1>
+
+    {{ section.content | safe }}
+
+    <h2>Episodes</h2>
+
+    <div role="list">
+    {% for page in section.pages | reverse  %}
+      <div role="listitem" class="article-poster" property="hasPart" typeof="Article">
+        <a href="{{ page.permalink | safe }}" class="h3" property="url">Episode {{ loop.index }} – <span property="name">{{ page.title | markdown(inline=true) | safe }}</span></a>
+        {{ article::metadata(page = page, full = false) }}
+        {% if page.description %}
+        <div property="description">
+        {{ page.description | markdown(inline = false) | safe }}
+        </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+    </div>
+
+    {% if section.extra.complete -%}
+    <p>This series is complete!</p>
+    {%- else -%}
+    <p>This series is in progress, stay tuned!</p>
+    {%- endif %}
+  </section>
+{% endblock body %}

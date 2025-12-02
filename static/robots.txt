@@ -1,0 +1,8 @@
+# Everything else is welcomed.
+
+User-agent: *
+Disallow:
+Allow: /
+
+Sitemap: https://federicocarrone.com/sitemap.xml
+

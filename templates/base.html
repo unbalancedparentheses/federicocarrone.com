@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="content-security-policy" content="default-src 'self'; child-src 'self' https://www.youtube-nocookie.com; script-src 'self' https://cloud.umami.is">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>{%- block title -%}federicocarrone.com{%- endblock title -%}</title>
+
+  <link rel="stylesheet" href="{{ get_url(path = "/style/min/main.css", cachebust = true) }}" />
+  <link rel="stylesheet" href="{{ get_url(path = "/style/min/syntax-theme.css", cachebust = true) }}" />
+
+  <meta name="author" content="Federico Carrone" />
+  {%- if page.description %}
+  <meta name="description" content="{{ page.description }}" />
+  {%- elif section.description %}
+  <meta name="description" content="{{ section.description }}" />
+  {%- else %}
+  <meta name="description" content="federicocarrone.com" />
+  {%- endif %}
+  {%- if page.taxonomies.keywords %}
+  <meta name="keywords" content="{{ page.taxonomies.keywords | join(sep=", ") }}" />
+  {%- endif %}
+  <meta property="og:title" content="{%- block long_title -%}federicocarrone.com{%- endblock long_title -%}" />
+  <meta property="og:site_name" content="federicocarrone.com" />
+  <meta property="og:locale" content="en_US" />
+  {% set first_component = page.components | default(value = []) | first -%}
+  <meta property="og:type" content="{% if first_component == "series" or first_component == "articles" -%}article{% else %}website{% endif %}" />
+  {%- if page.permalink %}
+  <meta property="og:url" content="{{ page.permalink | safe }}" />
+  {%- elif section.permalink %}
+  <meta property="og:url" content="{{ section.permalink | safe }}" />
+  {%- else %}
+  <meta property="og:url" content="https://federicocarrone.com" />
+  {%- endif %}
+</head>
+<body class="content-grid">
+
+<nav id="menu" class="full-width content-grid">
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="{{ get_url(path = '@/articles/_index.md' )}}">Articles</a></li>
+    <li><a href="{{ get_url(path = '@/series/_index.md') }}">Series</a></li>
+  </ul>
+</nav>
+
+<main vocab="https://schema.org">
+{% block body %}
+  Block `body` is undefined
+{% endblock body %}
+</main>
+
+<footer class="full-width content-grid">
+  <div class="footer">
+    <div>
+      <h2>Contact me</h2>
+
+      <ul>
+        <li><a href="mailto:mail@fcarrone.com" title="Email">mail@fcarrone.com</a></li>
+        <li><a href="https://x.com/federicocarrone" title="Say hi on X" rel="me">X</a></li>
+        <li><a href="https://github.com/unbalancedparentheses" title="Say hi on Github">Github</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Recommendations</h2>
+
+      <ul>
+        <li><a href="https://ergodicgroup.com">ergodicgroup.com</a></li>
+        <li><a href="https://lambdaclass.com/">lambdaclass.com</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h2>More</h2>
+
+      <ul>
+        <li><a href="{{ get_url(path = "rss.xml", trailing_slash = false) }}">RSS</a></li>
+        <li><a href="{{ get_url(path = "atom.xml", trailing_slash = false) }}">Atom</a></li>
+        <li><a href="https://github.com/unbalancedparentheses/federicocarrone.com" title="Source code of this site">Source code</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script defer src="https://cloud.umami.is/script.js" data-website-id="30754987-0af7-4ea0-9bd3-711c543b6ecb"></script>
+</body>
+</html>

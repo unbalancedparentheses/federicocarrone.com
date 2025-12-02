@@ -1,0 +1,27 @@
+{% import "macros/series.html" as series %}
+
+{% extends "base.html" %}
+
+{% block title -%}
+  {{ section.title }}
+{%- endblock title %}
+
+{% block long_title -%}
+  {{ section.title }}
+{%- endblock long_title %}
+
+{% block body %}
+  <section typeof="ItemList">
+    <p>Series are subjects that are, unlike
+    <a href="{{ get_url(path = "@/articles/_index.md") }}">articles</a>, too long
+    to fit in one page. They spread over multiple episodes for more pleasure.</p>
+
+    <div role="list">
+    {% for section_path in section.subsections | reverse %}
+      <div role="listitem" class="series-poster" property="itemListElement" typeof="CreativeWorkSeries">
+        {{- series::poster(section = get_section(path = section_path)) -}}
+      </div>
+    {% endfor %}
+    </div>
+  </section>
+{% endblock body %}

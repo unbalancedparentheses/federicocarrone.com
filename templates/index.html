@@ -1,0 +1,48 @@
+{% import "macros/article.html" as article %}
+{% import "macros/series.html" as series %}
+
+{% extends "base.html" %}
+
+{% block title -%}
+  federicocarrone.com
+{%- endblock title %}
+
+{% block long_title -%}
+  federicocarrone.com
+{%- endblock long_title %}
+
+{% block body %}
+  <p>I am Federico Carrone, an entrepreneur working at the intersection of technology, finance, and culture. I build companies in distributed systems, cryptography, AI, gaming, and real assets with the conviction that digital infrastructure, capital markets, and cultural production are converging into a single strategic domain.</p>
+
+  <section typeof="ItemList">
+    <h1>
+      <span property="name">Latest series</span>
+      <small><a href="{{ get_url(path = "@/series/_index.md") }}" property="url">View all</a></small>
+    </h1>
+
+    <div role="list">
+    {% set section = get_section(path = "series/_index.md") -%}
+    {% for section_path in section.subsections | reverse | slice(end = 5) -%}
+      <div role="listitem" class="series-poster" property="itemListElement" typeof="CreativeWorkSeries">
+        {{- series::poster(section = get_section(path = section_path)) -}}
+      </div>
+    {% endfor %}
+    </div>
+  </section>
+
+  <section vocab="https://schema.org" typeof="ItemList">
+    <h1>
+      <span property="name">Pinned articles</span>
+      <small><a href="{{ get_url(path = "@/articles/_index.md") }}" property="url">View all</a></small>
+    </h1>
+
+    <div role="list">
+    {% set section = get_section(path = "articles/_index.md") -%}
+    {% for page in section.pages | filter(attribute = "extra.pinned", value = true) -%}
+      <div role="listitem" class="article-poster" property="itemListElement" typeof="Article">
+        {{- article::poster(page = page) -}}
+      </div>
+    {% endfor %}
+    </div>
+  </section>
+{% endblock body %}
