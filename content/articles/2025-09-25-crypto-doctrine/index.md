@@ -5,7 +5,7 @@ description = "We believe crypto has been incredibly successful at providing a t
 [taxonomies]
 keywords=["crypto"] 
 [extra]
-pinned = true
+pinned = false
 +++
 
 # Crypto and the 21st Century

@@ -1,11 +1,11 @@
 +++
-title = "Ethereum is the new financial backend of the world"
+title = "The new financial backend of the world"
 date = "2025-12-09"
 description = "Ethereum is emerging as a general purpose financial backend that reduces the cost and complexity of building financial services while improving their speed and security. For decades the internet accelerated communication but did not create a neutral system for defining ownership or enforcing obligations. Economic activity moved online without the accompanying machinery of rights, records, and jurisdiction. Ethereum fills this gap by embedding these functions in software and enforcing them through a distributed validator set."
 [taxonomies]
 keywords=["ethereum", "economy", "crypto"] 
 [extra]
-pinned = true
+pinned = false
 +++
 
 **By Federico Carrone and Roberto Catalan**  
