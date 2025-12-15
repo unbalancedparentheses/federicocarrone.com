@@ -9,7 +9,7 @@ keywords=["ergodic"]
 pinned = true
 +++
 
-Ergodic Group is organized around the observation that certain systems change character through sustained engagement. In these systems, repetition refines execution, experience carries forward, and accumulated judgment reshapes future outcomes. Time is not neutral. It filters error, stabilizes standards, and reveals structural quality. Systems differ less in what they produce than in how they behave under repeated contact with reality.
+[Ergodic Group](https://ergodicgroup.com/) is organized around the observation that certain systems change character through sustained engagement. In these systems, repetition refines execution, experience carries forward, and accumulated judgment reshapes future outcomes. Time is not neutral. It filters error, stabilizes standards, and reveals structural quality. Systems differ less in what they produce than in how they behave under repeated contact with reality.
 
 Contemporary society is accelerating across technical, cultural, and organizational dimensions. Cycles shorten, signals multiply, and coordination occurs under constant pressure to respond. This acceleration compounds itself, tightening feedback loops and compressing decision horizons. As pace increases, many structures continue operating while gradually shedding accumulated judgment and internal coherence. Activity persists while formation weakens. Systems appear functional even as their capacity to learn erodes.
 
