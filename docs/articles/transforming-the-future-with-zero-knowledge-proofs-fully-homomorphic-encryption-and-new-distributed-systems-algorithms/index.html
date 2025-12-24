@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="content-security-policy" content="default-src 'self'; child-src 'self' https://www.youtube-nocookie.com; script-src 'self' https://cloud.umami.is">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Transforming the Future with Zero-Knowledge Proofs, Fully Homomorphic Encryption and new Distributed Systems algorithms</title>
+
+  <link rel="stylesheet" href="https://federicocarrone.com/style/min/main.css?h=89c3b5c6a96ec65c5b56" />
+  <link rel="stylesheet" href="https://federicocarrone.com/style/min/syntax-theme.css?h=ef9797b0398b3ffe9058" />
+
+  <meta name="author" content="Federico Carrone" />
+  <meta name="description" content="Zero Knowledge Proofs (ZKPs) and other cryptographic and distributed systems primitives will help society create tools that can be used by everyone. ZKPs enable a party to demonstrate a statement to other parties without revealing any information beyond the proof. In more concrete terms, this enables a person to show another person that the computation they did is correct without having to redo it and without even having to grant access to the data that was used." />
+  <meta name="keywords" content="cryptography, coordination, trust" />
+  <meta property="og:title" content="Transforming the Future with Zero-Knowledge Proofs, Fully Homomorphic Encryption and new Distributed Systems algorithms" />
+  <meta property="og:site_name" content="federicocarrone.com" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://federicocarrone.com/articles/transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms/" />
+</head>
+<body class="content-grid">
+
+<nav id="menu" class="full-width content-grid">
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="https://federicocarrone.com/articles/">Articles</a></li>
+    <li><a href="https://federicocarrone.com/series/">Series</a></li>
+  </ul>
+</nav>
+
+<main vocab="https://schema.org">
+
+  <article class="article" typeof="Article">
+    <header>
+      <h1 property="name">Transforming the Future with Zero-Knowledge Proofs, Fully Homomorphic Encryption and new Distributed Systems algorithms</h1>
+
+      
+  <div class="metadata">
+    <time title="Published date" datetime="2023-04-13" property="datePublished">April 13, 2023</time>
+    <span title="Reading time" property="timeRequired" content="PT9M">9 minutes read</span>
+    
+    <span title="Keywords" property="keywords" content="cryptography, coordination, trust">
+      Keywords:&nbsp;<a href="/keywords/cryptography">cryptography</a>, <a href="/keywords/coordination">coordination</a>, <a href="/keywords/trust">trust</a></span>
+    
+      <span><a href="https://github.com/unbalancedparentheses/federicocarrone.com/edit/main/content/articles&#x2F;2023-04-13-transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms&#x2F;index.md" title="Submit a patch for this page">Edit</a> this page</span>
+      
+      <meta property="description" content="Zero Knowledge Proofs (ZKPs) and other cryptographic and distributed systems primitives will help society create tools that can be used by everyone. ZKPs enable a party to demonstrate a statement to other parties without revealing any information beyond the proof. In more concrete terms, this enables a person to show another person that the computation they did is correct without having to redo it and without even having to grant access to the data that was used." />
+      
+    
+  </div>
+
+    </header>
+
+    <p>The evolution of every scientific discipline or engineering field experiences cycles akin to those observed in economies. Incremental advancements are made daily by corporations, individuals, and academic institutions. Occasionally, a researcher or engineer makes a groundbreaking discovery that alters the course of the field. One such example is Sir Isaac Newton, who made significant contributions to calculus, motion, optics, and gravitation during the time of the bubonic plague, which claimed millions of lives. His relentless pursuit of knowledge throughout the pandemic proved instrumental in shaping the development of mathematics, physics, and engineering. Our comfortable modern lives stand upon the foundation of these monumental discoveries.</p>
+<p>The general public is aware of the big breakthroughs made in the aerospatial industry, energy production, internet of things, and last but not least artificial intelligence. However, most don’t know that during the COVID pandemic, enormous advances were made in cryptography. 47 years ago Diffie and Hellman wrote in their famous cryptography paper: “we stand today on the brink of a revolution in cryptography”, which enabled two people to exchange confidential information even when they can only communicate via a channel monitored by an adversary. This revolution enabled electronic commerce and the communication between citizens of the free world. We believe the discoveries made by researchers and engineers in cryptography during this COVID pandemic will be as important as the discoveries made by Diffie and Hellman in the upcoming decades.</p>
+<p>One of the big discoveries has been how to make Zero-Knowledge Proofs fast enough for real-world applications. This technology has been around since 1984 but as Diffie also said, “Lots of people working in cryptography have no deep concern with real application issues. They are trying to discover things clever enough to write papers about”. Fortunately for humanity, researchers and engineers have made this technology practical enough in the last decade (especially the last 2 years) to be useful.</p>
+<p>The financial system depends on the existence of intermediaries: an army of auditors, regulators, and accountants. The correct working of the financial machine depends on the integrity of its financial institutions. Integrity is maintained due to positive economic incentives and jail time, fines, and costly lawsuits if the intermediaries don’t do what the state and society expect from them. Bitcoin, a result of the 2008 crisis, created a permissionless financial system where its users can send and receive digital money without intermediaries and without anybody being able to block transactions. In countries like Argentina, Nigeria, or Lebanon, where stagnation and inflation erode its citizens' trust in the financial system and the state, Bitcoin and stablecoins on top of Ethereum are used on a daily basis by the young population to save and avoid capital controls. In developed countries, its usage is not as massive since the traditional financial system and the state is trusted by most citizens. However, the world is becoming more complex. Banks are failing in the US and Europe, a new war is taking place in Europe, debt levels are not sustainable in many countries, the fight between left and the right is retaking the main stage, tension between the West and the East increases, and technological change keeps accelerating.</p>
+<p>New applications built on top of unstoppable and trustless technologies that don’t depend on social trust will grow and thrive in this type of environment. Everything is being questioned. Only things that can’t be questioned will fully resist the passage of time. This will happen not only in developing countries but also in developed ones. Systems like Bitcoin, where everyone can verify how it’s running, are more resilient and become more useful by the day in a world that is getting more complex.</p>
+<p>Bitcoin's focus has been to become a new type of monetary asset and financial network. For this reason, the development of more complex programs on top of Bitcoin has always been restricted by design. Newer blockchains like Ethereum added the ability to create new types of applications. DeFi Protocols that enabled lending and borrowing, exchange of digital currencies and the ability to buy, sell and trade digital collectives and arts rapidly grew on top of Ethereum. However the cost of creating and transferring relevant amounts of assets in blockchains is costly. The ability to create more complex applications that sit on top of blockchains is also very limited. Applications can’t run more than a few milliseconds on Ethereum.</p>
+<p>These systems do not rely on social integrity like traditional systems. Instead, they operate as a permissionless and censorship-resistant network, allowing anyone to add a node and submit updates to its state. To ensure verification, each node must re-execute all transactions, which makes the system decentralized and secure, albeit slower than centralized systems. Consequently, this imposes a limitation on the types of applications that can be built on blockchains. Applications requiring frequent database state updates, such as those exceeding a few times per second, or machine learning algorithms, are not feasible on blockchain platforms.</p>
+<p>This is where Zero Knowledge Proofs (ZKPs) and other cryptographic and distributed systems primitives will help society create tools that can be used by everyone. ZKPs enable a party to demonstrate a statement to other parties without revealing any information beyond the proof. In more concrete terms, this enables a person to show another person that the computation they did is correct without having to redo it and without even having to grant access to the data that was used. An important aspect of this is that the verification is done in a much faster time than the proving. In even simpler terms, it proves that the output of a certain computation is correct. The verification is way easier and faster to do than the execution or proving. Anybody can check the proof, and this saves computing time and money.</p>
+<p>At the beginning it’s difficult to grasp, even for engineers, that such a technology is even possible. The mathematics behind it, until recently, seemed magical, and that’s why it was called moon math. Thanks to ZKPs, transferring money in blockchains similar to Bitcoin is cheaper and way faster since there is no need to re-execute each transaction by each node. Only one node is needed to process all the transactions and prove them using a ZKPs, while the rest simply need to verify it, saving valuable computing resources. Among other things, ZKPs enable creating a financial system that doesn’t depend on social trust like traditional finance and that doesn’t depend as much on re-executing algorithms as Bitcoin.</p>
+<p>Zero Knowledge Proofs facilitate the development of an entirely new range of applications that are executed and proven on a single computer outside the blockchain, with verification occurring within Ethereum. The verification cost is way cheaper than the time it takes to prove or execute it. Ethereum will evolve from a slow yet secure distributed mainframe, where execution time is shared among all users to run small programs, into a distributed computer that stores and verifies proofs generated externally from the blockchain.</p>
+<p>Not only will blockchains benefit from the development of new cryptographic primitives like Zero Knowledge Proofs (ZKPs), but other areas will also be significantly impacted. As AI-generated content begins to overshadow human-generated content on the internet, ZKPs will become essential for verifying that such content was produced by unbiased AI models. "Proof of humanity" systems are already employing ZKPs to ensure the accurate computation of a human accessing specific resources.</p>
+<p>Hardware is another area where ZKPs will make an impact. Similar to how graphics cards in the 1990s revolutionized the video game industry, zero-knowledge hardware acceleration will be integrated into computers to enhance efficiency.</p>
+<p>ZKPs can also be utilized to balance storage and computation securely. For instance, security cameras generate vast amounts of data. ZKPs can provide a compact proof that AI models did not detect any critical information in the video, allowing the system to delete the footage and save storage space.</p>
+<p>ZKPs will even be used for national security purposes. As energy production shifts from centralized power plants to distributed sources like solar panels and wind turbines, verifying the proper execution of software on their controllers becomes vital. In the coming decades, ZKPs will play a crucial role in securing these devices.</p>
+<p>Software industry regulations are inevitable, and industries such as online casinos and ad networks using Real-Time Bidding protocols will be legally required to demonstrate that they have not deceived their clients. Laws protecting users from large tech corporations are already in place in Europe, partly due to concerns about data misuse by foreign powers to influence political campaigns.</p>
+<p>Requirements for secure storage and processing of encrypted data will become increasingly necessary. Fully Homomorphic Encryption (FHE), a technology akin to ZKPs, will be one of the tools utilized for this purpose. FHE enables computation on encrypted data, ensuring privacy. As FHE becomes more efficient and practical, most databases will integrate some FHE functionality, preventing administrators from accessing user data directly.</p>
+<p>Zero-knowledge proofs (ZKPs), which generate evidence for a third party to confirm the accurate execution of a computation, and Fully Homomorphic Encryption (FHE), which enables calculations on encrypted data, will be combined with distributed systems algorithms that are capable of tolerating significant network failures similar to those employed by Bitcoin. Together they will be utilized to comply with regulations while creating trustless applications.</p>
+<p>In the past decade, we have successfully launched applications serving dozens of millions of users. Leveraging our expertise, we are now dedicated to providing both technical and financial support to help others create startups focused on developing and implementing these vital technologies. As society grapples with the challenges of our rapidly evolving world these innovations will prove to be indispensable.</p>
+
+  </article>
+
+</main>
+
+<footer class="full-width content-grid">
+  <div class="footer">
+    <div>
+      <h2>Contact me</h2>
+
+      <ul>
+        <li><a href="mailto:mail@fcarrone.com" title="Email">mail@fcarrone.com</a></li>
+        <li><a href="https://x.com/federicocarrone" title="Say hi on X" rel="me">X</a></li>
+        <li><a href="https://github.com/unbalancedparentheses" title="Say hi on Github">Github</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Recommendations</h2>
+
+      <ul>
+        <li><a href="https://ergodicgroup.com">ergodicgroup.com</a></li>
+        <li><a href="https://lambdaclass.com/">lambdaclass.com</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h2>More</h2>
+
+      <ul>
+        <li><a href="https://federicocarrone.com/rss.xml">RSS</a></li>
+        <li><a href="https://federicocarrone.com/atom.xml">Atom</a></li>
+        <li><a href="https://github.com/unbalancedparentheses/federicocarrone.com" title="Source code of this site">Source code</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script defer src="https://cloud.umami.is/script.js" data-website-id="30754987-0af7-4ea0-9bd3-711c543b6ecb"></script>
+</body>
+</html>
