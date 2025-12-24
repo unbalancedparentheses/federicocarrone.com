@@ -1,28 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
-    <title> - cryptography</title>
-    <link rel="self" type="application/atom+xml" href="https://federicocarrone.com/keywords/cryptography/atom.xml"/>
-    <link rel="alternate" type="text/html" href="https://federicocarrone.com"/>
-    <generator uri="https://www.getzola.org/">Zola</generator>
-    <updated>2023-04-13T00:00:00+00:00</updated>
-    <id>https://federicocarrone.com/keywords/cryptography/atom.xml</id>
-    <entry xml:lang="en">
-        <title>On the displacement of trust: proving, verification and the reconfiguration of authority</title>
-        <published>2023-04-13T00:00:00+00:00</published>
-        <updated>2023-04-13T00:00:00+00:00</updated>
-        
-        <author>
-          <name>
-            
-              Unknown
-            
-          </name>
-        </author>
-        
-        <link rel="alternate" type="text/html" href="https://federicocarrone.com/articles/transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms/"/>
-        <id>https://federicocarrone.com/articles/transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms/</id>
-        
-        <content type="html" xml:base="https://federicocarrone.com/articles/transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms/">&lt;p&gt;Moments of genuine scientific and conceptual transformation rarely announce themselves clearly at the time they occur, not because they lack importance, but because they do not arrive as finished doctrines or named revolutions. They emerge instead as quiet accumulations of tools and techniques forged under pressure, usually in response to systems that no longer scale and assumptions that continue to operate long after they have ceased to be true. Only much later do such developments appear inevitable, and only in retrospect do we recognize that what once looked like narrow technical progress was in fact a deeper reconfiguration of how societies organize knowledge, authority, and trust.&lt;&#x2F;p&gt;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+      <title> - trust</title>
+      <link>https://federicocarrone.com</link>
+      <description></description>
+      <generator>Zola</generator>
+      <language>en</language>
+      <atom:link href="https://federicocarrone.com/keywords/trust/rss.xml" rel="self" type="application/rss+xml"/>
+      <lastBuildDate>Thu, 13 Apr 2023 00:00:00 +0000</lastBuildDate>
+      <item>
+          <title>On the displacement of trust: proving, verification and the reconfiguration of authority</title>
+          <pubDate>Thu, 13 Apr 2023 00:00:00 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://federicocarrone.com/articles/transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms/</link>
+          <guid>https://federicocarrone.com/articles/transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms/</guid>
+          <description xml:base="https://federicocarrone.com/articles/transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms/">&lt;p&gt;Moments of genuine scientific and conceptual transformation rarely announce themselves clearly at the time they occur, not because they lack importance, but because they do not arrive as finished doctrines or named revolutions. They emerge instead as quiet accumulations of tools and techniques forged under pressure, usually in response to systems that no longer scale and assumptions that continue to operate long after they have ceased to be true. Only much later do such developments appear inevitable, and only in retrospect do we recognize that what once looked like narrow technical progress was in fact a deeper reconfiguration of how societies organize knowledge, authority, and trust.&lt;&#x2F;p&gt;
 &lt;p&gt;We are living through such a moment now. Contemporary society depends on vast digital systems that coordinate billions of people across markets, governments, media, and infrastructure, yet the models of trust that allow these systems to function were designed for a world that was slower, more legible, and far more centralized. Institutions, platforms, and intermediaries remain charged with certifying truth, protecting privacy, and enforcing rules, even as information moves at speeds and scales that overwhelm human oversight and strain institutional capacity beyond repair. The resulting tension is not merely inefficiency or lag, but a structural mismatch between how coordination actually occurs and how legitimacy is still supposed to be produced.&lt;&#x2F;p&gt;
 &lt;p&gt;At the center of this mismatch lies a problem that is epistemic rather than technological. We increasingly lack reliable ways to know what is true, who can be trusted, and whether systems behave as they claim to behave. Data can be copied, altered, and fabricated at negligible cost. Decisions that shape lives, markets, and public outcomes are delegated to systems whose internal logic is opaque even to their operators. Participation in economic and social life routinely requires the surrender of personal information without any meaningful ability to verify how it will be used, retained, or recombined. Trust has become simultaneously indispensable and structurally fragile, demanded everywhere and grounded nowhere.&lt;&#x2F;p&gt;
 &lt;p&gt;Historically, societies managed this problem through social mechanisms such as reputation, kinship, ritual, and later through institutions grounded in law, bureaucracy, and professional authority. These arrangements worked not because they were perfect, but because power and information were scarce, slow moving, and costly to manipulate. Verification could be mediated by human judgment, and failure propagated slowly enough to be absorbed. In the digital era, trust has been increasingly outsourced to large platforms whose incentives are aligned with scale, growth, and engagement rather than durability, legitimacy, or accountability. The widening gap between institutional claims and individual verifiability is not a temporary failure of governance, but a structural consequence of this arrangement.&lt;&#x2F;p&gt;
@@ -41,7 +33,7 @@
 &lt;p&gt;These systems are not without risk. Cryptographic bugs have drained enormous sums. Proof systems rely on assumptions and implementations that have not yet faced decades of adversarial pressure. Verification relocates trust rather than abolishing it, shifting it from institutions and individuals to mathematics, code, and hardware, each with its own failure modes. What is changing is not the existence of trust, but its distribution and visibility.&lt;&#x2F;p&gt;
 &lt;p&gt;Zero knowledge proofs, encrypted computation, and distributed coordination are no longer isolated research agendas but components of an emerging stack. Verification is becoming cheap. Privacy preserving computation is becoming practical. Coordination without centralized trust is becoming robust. These shifts arrive as artificial intelligence makes fabrication cheap and pervasive, rendering persuasion, credentials, and authority increasingly brittle. In such an environment, structure becomes the only guarantee that scales.&lt;&#x2F;p&gt;
 &lt;p&gt;Institutions do not disappear, but their role is unsettled. They shift from being sources of trust to operators within systems that are verifiable by design. Authority becomes constrained rather than assumed. This transition is neither purely technical nor purely political. It alters what it means to claim, to comply, and to coordinate. What is taking shape is not simply a new set of tools, but a different condition for social life, one in which legitimacy is no longer anchored primarily in who speaks, but in what can be proven, and in which trust, once the silent center of coordination, is displaced, redistributed, and no longer guaranteed to return to the place it once occupied.&lt;&#x2F;p&gt;
-</content>
-        
-    </entry>
-</feed>
+</description>
+      </item>
+    </channel>
+</rss>
