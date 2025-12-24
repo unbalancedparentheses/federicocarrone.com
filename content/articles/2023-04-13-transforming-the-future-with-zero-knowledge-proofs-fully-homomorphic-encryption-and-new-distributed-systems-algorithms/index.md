@@ -1,6 +1,6 @@
 +++
 title = "Transforming the future with zero-knowledge proofs, fully homomorphic encryption and new distributed systems algorithms"
-date = "2025-09-25"
+date = "2023-04-13"
 description = "Zero Knowledge Proofs (ZKPs) and other cryptographic and distributed systems primitives will help society create tools that can be used by everyone. ZKPs enable a party to demonstrate a statement to other parties without revealing any information beyond the proof. In more concrete terms, this enables a person to show another person that the computation they did is correct without having to redo it and without even having to grant access to the data that was used."
 [taxonomies]
 keywords=["cryptography"] 
