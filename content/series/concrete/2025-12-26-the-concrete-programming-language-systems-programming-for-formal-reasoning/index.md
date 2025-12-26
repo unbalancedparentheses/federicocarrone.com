@@ -86,7 +86,7 @@ Purity in Concrete means no side effects and no heap allocation. Stack allocatio
 
 When a function needs to perform effects, it declares exactly which ones:
 
-```concrete
+```
 fn read_file(path: String) with(FileRead) -> String {
     ...
 }
@@ -102,7 +102,7 @@ Capabilities propagate monotonically through the call graph. If `f` calls `g`, a
 
 For application entry points and prototyping, Concrete provides a shorthand. The `!` suffix declares the `Std` capability:
 
-```concrete
+```
 fn main!() {
     println("Hello")
 }
@@ -120,7 +120,7 @@ The `Unsafe` capability surfaces all unsafe operations through the same system. 
 
 All values in Concrete are linear by default. A linear value must be consumed exactly once—not zero times (that's a leak), not twice (that's a double-free). Consumption happens when you pass the value to a function that takes ownership, return it, destructure it via pattern matching, or explicitly call `destroy(x)`.
 
-```concrete
+```
 fn example!() {
     let f = open("data.txt")
     defer destroy(f)
@@ -133,7 +133,7 @@ If `f` isn't consumed on all paths, the program is rejected. If you try to use `
 
 Some types—integers, booleans, floats—are explicitly marked `Copy` and escape linear restrictions:
 
-```concrete
+```
 type Copy Int
 type Copy Bool
 type Copy Float64
@@ -145,7 +145,7 @@ But the default is linearity, which forces you to think about resource ownership
 
 A linear type may define a destructor that executes when `destroy(x)` is called:
 
-```concrete
+```
 type File {
     handle: FileHandle
 }
@@ -161,7 +161,7 @@ The destructor takes ownership of `self`, may require capabilities, and runs exa
 
 The `defer` statement makes cleanup explicit. Unlike languages where destructors run implicitly at scope boundaries, Concrete requires you to write `defer destroy(f)`. You see the cleanup in the source. The compiler never secretly inserts destructor calls.
 
-```concrete
+```
 fn process_files!() {
     let f1 = open("a.txt")
     defer destroy(f1)           // you see this
@@ -183,7 +183,7 @@ When a value is scheduled with `defer destroy(x)`, it becomes reserved. You cann
 
 Concrete's borrowing system draws from Rust but simplifies it. References exist within lexical regions—scopes that bound their lifetime. You can have multiple immutable borrows or one mutable borrow. References can't escape their region.
 
-```concrete
+```
 borrow f as fref in R {
     // fref has type &[File, R]
     // f is unusable in this block
@@ -194,7 +194,7 @@ borrow f as fref in R {
 
 The key difference from Rust: no lifetime parameters in function signatures. Functions that accept references are generic over the region, but this genericity is implicit:
 
-```concrete
+```
 fn length<R>(file: &[File, R]) -> Uint {
     ...
 }
@@ -204,7 +204,7 @@ The function cannot store the reference because it has no way to name `R` outsid
 
 For single-expression borrows, the region is anonymous:
 
-```concrete
+```
 let len = length(&f)  // borrows f for just this call
 ```
 
@@ -227,7 +227,7 @@ Allocation deserves special attention because it's so often invisible. In most l
 
 Concrete treats allocation as a capability. Functions that may allocate declare `with(Alloc)`. The call site binds which allocator to use:
 
-```concrete
+```
 fn main!() {
     let arena = Arena.new()
     defer arena.deinit()
@@ -243,7 +243,7 @@ Allocator binding is lexically scoped. A nested binding may shadow an outer one.
 
 Stack allocation does not require the `Alloc` capability:
 
-```concrete
+```
 fn example() {
     let x: Int = 42                    // stack
     let arr: [100]Uint8 = zeroed()     // stack
@@ -256,7 +256,7 @@ This makes allocation-free code provably allocation-free.
 
 Concrete provides several allocator types out of the box:
 
-```concrete
+```
 // General-purpose heap allocator
 let gpa = GeneralPurposeAllocator.new()
 defer gpa.deinit()
@@ -276,7 +276,7 @@ All allocators implement a common `Allocator` trait with `alloc`, `free`, and `r
 
 Errors are values, not exceptions:
 
-```concrete
+```
 fn parse(input: String) -> Result<Config, ParseError> {
     ...
 }
@@ -299,7 +299,7 @@ There are no exceptions and no panic mechanism in the core language. If the runt
 
 Exhaustive pattern matching with linear type awareness:
 
-```concrete
+```
 fn describe(opt: Option<Int>) -> String {
     match opt {
         Some(n) => format("Got {}", n),
@@ -310,7 +310,7 @@ fn describe(opt: Option<Int>) -> String {
 
 Linear types in patterns must be consumed:
 
-```concrete
+```
 fn handle!(result: Result<Data, File>) {
     match result {
         Ok(data) => use_data(data),
@@ -321,7 +321,7 @@ fn handle!(result: Result<Data, File>) {
 
 Both branches consume their linear values. Borrowing in patterns is also supported:
 
-```concrete
+```
 fn peek(opt: &Option<Int>) -> Int {
     match opt {
         &Some(n) => n,
@@ -334,7 +334,7 @@ fn peek(opt: &Option<Int>) -> Int {
 
 Traits provide bounded polymorphism:
 
-```concrete
+```
 trait Ord {
     fn compare(&self, other: &Self) -> Ordering
 }
@@ -360,7 +360,7 @@ Trait methods may take the receiver as `&self`, `&mut self`, or `self`. If a tra
 
 Generic functions cannot accidentally become effectful depending on instantiation. Capabilities are checked before monomorphization and are invariant under instantiation:
 
-```concrete
+```
 fn map<T, U>(list: List<T>, f: fn(T) -> U) -> List<U> {
     ...
 }
@@ -368,7 +368,7 @@ fn map<T, U>(list: List<T>, f: fn(T) -> U) -> List<U> {
 
 This function is pure regardless of what `T` and `U` are. If `f` requires capabilities, that must be declared:
 
-```concrete
+```
 fn map_io<T, U>(list: List<T>, f: fn(T) with(IO) -> U) with(IO) -> List<U> {
     ...
 }
@@ -384,7 +384,7 @@ Type inference is **local only**:
 - Inside function bodies, local variable types may be inferred from their initializers
 - Type information flows in one direction (from annotations to inference, never backward)
 
-```concrete
+```
 fn process(data: List<Int>) with(Alloc) -> List<Int> {
     let doubled = map(data, fn(x) { x * 2 })  // type inferred
     let filtered = filter(doubled, fn(x) { x > 0 })  // type inferred
@@ -396,7 +396,7 @@ This keeps type errors local and makes signatures self-documenting. You can alwa
 
 ## Modules
 
-```concrete
+```
 module FileSystem
 
 public fn open(path: String) with(FileOpen) -> Result<File, IOError> {
@@ -418,7 +418,7 @@ Capabilities are part of a function's signature and therefore part of the public
 
 Imports support aliasing and selective imports:
 
-```concrete
+```
 import FileSystem
 import FileSystem.{open, read, write}
 import FileSystem as FS
@@ -428,7 +428,7 @@ import FileSystem as FS
 
 ### Primitives
 
-```concrete
+```
 Bool
 Int, Int8, Int16, Int32, Int64
 Uint, Uint8, Uint16, Uint32, Uint64
@@ -440,7 +440,7 @@ All primitive numeric types and `Bool` are `Copy`. `String` is linear.
 
 ### Algebraic Data Types
 
-```concrete
+```
 type Option<T> {
     Some(T),
     None
@@ -459,7 +459,7 @@ type List<T> {
 
 ### Records
 
-```concrete
+```
 type Point {
     x: Float64,
     y: Float64
@@ -468,7 +468,7 @@ type Point {
 
 A record is `Copy` only if explicitly marked and all fields are `Copy`:
 
-```concrete
+```
 type Copy Point {
     x: Float64,
     y: Float64
@@ -570,7 +570,7 @@ These are mechanical guarantees derived from the type system, which is itself pr
 
 ## Example: File Processing
 
-```concrete
+```
 module Main
 
 import FileSystem.{open, read, write}
