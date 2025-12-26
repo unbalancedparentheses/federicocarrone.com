@@ -1,6 +1,6 @@
 +++
 title = "The Death of the Inner Self"
-date = "2025-09-25"
+date = "2025-12-23"
 description = ""
 [taxonomies]
 keywords=["consciousness"]
