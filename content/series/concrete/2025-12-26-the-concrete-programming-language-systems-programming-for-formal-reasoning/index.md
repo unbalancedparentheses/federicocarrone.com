@@ -576,7 +576,7 @@ module Main
 import FileSystem.{open, read, write}
 import Parse.{parse_csv}
 
-fn process_file!(input_path: String, output_path: String) with(Alloc) -> Result<(), Error> {
+fn process_file(input_path: String, output_path: String) with(Std) -> Result<(), Error> {
     let in_file = open(input_path)?
     defer destroy(in_file)
     
