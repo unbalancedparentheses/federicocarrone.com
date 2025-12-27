@@ -453,7 +453,7 @@
 </span><span class="z-text z-plain">import FileSystem.{open, read, write}
 </span><span class="z-text z-plain">import Parse.{parse_csv}
 </span><span class="z-text z-plain">
-</span><span class="z-text z-plain">fn process_file!(input_path: String, output_path: String) with(Alloc) -&gt; Result&lt;(), Error&gt; {
+</span><span class="z-text z-plain">fn process_file(input_path: String, output_path: String) with(Std) -&gt; Result&lt;(), Error&gt; {
 </span><span class="z-text z-plain">    let in_file = open(input_path)?
 </span><span class="z-text z-plain">    defer destroy(in_file)
 </span><span class="z-text z-plain">    

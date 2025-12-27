@@ -1,10 +1,10 @@
-build-css:
-	lightningcss static/style/*.css --minify --output-dir static/style/min/
+.PHONY: build
 
-build-site:
+build:
 	zola build
 
-build: build-css build-site
+build-css:
+	lightningcss static/style/*.css --minify --output-dir static/style/min/
 
 watch:
 	zola serve && fg

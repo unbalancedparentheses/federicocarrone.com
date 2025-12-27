@@ -409,7 +409,7 @@
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;import FileSystem.{open, read, write}
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;import Parse.{parse_csv}
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn process_file!(input_path: String, output_path: String) with(Alloc) -&amp;gt; Result&amp;lt;(), Error&amp;gt; {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn process_file(input_path: String, output_path: String) with(Std) -&amp;gt; Result&amp;lt;(), Error&amp;gt; {
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let in_file = open(input_path)?
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer destroy(in_file)
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    
