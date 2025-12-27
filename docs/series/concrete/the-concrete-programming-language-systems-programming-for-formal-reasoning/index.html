@@ -49,7 +49,7 @@
       
   <div class="metadata">
     <time title="Published date" datetime="2025-12-26" property="datePublished">December 26, 2025</time>
-    <span title="Reading time" property="timeRequired" content="PT19M">19 minutes read</span>
+    <span title="Reading time" property="timeRequired" content="PT28M">28 minutes read</span>
     
       <span><a href="https://github.com/unbalancedparentheses/federicocarrone.com/edit/main/content/series&#x2F;concrete&#x2F;2025-12-26-the-concrete-programming-language-systems-programming-for-formal-reasoning&#x2F;index.md" title="Submit a patch for this page">Edit</a> this page</span>
       
@@ -719,6 +719,188 @@
 </span><span class="z-text z-plain"> 2 | fn dangerous(addr: Address[Int]) with(Unsafe) -&gt; Int
 </span><span class="z-text z-plain">   |                                  ++++++++++++
 </span></code></pre>
+<h2 id="references">References</h2>
+<h3 id="languages">Languages</h3>
+<ul>
+<li><a href="https://lean-lang.org/">Lean 4</a> — theorem prover and programming language</li>
+<li><a href="https://austral-lang.org/">Austral</a> — linear types and capabilities for systems programming
+<ul>
+<li><a href="https://austral-lang.org/spec/spec.html">Specification</a></li>
+</ul>
+</li>
+<li><a href="https://www.rust-lang.org/">Rust</a> — ownership, borrowing, traits</li>
+<li><a href="https://ziglang.org/">Zig</a> — explicit allocators, defer, no hidden control flow</li>
+<li><a href="https://www.roc-lang.org/">Roc</a> — pure functional, <code>!</code> for effects</li>
+<li><a href="https://koka-lang.github.io/koka/doc/index.html">Koka</a> — algebraic effects and handlers</li>
+<li><a href="https://www.eff-lang.org/">Eff</a> — algebraic effects research language</li>
+<li><a href="https://github.com/frank-lang/frank">Frank</a> — effects as calling conventions</li>
+<li><a href="https://clean.cs.ru.nl/">Clean</a> — uniqueness types, pure by default</li>
+<li><a href="http://www.ats-lang.org/">ATS</a> — linear types with theorem proving</li>
+<li><a href="https://cyclone.thelanguage.org/">Cyclone</a> — region-based memory for C</li>
+<li><a href="https://www.adacore.com/about-spark">Ada/SPARK</a> — formal verification in systems programming</li>
+</ul>
+<h3 id="verified-systems">Verified Systems</h3>
+<ul>
+<li><a href="https://compcert.org/">CompCert</a> — verified C compiler</li>
+<li><a href="https://sel4.systems/">seL4</a> — verified microkernel</li>
+<li><a href="https://flint.cs.yale.edu/certikos/">CertiKOS</a> — verified concurrent OS kernel</li>
+<li><a href="https://iris-project.org/">Iris</a> — higher-order concurrent separation logic</li>
+</ul>
+<h3 id="papers">Papers</h3>
+<ul>
+<li><a href="https://homepages.inf.ed.ac.uk/wadler/papers/linearlogic/linearlogic.pdf">Linear Logic</a> — Wadler's introduction</li>
+<li><a href="https://www.cs.cmu.edu/~fp/courses/15816-s12/misc/substructural.pdf">Substructural Type Systems</a> — Walker's survey</li>
+<li><a href="https://granule-project.github.io/papers/esop22-paper.pdf">Linearity and Uniqueness: An Entente Cordiale</a> — linear vs unique vs affine</li>
+<li><a href="https://www.cs.umd.edu/~mwh/papers/cyclone-safety.pdf">Cyclone: A Safe Dialect of C</a> — region-based memory</li>
+<li><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/08/algeff-tr-2016-v2.pdf">Algebraic Effects for Functional Programming</a> — Leijen's tutorial</li>
+<li><a href="https://srl.cs.jhu.edu/pubs/SRL2003-02.pdf">Capability Myths Demolished</a> — what capabilities actually provide</li>
+<li><a href="https://www.cs.cmu.edu/~crary/819-f09/Landin66.pdf">The Next 700 Programming Languages</a> — Landin's classic on language design</li>
+<li><a href="https://www.amazon.science/publications/using-lightweight-formal-methods-to-validate-a-key-value-storage-node-in-amazon-s3">Using Lightweight Formal Methods to Validate a Key-Value Storage Node</a> — practical verification at AWS</li>
+<li><a href="https://patpannuto.com/pubs/levy15ownership.pdf">Ownership is Theft: Experiences Building an Embedded OS in Rust</a> — Tock OS on ownership in practice</li>
+<li><a href="https://plv.mpi-sws.org/rustbelt/popl18/paper.pdf">RustBelt: Securing the Foundations of the Rust Programming Language</a> — formal verification of Rust's type system</li>
+<li><a href="https://plv.mpi-sws.org/rustbelt/stacked-borrows/paper.pdf">Stacked Borrows: An Aliasing Model for Rust</a> — Ralf Jung on Rust's aliasing rules</li>
+<li><a href="https://web.cecs.pdx.edu/~mpj/pubs/polyrec.pdf">A Polymorphic Type System for Extensible Records and Variants</a> — row polymorphism</li>
+<li><a href="https://www.tweag.io/blog/2017-03-13-linear-types/">Retrofitting Linear Types</a> — adding linear types to Haskell</li>
+</ul>
+<h3 id="blog-posts">Blog Posts</h3>
+<p><strong>Austral and Linear Types</strong></p>
+<ul>
+<li><a href="https://borretti.me/article/introducing-austral">Introducing Austral</a> — Fernando Borretti's rationale</li>
+<li><a href="https://borretti.me/article/how-australs-linear-type-checker-works">How Austral's Linear Type Checker Works</a> — implementation details</li>
+<li><a href="https://borretti.me/article/linear-types-and-capabilities">Linear Types and Capabilities</a> — how they compose</li>
+<li><a href="https://borretti.me/article/type-systems-memory-safety">Type Systems for Memory Safety</a> — survey of approaches</li>
+<li><a href="https://borretti.me/article/case-for-compiler-complexity">The Case for Compiler Complexity</a> — why simple isn't always better</li>
+<li><a href="https://homepages.inf.ed.ac.uk/wadler/topics/linear-logic.html">Linear types can change the world!</a> — Wadler's classic</li>
+</ul>
+<p><strong>Rust Ownership and Borrowing</strong></p>
+<ul>
+<li><a href="https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/">The Problem with Single-threaded Shared Mutability</a> — why Rust forbids it</li>
+<li><a href="https://limpet.net/mbrubeck/2019/02/07/rust-a-unique-perspective.html">Rust: A unique perspective</a> — ownership from first principles</li>
+<li><a href="https://rust-unofficial.github.io/too-many-lists/">Learn Rust With Entirely Too Many Linked Lists</a> — ownership through pain</li>
+<li><a href="https://doc.rust-lang.org/nomicon/">The Rustonomicon</a> — dark arts of unsafe Rust</li>
+<li><a href="https://www.ralfj.de/blog/">Ralf Jung's Blog</a> — Stacked Borrows, unsafe, formal semantics</li>
+<li><a href="https://stackoverflow.com/questions/28519997/what-are-rusts-exact-auto-dereferencing-rules">What are Rust's exact auto-dereferencing rules?</a> — surprisingly deep</li>
+<li><a href="https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html#non-lexical-lifetimes">Non-lexical lifetimes</a> — why Rust moved beyond lexical scopes</li>
+<li><a href="https://smallcultfollowing.com/babysteps/blog/2018/04/27/an-alias-based-formulation-of-the-borrow-checker/">Polonius: the future of the borrow checker</a> — Niko Matsakis</li>
+<li><a href="https://smallcultfollowing.com/babysteps/blog/2018/11/10/after-nll-moving-from-borrowed-data-and-the-sentinel-pattern/">After NLL: Moving from borrowed data and the sentinel pattern</a> — borrow checker limitations</li>
+<li><a href="https://docs.rs/dtolnay/latest/dtolnay/macro._02__reference_types.html">Accurate mental model for Rust's reference types</a> — dtolnay</li>
+<li><a href="https://dev.to/worldwidewebster/where-rusts-enum-shines-2cg6">Where Rust's Enum Shines</a> — ADTs in practice</li>
+</ul>
+<p><strong>Zig Design</strong></p>
+<ul>
+<li><a href="https://zig.news/kristoff/allocgate-finalizing-allocators-in-zig-3l99">Allocgate</a> — why Zig's allocator design changed</li>
+<li><a href="https://kristoff.it/blog/what-is-zigs-comptime/">What is Zig's Comptime</a> — compile-time execution</li>
+<li><a href="https://www.scattered-thoughts.net/writing/a-reply-to-zigs-creator-on-undefined-behavior/">A Reply to Zig's Creator on Undefined Behavior</a> — Jamie Brandon</li>
+<li><a href="https://zig.news/kristoff/zigs-io-and-you-2c28">Zig's I/O and You</a> — I/O design</li>
+<li><a href="https://zig.news/david_chisnall/zig-vs-c-35eo">Zig vs C++</a> — David Chisnall</li>
+<li><a href="https://ziglang.org/learn/why_zig_over_c_cpp/">Why Zig When There's Already C++, D, and Rust?</a> — official comparison</li>
+</ul>
+<p><strong>Effects and Capabilities</strong></p>
+<ul>
+<li><a href="https://overreacted.io/algebraic-effects-for-the-rest-of-us/">Algebraic Effects for the Rest of Us</a> — Dan Abramov's accessible introduction</li>
+<li><a href="https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/">What Color is Your Function?</a> — Bob Nystrom on why effect tracking matters</li>
+<li><a href="https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/">Structured Concurrency</a> — Nathaniel Smith on structured effects</li>
+<li><a href="https://www.eff-lang.org/learn/faq/">The Effect System FAQ</a> — from the Eff team</li>
+<li><a href="https://www.eff-lang.org/handlers-tutorial.pdf">An Introduction to Algebraic Effects and Handlers</a> — Matija Pretnar</li>
+<li><a href="https://koka-lang.github.io/koka/doc/book.html">Koka: Programming with Row-polymorphic Effect Types</a> — official book</li>
+<li><a href="https://www.microsoft.com/en-us/research/video/typed-continuations-and-the-origin-of-algebraic-effects/">Typed Continuations and the Origin of Algebraic Effects</a> — Daan Leijen</li>
+</ul>
+<p><strong>Roc and Purity</strong></p>
+<ul>
+<li><a href="https://www.roc-lang.org/design_goals.html">Roc Design Philosophy</a> — official goals</li>
+<li><a href="https://www.youtube.com/watch?v=cpQwtwVKAfU">Why Roc?</a> — Richard Feldman at Goto</li>
+<li><a href="https://www.youtube.com/watch?v=3n17wHe5wEw">Functional Programming for Pragmatists</a> — Richard Feldman</li>
+<li><a href="https://www.youtube.com/watch?v=vzfy4EKwG_Y">Outperforming Imperative with Pure Functional Languages</a> — Richard Feldman</li>
+</ul>
+<p><strong>Memory Management</strong></p>
+<ul>
+<li><a href="https://www.foonathan.net/2022/08/malloc-overview/">What's a Memory Allocator Anyway?</a> — Jonathan Müller</li>
+<li><a href="https://www.rfleury.com/p/untangling-lifetimes-the-arena-allocator">Untangling Lifetimes: The Arena Allocator</a> — Ryan Fleury</li>
+<li><a href="https://media.handmade-seattle.com/practical-data-oriented-design/">A Practical Guide to Applying Data-Oriented Design</a> — Andrew Kelley</li>
+<li><a href="https://www.gingerbill.org/series/memory-allocation-strategies/">Memory Allocation Strategies</a> — Bill Hall's series</li>
+<li><a href="https://slembcke.github.io/2020/10/12/CustomAllocators.html">Custom Allocators Demystified</a> — Scott Lembcke</li>
+<li><a href="https://fitzgeraldnick.com/2019/11/01/always-bump-downwards.html">Always Bump Downwards</a> — Nick Fitzgerald on bump allocators</li>
+<li><a href="https://www.foonathan.net/2022/08/malloc-interface/">malloc() and free() are a bad API</a> — Jonathan Müller</li>
+</ul>
+<p><strong>Formal Methods and Verification</strong></p>
+<ul>
+<li><a href="https://www.hillelwayne.com/post/theorem-prover-showdown/">Proofs About Programs</a> — Hillel Wayne comparing theorem provers</li>
+<li><a href="https://brooker.co.za/blog/2022/06/02/formal.html">Formal Methods Only Solve Half My Problems</a> — Marc Brooker at AWS</li>
+<li><a href="https://www.hillelwayne.com/post/using-tla-in-the-real-world/">Using TLA+ in the Real World</a> — Hillel Wayne</li>
+<li><a href="https://www.hillelwayne.com/post/learntla-v2/">TLA+ is More Teachable Than I Thought</a> — Hillel Wayne</li>
+<li><a href="https://cacm.acm.org/magazines/2015/4/184701-how-amazon-web-services-uses-formal-methods/fulltext">How AWS Uses Formal Methods</a> — Communications of the ACM</li>
+<li><a href="https://www.hillelwayne.com/post/where-the-bugs-are/">Where the Bugs Are</a> — where verification helps</li>
+<li><a href="https://sel4.systems/About/seL4-whitepaper.pdf">seL4: Formal Verification of an Operating-System Kernel</a> — white paper</li>
+<li><a href="https://web.stanford.edu/~engler/ASPLOS24-dave.pdf">Verification at Scale</a> — how to verify real systems</li>
+<li><a href="https://blog.brownplt.org/2024/01/04/compile-your-proofs.html">You Should Compile Your Proofs</a> — on proof engineering</li>
+</ul>
+<p><strong>Lean 4</strong></p>
+<ul>
+<li><a href="https://lean-lang.org/functional_programming_in_lean/">Functional Programming in Lean</a> — official book</li>
+<li><a href="https://lean-lang.org/theorem_proving_in_lean4/">Theorem Proving in Lean 4</a> — official book</li>
+<li><a href="https://github.com/leanprover-community/lean4-metaprogramming-book">Metaprogramming in Lean 4</a> — macros and tactics</li>
+<li><a href="https://lean-lang.org/papers/thesis-leo.pdf">The Lean Type System</a> — Leonardo de Moura's thesis</li>
+<li><a href="https://lean-lang.org/blog/">Lean 4 Release Notes</a> — official blog</li>
+</ul>
+<p><strong>Type Theory and PL Design</strong></p>
+<ul>
+<li><a href="https://cdsmith.wordpress.com/2011/01/09/an-old-article-i-wrote/">What to Know Before Debating Type Systems</a> — Chris Smith</li>
+<li><a href="https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/">Parse, Don't Validate</a> — Alexis King</li>
+<li><a href="https://alexis.kingmath.org/2018/08/05/no-ifs-ands-or-buts/">No Ifs, Ands, or Buts</a> — Alexis King on totality</li>
+<li><a href="https://lexi-lambda.github.io/blog/2020/11/01/names-are-not-type-safety/">Names Are Not Type Safety</a> — Alexis King</li>
+<li><a href="https://lexi-lambda.github.io/blog/2020/08/13/types-as-axioms-or-playing-with-fire/">Types as Axioms, or: Playing With Fire</a> — Alexis King</li>
+<li><a href="https://blog.ploeh.dk/2015/04/13/less-is-more-language-features/">Less is more: language features</a> — Mark Seemann on constraints</li>
+<li><a href="https://www.youtube.com/watch?v=GqmsQeSzMdw">Constraints Liberate, Liberties Constrain</a> — Runar Bjarnason</li>
+<li><a href="https://www.infoq.com/presentations/Simple-Made-Easy/">Simple Made Easy</a> — Rich Hickey</li>
+<li><a href="http://curtclifton.net/papers/MosessonClifton06.pdf">Out of the Tar Pit</a> — complexity and state</li>
+<li><a href="https://wiki.c2.com/?TheBipolarLispProgrammer">The Bipolar Lisp Programmer</a> — Mark Tarver on language design</li>
+</ul>
+<p><strong>Go's Decisions</strong></p>
+<ul>
+<li><a href="https://go.dev/talks/2012/splash.article">Go at Google: Language Design in the Service of Software Engineering</a> — Rob Pike</li>
+<li><a href="https://go.dev/blog/errors-are-values">Errors are values</a> — Rob Pike</li>
+<li><a href="https://go-proverbs.github.io/">Go Proverbs</a> — design philosophy</li>
+<li><a href="https://go.dev/blog/toward-go2">Toward Go 2</a> — Russ Cox on language evolution</li>
+<li><a href="https://www.youtube.com/watch?v=rFejpH_tAHM">Simplicity is Complicated</a> — Rob Pike</li>
+</ul>
+<p><strong>Clean and Uniqueness Types</strong></p>
+<ul>
+<li><a href="https://clean.cs.ru.nl/download/doc/CleanLangRep.3.0.pdf">Clean Language Report</a> — specification</li>
+<li><a href="https://www.mbsd.cs.ru.nl/publications/papers/2010/deVries-Plasmeijer-uniqueness-simplified.pdf">Uniqueness Typing Simplified</a> — how it works</li>
+</ul>
+<p><strong>Error Handling</strong></p>
+<ul>
+<li><a href="https://joeduffyblog.com/2016/02/07/the-error-model/">The Error Model</a> — Joe Duffy on Midori's approach</li>
+<li><a href="https://www.jonathanturner.org/2015/11/errors-and-exceptions.html">Errors and Exceptions</a> — Jonathan Turner</li>
+<li><a href="https://eiriktsarpalis.wordpress.com/2017/02/19/youre-using-httpclient-wrong/">From Exceptions to Error Values</a> — why exceptions fail</li>
+<li><a href="https://sled.rs/errors">Error Handling in a Correctness-Critical Rust Project</a> — sled database</li>
+</ul>
+<h3 id="talks">Talks</h3>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=0jI-AlWEwYI">Effects for Less</a> — Alexis King on effects (essential)</li>
+<li><a href="https://www.youtube.com/watch?v=Unq712gqu2U">The Road to Zig 1.0</a> — Andrew Kelley on Zig's design</li>
+<li><a href="https://www.youtube.com/watch?v=A3AdN7U24iU">Rust: A Language for the Next 40 Years</a> — Carol Nichols</li>
+<li><a href="https://www.youtube.com/watch?v=aKLntZcp27M">RustConf 2018: Closing Keynote</a> — Catherine West on ECS and ownership</li>
+<li><a href="https://www.youtube.com/watch?v=j6IKVbiPxgA">Outperforming Rust with Functional Programming</a> — Richard Feldman</li>
+<li><a href="https://www.youtube.com/watch?v=HgtRAbE1nBM">Is It Time to Rewrite the OS in Rust?</a> — Bryan Cantrill</li>
+<li><a href="https://www.youtube.com/watch?v=IOiZatlZtGU">Propositions as Types</a> — Philip Wadler</li>
+<li><a href="https://www.youtube.com/watch?v=wNa3MMbhwS4">Dependent Types in Haskell</a> — Stephanie Weirich</li>
+<li><a href="https://www.youtube.com/watch?v=nV3r1rB5_6E">Correctness by Construction</a> — Derek Dreyer on RustBelt</li>
+<li><a href="https://www.youtube.com/watch?v=WFtnJk3GGiU">What We Talk About When We Talk About Monads</a> — Bartosz Milewski</li>
+<li><a href="https://www.youtube.com/watch?v=7GcrT0SBSnI">Why Algebraic Effects Matter</a> — Daan Leijen</li>
+<li><a href="https://www.youtube.com/watch?v=t0mhvd3-60Y">Linear Types for Low-latency, High-throughput Systems</a> — Jean-Philippe Bernardy</li>
+<li><a href="https://www.youtube.com/watch?v=Sj3b8Sltx1s">seL4 and Formal Verification</a> — Gernot Heiser</li>
+</ul>
+<h3 id="books">Books</h3>
+<ul>
+<li><a href="https://www.cis.upenn.edu/~bcpierce/tapl/">Types and Programming Languages</a> — Pierce</li>
+<li><a href="https://www.cs.cmu.edu/~rwh/pfpl/">Practical Foundations for Programming Languages</a> — Harper</li>
+<li><a href="http://adam.chlipala.net/cpdt/">Certified Programming with Dependent Types</a> — Chlipala</li>
+<li><a href="https://softwarefoundations.cis.upenn.edu/">Software Foundations</a> — interactive Coq textbook</li>
+<li><a href="https://plfa.github.io/">Programming Language Foundations in Agda</a> — Wadler and Kokke</li>
+<li><a href="https://mitpress.mit.edu/9780262536431/the-little-typer/">The Little Typer</a> — Friedman and Christiansen</li>
+<li><a href="https://craftinginterpreters.com/">Crafting Interpreters</a> — Bob Nystrom</li>
+</ul>
 
 
     <nav class="previous-next-episodes"><div class="button button--disabled text-align-end">(coming soon)&nbsp;❯</div></nav>

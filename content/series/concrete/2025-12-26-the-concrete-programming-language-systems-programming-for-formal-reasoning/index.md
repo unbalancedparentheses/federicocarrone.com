@@ -934,3 +934,172 @@ error[E0501]: operation requires `Unsafe` capability
  2 | fn dangerous(addr: Address[Int]) with(Unsafe) -> Int
    |                                  ++++++++++++
 ```
+
+## References
+
+### Languages
+
+- [Lean 4](https://lean-lang.org/) — theorem prover and programming language
+- [Austral](https://austral-lang.org/) — linear types and capabilities for systems programming
+  - [Specification](https://austral-lang.org/spec/spec.html)
+- [Rust](https://www.rust-lang.org/) — ownership, borrowing, traits
+- [Zig](https://ziglang.org/) — explicit allocators, defer, no hidden control flow
+- [Roc](https://www.roc-lang.org/) — pure functional, `!` for effects
+- [Koka](https://koka-lang.github.io/koka/doc/index.html) — algebraic effects and handlers
+- [Eff](https://www.eff-lang.org/) — algebraic effects research language
+- [Frank](https://github.com/frank-lang/frank) — effects as calling conventions
+- [Clean](https://clean.cs.ru.nl/) — uniqueness types, pure by default
+- [ATS](http://www.ats-lang.org/) — linear types with theorem proving
+- [Cyclone](https://cyclone.thelanguage.org/) — region-based memory for C
+- [Ada/SPARK](https://www.adacore.com/about-spark) — formal verification in systems programming
+
+### Verified Systems
+
+- [CompCert](https://compcert.org/) — verified C compiler
+- [seL4](https://sel4.systems/) — verified microkernel
+- [CertiKOS](https://flint.cs.yale.edu/certikos/) — verified concurrent OS kernel
+- [Iris](https://iris-project.org/) — higher-order concurrent separation logic
+
+### Papers
+
+- [Linear Logic](https://homepages.inf.ed.ac.uk/wadler/papers/linearlogic/linearlogic.pdf) — Wadler's introduction
+- [Substructural Type Systems](https://www.cs.cmu.edu/~fp/courses/15816-s12/misc/substructural.pdf) — Walker's survey
+- [Linearity and Uniqueness: An Entente Cordiale](https://granule-project.github.io/papers/esop22-paper.pdf) — linear vs unique vs affine
+- [Cyclone: A Safe Dialect of C](https://www.cs.umd.edu/~mwh/papers/cyclone-safety.pdf) — region-based memory
+- [Algebraic Effects for Functional Programming](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/08/algeff-tr-2016-v2.pdf) — Leijen's tutorial
+- [Capability Myths Demolished](https://srl.cs.jhu.edu/pubs/SRL2003-02.pdf) — what capabilities actually provide
+- [The Next 700 Programming Languages](https://www.cs.cmu.edu/~crary/819-f09/Landin66.pdf) — Landin's classic on language design
+- [Using Lightweight Formal Methods to Validate a Key-Value Storage Node](https://www.amazon.science/publications/using-lightweight-formal-methods-to-validate-a-key-value-storage-node-in-amazon-s3) — practical verification at AWS
+- [Ownership is Theft: Experiences Building an Embedded OS in Rust](https://patpannuto.com/pubs/levy15ownership.pdf) — Tock OS on ownership in practice
+- [RustBelt: Securing the Foundations of the Rust Programming Language](https://plv.mpi-sws.org/rustbelt/popl18/paper.pdf) — formal verification of Rust's type system
+- [Stacked Borrows: An Aliasing Model for Rust](https://plv.mpi-sws.org/rustbelt/stacked-borrows/paper.pdf) — Ralf Jung on Rust's aliasing rules
+- [A Polymorphic Type System for Extensible Records and Variants](https://web.cecs.pdx.edu/~mpj/pubs/polyrec.pdf) — row polymorphism
+- [Retrofitting Linear Types](https://www.tweag.io/blog/2017-03-13-linear-types/) — adding linear types to Haskell
+
+### Blog Posts
+
+**Austral and Linear Types**
+- [Introducing Austral](https://borretti.me/article/introducing-austral) — Fernando Borretti's rationale
+- [How Austral's Linear Type Checker Works](https://borretti.me/article/how-australs-linear-type-checker-works) — implementation details
+- [Linear Types and Capabilities](https://borretti.me/article/linear-types-and-capabilities) — how they compose
+- [Type Systems for Memory Safety](https://borretti.me/article/type-systems-memory-safety) — survey of approaches
+- [The Case for Compiler Complexity](https://borretti.me/article/case-for-compiler-complexity) — why simple isn't always better
+- [Linear types can change the world!](https://homepages.inf.ed.ac.uk/wadler/topics/linear-logic.html) — Wadler's classic
+
+**Rust Ownership and Borrowing**
+- [The Problem with Single-threaded Shared Mutability](https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/) — why Rust forbids it
+- [Rust: A unique perspective](https://limpet.net/mbrubeck/2019/02/07/rust-a-unique-perspective.html) — ownership from first principles
+- [Learn Rust With Entirely Too Many Linked Lists](https://rust-unofficial.github.io/too-many-lists/) — ownership through pain
+- [The Rustonomicon](https://doc.rust-lang.org/nomicon/) — dark arts of unsafe Rust
+- [Ralf Jung's Blog](https://www.ralfj.de/blog/) — Stacked Borrows, unsafe, formal semantics
+- [What are Rust's exact auto-dereferencing rules?](https://stackoverflow.com/questions/28519997/what-are-rusts-exact-auto-dereferencing-rules) — surprisingly deep
+- [Non-lexical lifetimes](https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html#non-lexical-lifetimes) — why Rust moved beyond lexical scopes
+- [Polonius: the future of the borrow checker](https://smallcultfollowing.com/babysteps/blog/2018/04/27/an-alias-based-formulation-of-the-borrow-checker/) — Niko Matsakis
+- [After NLL: Moving from borrowed data and the sentinel pattern](https://smallcultfollowing.com/babysteps/blog/2018/11/10/after-nll-moving-from-borrowed-data-and-the-sentinel-pattern/) — borrow checker limitations
+- [Accurate mental model for Rust's reference types](https://docs.rs/dtolnay/latest/dtolnay/macro._02__reference_types.html) — dtolnay
+- [Where Rust's Enum Shines](https://dev.to/worldwidewebster/where-rusts-enum-shines-2cg6) — ADTs in practice
+
+**Zig Design**
+- [Allocgate](https://zig.news/kristoff/allocgate-finalizing-allocators-in-zig-3l99) — why Zig's allocator design changed
+- [What is Zig's Comptime](https://kristoff.it/blog/what-is-zigs-comptime/) — compile-time execution
+- [A Reply to Zig's Creator on Undefined Behavior](https://www.scattered-thoughts.net/writing/a-reply-to-zigs-creator-on-undefined-behavior/) — Jamie Brandon
+- [Zig's I/O and You](https://zig.news/kristoff/zigs-io-and-you-2c28) — I/O design
+- [Zig vs C++](https://zig.news/david_chisnall/zig-vs-c-35eo) — David Chisnall
+- [Why Zig When There's Already C++, D, and Rust?](https://ziglang.org/learn/why_zig_over_c_cpp/) — official comparison
+
+**Effects and Capabilities**
+- [Algebraic Effects for the Rest of Us](https://overreacted.io/algebraic-effects-for-the-rest-of-us/) — Dan Abramov's accessible introduction
+- [What Color is Your Function?](https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/) — Bob Nystrom on why effect tracking matters
+- [Structured Concurrency](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/) — Nathaniel Smith on structured effects
+- [The Effect System FAQ](https://www.eff-lang.org/learn/faq/) — from the Eff team
+- [An Introduction to Algebraic Effects and Handlers](https://www.eff-lang.org/handlers-tutorial.pdf) — Matija Pretnar
+- [Koka: Programming with Row-polymorphic Effect Types](https://koka-lang.github.io/koka/doc/book.html) — official book
+- [Typed Continuations and the Origin of Algebraic Effects](https://www.microsoft.com/en-us/research/video/typed-continuations-and-the-origin-of-algebraic-effects/) — Daan Leijen
+
+**Roc and Purity**
+- [Roc Design Philosophy](https://www.roc-lang.org/design_goals.html) — official goals
+- [Why Roc?](https://www.youtube.com/watch?v=cpQwtwVKAfU) — Richard Feldman at Goto
+- [Functional Programming for Pragmatists](https://www.youtube.com/watch?v=3n17wHe5wEw) — Richard Feldman
+- [Outperforming Imperative with Pure Functional Languages](https://www.youtube.com/watch?v=vzfy4EKwG_Y) — Richard Feldman
+
+**Memory Management**
+- [What's a Memory Allocator Anyway?](https://www.foonathan.net/2022/08/malloc-overview/) — Jonathan Müller
+- [Untangling Lifetimes: The Arena Allocator](https://www.rfleury.com/p/untangling-lifetimes-the-arena-allocator) — Ryan Fleury
+- [A Practical Guide to Applying Data-Oriented Design](https://media.handmade-seattle.com/practical-data-oriented-design/) — Andrew Kelley
+- [Memory Allocation Strategies](https://www.gingerbill.org/series/memory-allocation-strategies/) — Bill Hall's series
+- [Custom Allocators Demystified](https://slembcke.github.io/2020/10/12/CustomAllocators.html) — Scott Lembcke
+- [Always Bump Downwards](https://fitzgeraldnick.com/2019/11/01/always-bump-downwards.html) — Nick Fitzgerald on bump allocators
+- [malloc() and free() are a bad API](https://www.foonathan.net/2022/08/malloc-interface/) — Jonathan Müller
+
+**Formal Methods and Verification**
+- [Proofs About Programs](https://www.hillelwayne.com/post/theorem-prover-showdown/) — Hillel Wayne comparing theorem provers
+- [Formal Methods Only Solve Half My Problems](https://brooker.co.za/blog/2022/06/02/formal.html) — Marc Brooker at AWS
+- [Using TLA+ in the Real World](https://www.hillelwayne.com/post/using-tla-in-the-real-world/) — Hillel Wayne
+- [TLA+ is More Teachable Than I Thought](https://www.hillelwayne.com/post/learntla-v2/) — Hillel Wayne
+- [How AWS Uses Formal Methods](https://cacm.acm.org/magazines/2015/4/184701-how-amazon-web-services-uses-formal-methods/fulltext) — Communications of the ACM
+- [Where the Bugs Are](https://www.hillelwayne.com/post/where-the-bugs-are/) — where verification helps
+- [seL4: Formal Verification of an Operating-System Kernel](https://sel4.systems/About/seL4-whitepaper.pdf) — white paper
+- [Verification at Scale](https://web.stanford.edu/~engler/ASPLOS24-dave.pdf) — how to verify real systems
+- [You Should Compile Your Proofs](https://blog.brownplt.org/2024/01/04/compile-your-proofs.html) — on proof engineering
+
+**Lean 4**
+- [Functional Programming in Lean](https://lean-lang.org/functional_programming_in_lean/) — official book
+- [Theorem Proving in Lean 4](https://lean-lang.org/theorem_proving_in_lean4/) — official book
+- [Metaprogramming in Lean 4](https://github.com/leanprover-community/lean4-metaprogramming-book) — macros and tactics
+- [The Lean Type System](https://lean-lang.org/papers/thesis-leo.pdf) — Leonardo de Moura's thesis
+- [Lean 4 Release Notes](https://lean-lang.org/blog/) — official blog
+
+**Type Theory and PL Design**
+- [What to Know Before Debating Type Systems](https://cdsmith.wordpress.com/2011/01/09/an-old-article-i-wrote/) — Chris Smith
+- [Parse, Don't Validate](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/) — Alexis King
+- [No Ifs, Ands, or Buts](https://alexis.kingmath.org/2018/08/05/no-ifs-ands-or-buts/) — Alexis King on totality
+- [Names Are Not Type Safety](https://lexi-lambda.github.io/blog/2020/11/01/names-are-not-type-safety/) — Alexis King
+- [Types as Axioms, or: Playing With Fire](https://lexi-lambda.github.io/blog/2020/08/13/types-as-axioms-or-playing-with-fire/) — Alexis King
+- [Less is more: language features](https://blog.ploeh.dk/2015/04/13/less-is-more-language-features/) — Mark Seemann on constraints
+- [Constraints Liberate, Liberties Constrain](https://www.youtube.com/watch?v=GqmsQeSzMdw) — Runar Bjarnason
+- [Simple Made Easy](https://www.infoq.com/presentations/Simple-Made-Easy/) — Rich Hickey
+- [Out of the Tar Pit](http://curtclifton.net/papers/MosessonClifton06.pdf) — complexity and state
+- [The Bipolar Lisp Programmer](https://wiki.c2.com/?TheBipolarLispProgrammer) — Mark Tarver on language design
+
+**Go's Decisions**
+- [Go at Google: Language Design in the Service of Software Engineering](https://go.dev/talks/2012/splash.article) — Rob Pike
+- [Errors are values](https://go.dev/blog/errors-are-values) — Rob Pike
+- [Go Proverbs](https://go-proverbs.github.io/) — design philosophy
+- [Toward Go 2](https://go.dev/blog/toward-go2) — Russ Cox on language evolution
+- [Simplicity is Complicated](https://www.youtube.com/watch?v=rFejpH_tAHM) — Rob Pike
+
+**Clean and Uniqueness Types**
+- [Clean Language Report](https://clean.cs.ru.nl/download/doc/CleanLangRep.3.0.pdf) — specification
+- [Uniqueness Typing Simplified](https://www.mbsd.cs.ru.nl/publications/papers/2010/deVries-Plasmeijer-uniqueness-simplified.pdf) — how it works
+
+**Error Handling**
+- [The Error Model](https://joeduffyblog.com/2016/02/07/the-error-model/) — Joe Duffy on Midori's approach
+- [Errors and Exceptions](https://www.jonathanturner.org/2015/11/errors-and-exceptions.html) — Jonathan Turner
+- [From Exceptions to Error Values](https://eiriktsarpalis.wordpress.com/2017/02/19/youre-using-httpclient-wrong/) — why exceptions fail
+- [Error Handling in a Correctness-Critical Rust Project](https://sled.rs/errors) — sled database
+
+### Talks
+
+- [Effects for Less](https://www.youtube.com/watch?v=0jI-AlWEwYI) — Alexis King on effects (essential)
+- [The Road to Zig 1.0](https://www.youtube.com/watch?v=Unq712gqu2U) — Andrew Kelley on Zig's design
+- [Rust: A Language for the Next 40 Years](https://www.youtube.com/watch?v=A3AdN7U24iU) — Carol Nichols
+- [RustConf 2018: Closing Keynote](https://www.youtube.com/watch?v=aKLntZcp27M) — Catherine West on ECS and ownership
+- [Outperforming Rust with Functional Programming](https://www.youtube.com/watch?v=j6IKVbiPxgA) — Richard Feldman
+- [Is It Time to Rewrite the OS in Rust?](https://www.youtube.com/watch?v=HgtRAbE1nBM) — Bryan Cantrill
+- [Propositions as Types](https://www.youtube.com/watch?v=IOiZatlZtGU) — Philip Wadler
+- [Dependent Types in Haskell](https://www.youtube.com/watch?v=wNa3MMbhwS4) — Stephanie Weirich
+- [Correctness by Construction](https://www.youtube.com/watch?v=nV3r1rB5_6E) — Derek Dreyer on RustBelt
+- [What We Talk About When We Talk About Monads](https://www.youtube.com/watch?v=WFtnJk3GGiU) — Bartosz Milewski
+- [Why Algebraic Effects Matter](https://www.youtube.com/watch?v=7GcrT0SBSnI) — Daan Leijen
+- [Linear Types for Low-latency, High-throughput Systems](https://www.youtube.com/watch?v=t0mhvd3-60Y) — Jean-Philippe Bernardy
+- [seL4 and Formal Verification](https://www.youtube.com/watch?v=Sj3b8Sltx1s) — Gernot Heiser
+
+### Books
+
+- [Types and Programming Languages](https://www.cis.upenn.edu/~bcpierce/tapl/) — Pierce
+- [Practical Foundations for Programming Languages](https://www.cs.cmu.edu/~rwh/pfpl/) — Harper
+- [Certified Programming with Dependent Types](http://adam.chlipala.net/cpdt/) — Chlipala
+- [Software Foundations](https://softwarefoundations.cis.upenn.edu/) — interactive Coq textbook
+- [Programming Language Foundations in Agda](https://plfa.github.io/) — Wadler and Kokke
+- [The Little Typer](https://mitpress.mit.edu/9780262536431/the-little-typer/) — Friedman and Christiansen
+- [Crafting Interpreters](https://craftinginterpreters.com/) — Bob Nystrom
