@@ -67,7 +67,7 @@
 <p>The specification and the formalization will co-evolve. As we prove properties in Lean, we'll update this document. As we write this document, we'll discover what needs proving. The goal is convergence: eventually, this specification will be a human-readable projection of a machine-checked artifact.</p>
 <h2 id="the-core-idea">The Core Idea</h2>
 <p>Most languages treat verification as something bolted on after the fact. You write code, then maybe you write tests, maybe you run a linter, maybe you bring in a theorem prover for critical sections. The language itself remains agnostic about provability.</p>
-<p>Concrete inverts this relationship. The language is <em>designed around</em> a verified core, a small kernel calculus formalized in Lean with mechanically-checked proofs of progress, preservation, linearity soundness, and effect soundness. The surface language exists only to elaborate into this kernel.</p>
+<p>Concrete inverts this relationship. The language is <em>designed around</em> a verified core, a small kernel calculus formalized in Lean 4 with mechanically-checked proofs of progress, preservation, linearity soundness, and effect soundness. The surface language exists only to elaborate into this kernel.</p>
 <h3 id="what-correct-means">What "Correct" Means</h3>
 <p>When we say a type-checked program is "correct by construction," we mean correct with respect to specific properties:</p>
 <ul>
@@ -142,7 +142,8 @@
 </ul>
 <p>These avoid floating-point representation errors in financial systems and cryptographic applications.</p>
 <h2 id="linearity-and-copy">Linearity and Copy</h2>
-<p>All values in Concrete are linear by default. A linear value must be consumed exactly once, not zero times (that's a leak), not twice (that's a double-free). Consumption happens when you pass the value to a function that takes ownership, return it, destructure it via pattern matching, or explicitly call <code>destroy(x)</code>.</p>
+<p>All values in Concrete are linear by default. A linear value must be consumed exactly once, not zero times (that's a leak), not twice (that's a double-free). This is closer to Austral's strict linearity than Rust's affine types, which allow values to be dropped without explicit consumption.</p>
+<p>Consumption happens when you pass the value to a function that takes ownership, return it, destructure it via pattern matching, or explicitly call <code>destroy(x)</code>.</p>
 <pre class="z-code"><code><span class="z-text z-plain">fn example!() {
 </span><span class="z-text z-plain">    let f = open(&quot;data.txt&quot;)
 </span><span class="z-text z-plain">    defer destroy(f)
@@ -178,7 +179,7 @@
 </span></code></pre>
 <p>The destructor takes ownership of <code>self</code>, may require capabilities, and runs exactly once when explicitly invoked. <code>destroy(x)</code> is only valid if the type defines a destructor. A type without a destructor must be consumed by moving, returning, or destructuring.</p>
 <h3 id="defer">Defer</h3>
-<p>The <code>defer</code> statement schedules cleanup at scope exit:</p>
+<p>The <code>defer</code> statement schedules cleanup at scope exit, borrowed directly from Zig and Go:</p>
 <pre class="z-code"><code><span class="z-text z-plain">fn process_files!() {
 </span><span class="z-text z-plain">    let f1 = open(&quot;a.txt&quot;)
 </span><span class="z-text z-plain">    defer destroy(f1)
@@ -194,16 +195,16 @@
 <p>Multiple <code>defer</code> statements execute in reverse order (LIFO). <code>defer</code> runs at scope exit including early returns and error propagation.</p>
 <p>When a value is scheduled with <code>defer destroy(x)</code>, it becomes reserved. You cannot move it, destroy it again, or create borrows that overlap the deferred destruction point.</p>
 <h3 id="abort">Abort</h3>
-<p>Abort is immediate process termination, outside normal control flow:</p>
+<p>Abort is immediate process termination, outside normal control flow. Following Zig's model:</p>
 <ul>
 <li>Out-of-memory conditions trigger abort</li>
 <li>Stack overflow triggers abort</li>
 <li>Explicit <code>abort()</code> terminates immediately</li>
 <li><strong>Deferred cleanup does not run on abort</strong></li>
 </ul>
-<p>This matches Zig's behavior: <code>defer</code> is for normal control flow, not catastrophic failure. Abort is outside language semantics. The process stops. There are no guarantees about state after abort begins.</p>
+<p><code>defer</code> is for normal control flow, not catastrophic failure. Abort is outside language semantics. The process stops. There are no guarantees about state after abort begins.</p>
 <h2 id="borrowing">Borrowing</h2>
-<p>References let you use values without consuming them. References exist within lexical regions that bound their lifetime.</p>
+<p>References let you use values without consuming them. Concrete's borrowing model draws from Rust but simplifies it: references exist within lexical regions that bound their lifetime, with no lifetime parameters in function signatures.</p>
 <pre class="z-code"><code><span class="z-text z-plain">borrow f as fref in R {
 </span><span class="z-text z-plain">    // fref has type &amp;[File, R]
 </span><span class="z-text z-plain">    // f is unusable in this block
@@ -211,7 +212,7 @@
 </span><span class="z-text z-plain">}
 </span><span class="z-text z-plain">// f is usable again
 </span></code></pre>
-<p>Unlike Rust, no lifetime parameters in function signatures. Functions that accept references are generic over the region, but implicitly:</p>
+<p>Functions that accept references are generic over the region, but implicitly:</p>
 <pre class="z-code"><code><span class="z-text z-plain">fn length&lt;R&gt;(file: &amp;[File, R]) -&gt; Uint {
 </span><span class="z-text z-plain">    ...
 </span><span class="z-text z-plain">}
@@ -231,7 +232,7 @@
 </ol>
 <p>Closures cannot capture references if the closure escapes the borrow region.</p>
 <h2 id="capabilities">Capabilities</h2>
-<p>Concrete is <strong>pure by default</strong>. A function without capability annotations cannot perform IO, cannot allocate, cannot mutate external state. It computes a result from its inputs, nothing more.</p>
+<p>Concrete is <strong>pure by default</strong>, following Austral's approach to effect tracking. A function without capability annotations cannot perform IO, cannot allocate, cannot mutate external state. It computes a result from its inputs, nothing more.</p>
 <p>Purity means no side effects and no heap allocation. Stack allocation and compile-time constants are permitted. Non-termination is possible; purity does not imply totality.</p>
 <p>When a function needs effects, it declares them:</p>
 <pre class="z-code"><code><span class="z-text z-plain">fn read_file(path: String) with(File) -&gt; String {
@@ -261,7 +262,7 @@
 <p>Each capability set must be concrete. This means generic combinators must be duplicated per capability set. Capability polymorphism is future work; the theory is well-understood (effect polymorphism in Koka, Eff, Frank), but adds complexity to the type system and the Lean formalization.</p>
 <h2 id="allocation">Allocation</h2>
 <p>Allocation deserves special attention because it's often invisible. In most languages, many operations allocate behind your back: string concatenation, collection growth, closure creation.</p>
-<p>Concrete treats allocation as a capability. Functions that allocate declare <code>with(Alloc)</code>. The call site binds which allocator:</p>
+<p>Concrete treats allocation as a capability, with explicit allocator passing inspired by Zig. Functions that allocate declare <code>with(Alloc)</code>. The call site binds which allocator:</p>
 <pre class="z-code"><code><span class="z-text z-plain">fn main!() {
 </span><span class="z-text z-plain">    let arena = Arena.new()
 </span><span class="z-text z-plain">    defer arena.deinit()
@@ -293,7 +294,7 @@
 </span></code></pre>
 <p>All allocators implement a common <code>Allocator</code> trait.</p>
 <h2 id="error-handling">Error Handling</h2>
-<p>Errors are values:</p>
+<p>Errors are values, using <code>Result&lt;T, E&gt;</code> like Rust and the <code>?</code> operator for propagation:</p>
 <pre class="z-code"><code><span class="z-text z-plain">fn parse(input: String) -&gt; Result&lt;Config, ParseError&gt; {
 </span><span class="z-text z-plain">    ...
 </span><span class="z-text z-plain">}
@@ -347,6 +348,7 @@
 </span><span class="z-text z-plain">}
 </span></code></pre>
 <h2 id="traits">Traits</h2>
+<p>Traits provide bounded polymorphism, similar to Rust's trait system:</p>
 <pre class="z-code"><code><span class="z-text z-plain">trait Ord {
 </span><span class="z-text z-plain">    fn compare(&amp;self, other: &amp;Self) -&gt; Ordering
 </span><span class="z-text z-plain">}
