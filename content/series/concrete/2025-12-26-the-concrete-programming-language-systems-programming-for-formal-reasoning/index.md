@@ -26,7 +26,7 @@ The specification and the formalization will co-evolve. As we prove properties i
 
 Most languages treat verification as something bolted on after the fact. You write code, then maybe you write tests, maybe you run a linter, maybe you bring in a theorem prover for critical sections. The language itself remains agnostic about provability.
 
-Concrete inverts this relationship. The language is *designed around* a verified core, a small kernel calculus formalized in Lean with mechanically-checked proofs of progress, preservation, linearity soundness, and effect soundness. The surface language exists only to elaborate into this kernel.
+Concrete inverts this relationship. The language is *designed around* a verified core, a small kernel calculus formalized in Lean 4 with mechanically-checked proofs of progress, preservation, linearity soundness, and effect soundness. The surface language exists only to elaborate into this kernel.
 
 ### What "Correct" Means
 
@@ -123,7 +123,9 @@ These avoid floating-point representation errors in financial systems and crypto
 
 ## Linearity and Copy
 
-All values in Concrete are linear by default. A linear value must be consumed exactly once, not zero times (that's a leak), not twice (that's a double-free). Consumption happens when you pass the value to a function that takes ownership, return it, destructure it via pattern matching, or explicitly call `destroy(x)`.
+All values in Concrete are linear by default. A linear value must be consumed exactly once, not zero times (that's a leak), not twice (that's a double-free). This is closer to Austral's strict linearity than Rust's affine types, which allow values to be dropped without explicit consumption.
+
+Consumption happens when you pass the value to a function that takes ownership, return it, destructure it via pattern matching, or explicitly call `destroy(x)`.
 
 ```
 fn example!() {
@@ -174,7 +176,7 @@ The destructor takes ownership of `self`, may require capabilities, and runs exa
 
 ### Defer
 
-The `defer` statement schedules cleanup at scope exit:
+The `defer` statement schedules cleanup at scope exit, borrowed directly from Zig and Go:
 
 ```
 fn process_files!() {
@@ -196,18 +198,18 @@ When a value is scheduled with `defer destroy(x)`, it becomes reserved. You cann
 
 ### Abort
 
-Abort is immediate process termination, outside normal control flow:
+Abort is immediate process termination, outside normal control flow. Following Zig's model:
 
 - Out-of-memory conditions trigger abort
 - Stack overflow triggers abort  
 - Explicit `abort()` terminates immediately
 - **Deferred cleanup does not run on abort**
 
-This matches Zig's behavior: `defer` is for normal control flow, not catastrophic failure. Abort is outside language semantics. The process stops. There are no guarantees about state after abort begins.
+`defer` is for normal control flow, not catastrophic failure. Abort is outside language semantics. The process stops. There are no guarantees about state after abort begins.
 
 ## Borrowing
 
-References let you use values without consuming them. References exist within lexical regions that bound their lifetime.
+References let you use values without consuming them. Concrete's borrowing model draws from Rust but simplifies it: references exist within lexical regions that bound their lifetime, with no lifetime parameters in function signatures.
 
 ```
 borrow f as fref in R {
@@ -218,7 +220,7 @@ borrow f as fref in R {
 // f is usable again
 ```
 
-Unlike Rust, no lifetime parameters in function signatures. Functions that accept references are generic over the region, but implicitly:
+Functions that accept references are generic over the region, but implicitly:
 
 ```
 fn length<R>(file: &[File, R]) -> Uint {
@@ -247,7 +249,7 @@ Closures cannot capture references if the closure escapes the borrow region.
 
 ## Capabilities
 
-Concrete is **pure by default**. A function without capability annotations cannot perform IO, cannot allocate, cannot mutate external state. It computes a result from its inputs, nothing more.
+Concrete is **pure by default**, following Austral's approach to effect tracking. A function without capability annotations cannot perform IO, cannot allocate, cannot mutate external state. It computes a result from its inputs, nothing more.
 
 Purity means no side effects and no heap allocation. Stack allocation and compile-time constants are permitted. Non-termination is possible; purity does not imply totality.
 
@@ -298,7 +300,7 @@ Each capability set must be concrete. This means generic combinators must be dup
 
 Allocation deserves special attention because it's often invisible. In most languages, many operations allocate behind your back: string concatenation, collection growth, closure creation.
 
-Concrete treats allocation as a capability. Functions that allocate declare `with(Alloc)`. The call site binds which allocator:
+Concrete treats allocation as a capability, with explicit allocator passing inspired by Zig. Functions that allocate declare `with(Alloc)`. The call site binds which allocator:
 
 ```
 fn main!() {
@@ -343,7 +345,7 @@ All allocators implement a common `Allocator` trait.
 
 ## Error Handling
 
-Errors are values:
+Errors are values, using `Result<T, E>` like Rust and the `?` operator for propagation:
 
 ```
 fn parse(input: String) -> Result<Config, ParseError> {
@@ -424,6 +426,8 @@ fn peek(opt: &Option<Int>) -> Int {
 ```
 
 ## Traits
+
+Traits provide bounded polymorphism, similar to Rust's trait system:
 
 ```
 trait Ord {

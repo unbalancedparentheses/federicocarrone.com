@@ -31,7 +31,7 @@
 &lt;p&gt;The specification and the formalization will co-evolve. As we prove properties in Lean, we&#x27;ll update this document. As we write this document, we&#x27;ll discover what needs proving. The goal is convergence: eventually, this specification will be a human-readable projection of a machine-checked artifact.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;the-core-idea&quot;&gt;The Core Idea&lt;&#x2F;h2&gt;
 &lt;p&gt;Most languages treat verification as something bolted on after the fact. You write code, then maybe you write tests, maybe you run a linter, maybe you bring in a theorem prover for critical sections. The language itself remains agnostic about provability.&lt;&#x2F;p&gt;
-&lt;p&gt;Concrete inverts this relationship. The language is &lt;em&gt;designed around&lt;&#x2F;em&gt; a verified core, a small kernel calculus formalized in Lean with mechanically-checked proofs of progress, preservation, linearity soundness, and effect soundness. The surface language exists only to elaborate into this kernel.&lt;&#x2F;p&gt;
+&lt;p&gt;Concrete inverts this relationship. The language is &lt;em&gt;designed around&lt;&#x2F;em&gt; a verified core, a small kernel calculus formalized in Lean 4 with mechanically-checked proofs of progress, preservation, linearity soundness, and effect soundness. The surface language exists only to elaborate into this kernel.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;what-correct-means&quot;&gt;What &quot;Correct&quot; Means&lt;&#x2F;h3&gt;
 &lt;p&gt;When we say a type-checked program is &quot;correct by construction,&quot; we mean correct with respect to specific properties:&lt;&#x2F;p&gt;
 &lt;ul&gt;
@@ -106,7 +106,8 @@
 &lt;&#x2F;ul&gt;
 &lt;p&gt;These avoid floating-point representation errors in financial systems and cryptographic applications.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;linearity-and-copy&quot;&gt;Linearity and Copy&lt;&#x2F;h2&gt;
-&lt;p&gt;All values in Concrete are linear by default. A linear value must be consumed exactly once, not zero times (that&#x27;s a leak), not twice (that&#x27;s a double-free). Consumption happens when you pass the value to a function that takes ownership, return it, destructure it via pattern matching, or explicitly call &lt;code&gt;destroy(x)&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;All values in Concrete are linear by default. A linear value must be consumed exactly once, not zero times (that&#x27;s a leak), not twice (that&#x27;s a double-free). This is closer to Austral&#x27;s strict linearity than Rust&#x27;s affine types, which allow values to be dropped without explicit consumption.&lt;&#x2F;p&gt;
+&lt;p&gt;Consumption happens when you pass the value to a function that takes ownership, return it, destructure it via pattern matching, or explicitly call &lt;code&gt;destroy(x)&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn example!() {
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let f = open(&amp;quot;data.txt&amp;quot;)
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer destroy(f)
@@ -142,7 +143,7 @@
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;The destructor takes ownership of &lt;code&gt;self&lt;&#x2F;code&gt;, may require capabilities, and runs exactly once when explicitly invoked. &lt;code&gt;destroy(x)&lt;&#x2F;code&gt; is only valid if the type defines a destructor. A type without a destructor must be consumed by moving, returning, or destructuring.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;defer&quot;&gt;Defer&lt;&#x2F;h3&gt;
-&lt;p&gt;The &lt;code&gt;defer&lt;&#x2F;code&gt; statement schedules cleanup at scope exit:&lt;&#x2F;p&gt;
+&lt;p&gt;The &lt;code&gt;defer&lt;&#x2F;code&gt; statement schedules cleanup at scope exit, borrowed directly from Zig and Go:&lt;&#x2F;p&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn process_files!() {
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let f1 = open(&amp;quot;a.txt&amp;quot;)
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer destroy(f1)
@@ -158,16 +159,16 @@
 &lt;p&gt;Multiple &lt;code&gt;defer&lt;&#x2F;code&gt; statements execute in reverse order (LIFO). &lt;code&gt;defer&lt;&#x2F;code&gt; runs at scope exit including early returns and error propagation.&lt;&#x2F;p&gt;
 &lt;p&gt;When a value is scheduled with &lt;code&gt;defer destroy(x)&lt;&#x2F;code&gt;, it becomes reserved. You cannot move it, destroy it again, or create borrows that overlap the deferred destruction point.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;abort&quot;&gt;Abort&lt;&#x2F;h3&gt;
-&lt;p&gt;Abort is immediate process termination, outside normal control flow:&lt;&#x2F;p&gt;
+&lt;p&gt;Abort is immediate process termination, outside normal control flow. Following Zig&#x27;s model:&lt;&#x2F;p&gt;
 &lt;ul&gt;
 &lt;li&gt;Out-of-memory conditions trigger abort&lt;&#x2F;li&gt;
 &lt;li&gt;Stack overflow triggers abort&lt;&#x2F;li&gt;
 &lt;li&gt;Explicit &lt;code&gt;abort()&lt;&#x2F;code&gt; terminates immediately&lt;&#x2F;li&gt;
 &lt;li&gt;&lt;strong&gt;Deferred cleanup does not run on abort&lt;&#x2F;strong&gt;&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
-&lt;p&gt;This matches Zig&#x27;s behavior: &lt;code&gt;defer&lt;&#x2F;code&gt; is for normal control flow, not catastrophic failure. Abort is outside language semantics. The process stops. There are no guarantees about state after abort begins.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;code&gt;defer&lt;&#x2F;code&gt; is for normal control flow, not catastrophic failure. Abort is outside language semantics. The process stops. There are no guarantees about state after abort begins.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;borrowing&quot;&gt;Borrowing&lt;&#x2F;h2&gt;
-&lt;p&gt;References let you use values without consuming them. References exist within lexical regions that bound their lifetime.&lt;&#x2F;p&gt;
+&lt;p&gt;References let you use values without consuming them. Concrete&#x27;s borrowing model draws from Rust but simplifies it: references exist within lexical regions that bound their lifetime, with no lifetime parameters in function signatures.&lt;&#x2F;p&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;borrow f as fref in R {
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; fref has type &amp;amp;[File, R]
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; f is unusable in this block
@@ -175,7 +176,7 @@
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;&#x2F;&#x2F; f is usable again
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Unlike Rust, no lifetime parameters in function signatures. Functions that accept references are generic over the region, but implicitly:&lt;&#x2F;p&gt;
+&lt;p&gt;Functions that accept references are generic over the region, but implicitly:&lt;&#x2F;p&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn length&amp;lt;R&amp;gt;(file: &amp;amp;[File, R]) -&amp;gt; Uint {
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
@@ -195,7 +196,7 @@
 &lt;&#x2F;ol&gt;
 &lt;p&gt;Closures cannot capture references if the closure escapes the borrow region.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;capabilities&quot;&gt;Capabilities&lt;&#x2F;h2&gt;
-&lt;p&gt;Concrete is &lt;strong&gt;pure by default&lt;&#x2F;strong&gt;. A function without capability annotations cannot perform IO, cannot allocate, cannot mutate external state. It computes a result from its inputs, nothing more.&lt;&#x2F;p&gt;
+&lt;p&gt;Concrete is &lt;strong&gt;pure by default&lt;&#x2F;strong&gt;, following Austral&#x27;s approach to effect tracking. A function without capability annotations cannot perform IO, cannot allocate, cannot mutate external state. It computes a result from its inputs, nothing more.&lt;&#x2F;p&gt;
 &lt;p&gt;Purity means no side effects and no heap allocation. Stack allocation and compile-time constants are permitted. Non-termination is possible; purity does not imply totality.&lt;&#x2F;p&gt;
 &lt;p&gt;When a function needs effects, it declares them:&lt;&#x2F;p&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn read_file(path: String) with(File) -&amp;gt; String {
@@ -225,7 +226,7 @@
 &lt;p&gt;Each capability set must be concrete. This means generic combinators must be duplicated per capability set. Capability polymorphism is future work; the theory is well-understood (effect polymorphism in Koka, Eff, Frank), but adds complexity to the type system and the Lean formalization.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;allocation&quot;&gt;Allocation&lt;&#x2F;h2&gt;
 &lt;p&gt;Allocation deserves special attention because it&#x27;s often invisible. In most languages, many operations allocate behind your back: string concatenation, collection growth, closure creation.&lt;&#x2F;p&gt;
-&lt;p&gt;Concrete treats allocation as a capability. Functions that allocate declare &lt;code&gt;with(Alloc)&lt;&#x2F;code&gt;. The call site binds which allocator:&lt;&#x2F;p&gt;
+&lt;p&gt;Concrete treats allocation as a capability, with explicit allocator passing inspired by Zig. Functions that allocate declare &lt;code&gt;with(Alloc)&lt;&#x2F;code&gt;. The call site binds which allocator:&lt;&#x2F;p&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn main!() {
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let arena = Arena.new()
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer arena.deinit()
@@ -257,7 +258,7 @@
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;All allocators implement a common &lt;code&gt;Allocator&lt;&#x2F;code&gt; trait.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;error-handling&quot;&gt;Error Handling&lt;&#x2F;h2&gt;
-&lt;p&gt;Errors are values:&lt;&#x2F;p&gt;
+&lt;p&gt;Errors are values, using &lt;code&gt;Result&amp;lt;T, E&amp;gt;&lt;&#x2F;code&gt; like Rust and the &lt;code&gt;?&lt;&#x2F;code&gt; operator for propagation:&lt;&#x2F;p&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn parse(input: String) -&amp;gt; Result&amp;lt;Config, ParseError&amp;gt; {
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
@@ -311,6 +312,7 @@
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;h2 id=&quot;traits&quot;&gt;Traits&lt;&#x2F;h2&gt;
+&lt;p&gt;Traits provide bounded polymorphism, similar to Rust&#x27;s trait system:&lt;&#x2F;p&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;trait Ord {
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    fn compare(&amp;amp;self, other: &amp;amp;Self) -&amp;gt; Ordering
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
