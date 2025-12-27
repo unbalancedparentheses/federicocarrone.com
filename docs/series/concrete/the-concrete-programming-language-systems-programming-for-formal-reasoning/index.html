@@ -49,7 +49,7 @@
       
   <div class="metadata">
     <time title="Published date" datetime="2025-12-26" property="datePublished">December 26, 2025</time>
-    <span title="Reading time" property="timeRequired" content="PT13M">13 minutes read</span>
+    <span title="Reading time" property="timeRequired" content="PT19M">19 minutes read</span>
     
       <span><a href="https://github.com/unbalancedparentheses/federicocarrone.com/edit/main/content/series&#x2F;concrete&#x2F;2025-12-26-the-concrete-programming-language-systems-programming-for-formal-reasoning&#x2F;index.md" title="Submit a patch for this page">Edit</a> this page</span>
       
@@ -485,6 +485,18 @@
 </span><span class="z-text z-plain">}
 </span></code></pre>
 <p>Everything is visible: resource acquisition, cleanup scheduling, error propagation, allocator binding.</p>
+<h2 id="influences">Influences</h2>
+<p>The kernel calculus is formalized in Lean 4. Coq could serve the same role; we chose Lean for its performance and active development.</p>
+<p>Austral shaped the type system more than any other language. Linear types in Concrete are strict: every value must be consumed exactly once. Rust's affine types allow dropping values without explicit consumption; we don't. The capability system for effect tracking also comes from Austral.</p>
+<p>From Rust: borrowing, traits, error handling, pattern matching. Concrete uses lexical regions instead of lifetime annotations, which simplifies the model but covers fewer cases. <code>Result&lt;T, E&gt;</code> and the <code>?</code> operator are lifted directly.</p>
+<p>Zig's influence shows in explicit allocator passing and defer. Zig functions that allocate take an allocator parameter; Concrete expresses the same idea through <code>with(Alloc)</code> and allocator binding at call sites.</p>
+<p>Go had defer first. Go also shipped gofmt, which ended style debates by making one canonical format. We ship a formatter too.</p>
+<p>The <code>!</code> syntax for impure functions comes from Roc. <code>fn main!()</code> marks impurity at a glance.</p>
+<p>Koka, Eff, and Frank are the algebraic effects languages. Concrete's capabilities are a simplified version of their effect systems. Capability polymorphism would bring us closer to their expressiveness; it's future work.</p>
+<p>Haskell proved that pure-by-default is practical. Clean had uniqueness types (precursor to linear types) and purity before Haskell did.</p>
+<p>Cyclone pioneered region-based memory, the research line that led to Rust's lifetimes and our lexical regions. ATS showed linear types and theorem proving can coexist. Ada/SPARK proved formal verification works in production: avionics, rail, security-critical systems.</p>
+<p>CompCert and seL4 established that you can mechanically verify real systems software. A verified C compiler and a verified microkernel. That's the standard we're aiming for.</p>
+<p>These ideas work. We're combining them and proving the combination sound.</p>
 <h2 id="who-should-use-this">Who Should Use This</h2>
 <p>Concrete trades convenience for explicitness, flexibility for auditability. Prototyping is slower. Some patterns become verbose. You'll miss interior mutability for certain data structures.</p>
 <p>But for cryptographic primitives, consensus protocols, financial transaction systems, medical device firmware, the trade is worth it. Strong claims about program behavior, mechanically verified.</p>
@@ -507,6 +519,206 @@
 <tr><td><code>destroy(x)</code></td><td>Consume via destructor</td></tr>
 <tr><td><code>foreign("symbol")</code></td><td>Foreign function binding</td></tr>
 </tbody></table>
+<hr />
+<h2 id="appendix-a-standard-capabilities">Appendix A: Standard Capabilities</h2>
+<p>The <code>Std</code> capability (accessed via <code>!</code>) bundles these individual capabilities:</p>
+<table><thead><tr><th>Capability</th><th>Gates</th></tr></thead><tbody>
+<tr><td><code>File</code></td><td>Open, read, write, close files. Directory operations.</td></tr>
+<tr><td><code>Network</code></td><td>Sockets, HTTP, DNS resolution.</td></tr>
+<tr><td><code>Alloc</code></td><td>Heap allocation. Requires allocator binding at call site.</td></tr>
+<tr><td><code>Clock</code></td><td>System time, monotonic time, sleep.</td></tr>
+<tr><td><code>Random</code></td><td>Random number generation. Requires explicit seed for reproducibility.</td></tr>
+<tr><td><code>Env</code></td><td>Environment variables, command line arguments.</td></tr>
+<tr><td><code>Process</code></td><td>Spawn processes, exit codes, signals.</td></tr>
+<tr><td><code>Console</code></td><td>Stdin, stdout, stderr.</td></tr>
+</tbody></table>
+<p>Capabilities not in <code>Std</code>:</p>
+<table><thead><tr><th>Capability</th><th>Gates</th></tr></thead><tbody>
+<tr><td><code>Unsafe</code></td><td>Raw pointer operations, FFI calls, transmute, inline assembly. Never implicit.</td></tr>
+</tbody></table>
+<p>A function with no capability annotation is pure. A function with <code>!</code> has access to everything except <code>Unsafe</code>. A function with explicit <code>with(File, Alloc)</code> has exactly those capabilities.</p>
+<p>Capabilities are not hierarchical. <code>Std</code> is a shorthand for a set, not a super-capability. You cannot request "half of Std."</p>
+<hr />
+<h2 id="appendix-b-open-questions">Appendix B: Open Questions</h2>
+<p>These are unresolved design decisions:</p>
+<p><strong>Concurrency</strong></p>
+<p>No concurrency primitives exist. The language is currently single-threaded. Any future model must preserve:</p>
+<ul>
+<li>Linearity (no data races from aliasing)</li>
+<li>Determinism (reproducible execution)</li>
+<li>Effect tracking (concurrency as capability)</li>
+</ul>
+<p>Candidates: structured concurrency (like Trio/libdill), deterministic parallelism (like Haskell's <code>par</code>), actor model with linear message passing. Not decided.</p>
+<p><strong>Capability Polymorphism</strong></p>
+<p>Currently impossible:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn map&lt;T, U, C&gt;(list: List&lt;T&gt;, f: fn(T) with(C) -&gt; U) with(C) -&gt; List&lt;U&gt;
+</span></code></pre>
+<p>This forces duplicating combinators for each capability set. The theory exists (Koka, Eff, Frank), but adds complexity. Open question: is the duplication acceptable, or do we need polymorphism?</p>
+<p><strong>Effect Handlers</strong></p>
+<p>Capabilities track effects but don't handle them. Full algebraic effects would allow:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn with_mock_filesystem&lt;T&gt;(f: fn() with(File) -&gt; T) -&gt; T {
+</span><span class="z-text z-plain">    handle File in f() {
+</span><span class="z-text z-plain">        open(path) =&gt; resume(MockFile.new(path))
+</span><span class="z-text z-plain">        read(file) =&gt; resume(mock_data)
+</span><span class="z-text z-plain">    }
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>This enables testing, sandboxing, effect interception. Significant implementation complexity. Not committed.</p>
+<p><strong>Module System</strong></p>
+<p>Current design is minimal. Open questions:</p>
+<ul>
+<li>Parameterized modules (functors)?</li>
+<li>Module-level capability restrictions?</li>
+<li>Visibility modifiers beyond public/private?</li>
+<li>Separate compilation units?</li>
+</ul>
+<p><strong>FFI Type Mapping</strong></p>
+<p>The spec says "C-compatible types" without defining them. Need to specify:</p>
+<ul>
+<li>Integer mappings (is <code>Int</code> C's <code>int</code> or <code>intptr_t</code>?)</li>
+<li>Struct layout guarantees</li>
+<li>Calling conventions</li>
+<li>Nullable pointer representation</li>
+<li>String encoding at boundaries</li>
+</ul>
+<p><strong>Variance</strong></p>
+<p>Generic types have variance implications. <code>List&lt;T&gt;</code> is covariant in <code>T</code>. <code>fn(T) -&gt; U</code> is contravariant in <code>T</code>. The spec doesn't address this. For linear types, variance interacts with consumption. Needs formalization.</p>
+<p><strong>Macros</strong></p>
+<p>No macro system. Options:</p>
+<ul>
+<li>None (keep it simple)</li>
+<li>Hygienic macros (Scheme-style)</li>
+<li>Procedural macros (Rust-style)</li>
+<li>Compile-time evaluation (Zig-style comptime)</li>
+</ul>
+<p>Procedural macros would need capability restrictions. Not decided.</p>
+<hr />
+<h2 id="appendix-c-glossary">Appendix C: Glossary</h2>
+<p><strong>Affine type</strong>: A type whose values can be used at most once. Rust's ownership model is affine: you can drop a value without consuming it.</p>
+<p><strong>Capability</strong>: A token that grants permission to perform an effect. Functions declare required capabilities; callers must have them. Capabilities propagate: if <code>f</code> calls <code>g</code>, and <code>g</code> needs <code>File</code>, then <code>f</code> needs <code>File</code>.</p>
+<p><strong>Consumption</strong>: Using a linear value in a way that fulfills its "exactly once" obligation. Methods of consumption: pass to a function taking ownership, return, destructure via pattern match, call <code>destroy()</code>.</p>
+<p><strong>Copy type</strong>: A type exempt from linearity. Values can be duplicated freely. Must be explicitly marked. Cannot have destructors or linear fields.</p>
+<p><strong>Destruction</strong>: Consuming a linear value by invoking its destructor. <code>destroy(x)</code> calls the type's destructor and consumes <code>x</code>.</p>
+<p><strong>Effect</strong>: An observable interaction with the world outside pure computation: IO, allocation, mutation, non-determinism. Concrete tracks effects through capabilities.</p>
+<p><strong>Elaboration</strong>: The compiler phase that transforms surface syntax into kernel IR. Type checking, linearity checking, and capability checking happen here.</p>
+<p><strong>Kernel</strong>: The core calculus formalized in Lean. A small language with mechanically verified properties. The surface language elaborates into it.</p>
+<p><strong>Lexical region</strong>: A scope that bounds reference lifetimes. References created in a region cannot escape it. Unlike Rust's lifetime parameters, regions are always lexical and never appear in signatures.</p>
+<p><strong>Linear type</strong>: A type whose values must be used exactly once. Not zero (leak), not twice (double-use). Concrete's default.</p>
+<p><strong>Purity</strong>: Absence of effects. A pure function computes a result from its inputs without IO, allocation, or mutation. In Concrete, functions without capability annotations are pure.</p>
+<p><strong>Raw pointer</strong>: An <code>Address[T]</code> value. Carries no lifetime or linearity information. Safe to create and hold; unsafe to use.</p>
+<p><strong>Reference</strong>: A borrowed view of a value. <code>&amp;T</code> for immutable, <code>&amp;mut T</code> for mutable. The original value is inaccessible while borrowed.</p>
+<p><strong>Region</strong>: See lexical region.</p>
+<p><strong>Std</strong>: The standard capability set. Shorthand for <code>File</code>, <code>Network</code>, <code>Alloc</code>, <code>Clock</code>, <code>Random</code>, <code>Env</code>, <code>Process</code>, <code>Console</code>. Excludes <code>Unsafe</code>.</p>
+<p><strong>Unsafe</strong>: The capability that permits operations the type system cannot verify: FFI, raw pointer dereference, transmute.</p>
+<hr />
+<h2 id="appendix-d-comparison-table">Appendix D: Comparison Table</h2>
+<table><thead><tr><th>Feature</th><th>Concrete</th><th>Rust</th><th>Zig</th><th>Austral</th><th>Go</th></tr></thead><tbody>
+<tr><td>Memory safety</td><td>Linear types</td><td>Ownership + borrow checker</td><td>Runtime checks (optional)</td><td>Linear types</td><td>GC</td></tr>
+<tr><td>Linearity</td><td>Strict (exactly once)</td><td>Affine (at most once)</td><td>None</td><td>Strict</td><td>None</td></tr>
+<tr><td>GC</td><td>None</td><td>None</td><td>None</td><td>None</td><td>Yes</td></tr>
+<tr><td>Effect tracking</td><td>Capabilities</td><td>None</td><td>None</td><td>Capabilities</td><td>None</td></tr>
+<tr><td>Pure by default</td><td>Yes</td><td>No</td><td>No</td><td>Yes</td><td>No</td></tr>
+<tr><td>Explicit allocation</td><td>Capability + binding</td><td>Global allocator</td><td>Allocator parameter</td><td>No</td><td>GC</td></tr>
+<tr><td>Null</td><td>None (<code>Option&lt;T&gt;</code>)</td><td>None (<code>Option&lt;T&gt;</code>)</td><td>Optional (<code>?T</code>)</td><td>None (<code>Option[T]</code>)</td><td>Yes (<code>nil</code>)</td></tr>
+<tr><td>Exceptions</td><td>None</td><td>Panic (discouraged)</td><td>None</td><td>None</td><td>Panic</td></tr>
+<tr><td>Error handling</td><td><code>Result</code> + <code>?</code></td><td><code>Result</code> + <code>?</code></td><td>Error unions</td><td><code>Result</code></td><td>Multiple returns</td></tr>
+<tr><td>Lifetime annotations</td><td>None (lexical regions)</td><td>Yes</td><td>None</td><td>None</td><td>N/A (GC)</td></tr>
+<tr><td>Formal verification</td><td>Kernel in Lean</td><td>External tools</td><td>None</td><td>None</td><td>None</td></tr>
+<tr><td>Defer</td><td>Yes</td><td>No (RAII)</td><td>Yes</td><td>No</td><td>Yes</td></tr>
+<tr><td>Interior mutability</td><td>None</td><td><code>Cell</code>, <code>RefCell</code>, etc.</td><td>Pointers</td><td>None</td><td>Pointers</td></tr>
+<tr><td>Unsafe escape hatch</td><td><code>with(Unsafe)</code></td><td><code>unsafe</code> blocks</td><td>No safe/unsafe distinction</td><td><code>Unsafe_Module</code></td><td>No distinction</td></tr>
+<tr><td>Macros</td><td>None (undecided)</td><td>Procedural + declarative</td><td>Comptime</td><td>None</td><td>None</td></tr>
+<tr><td>Concurrency</td><td>None (undecided)</td><td><code>async</code>, threads, channels</td><td>Threads, async</td><td>None</td><td>Goroutines, channels</td></tr>
+<tr><td>Formatter</td><td>Ships with language</td><td>rustfmt (separate)</td><td>zig fmt</td><td>None</td><td>gofmt</td></tr>
+<tr><td>Grammar</td><td>LL(1)</td><td>Complex</td><td>Simple</td><td>Simple</td><td>LALR</td></tr>
+</tbody></table>
+<hr />
+<h2 id="appendix-e-error-messages">Appendix E: Error Messages</h2>
+<p>These are representative error messages. The actual compiler may differ.</p>
+<p><strong>Linearity violation: value not consumed</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0201]: linear value `f` is never consumed
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:4:9
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 4 |     let f = open(&quot;data.txt&quot;)
+</span><span class="z-text z-plain">   |         ^ this value has type `File` which is linear
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = help: linear values must be consumed exactly once
+</span><span class="z-text z-plain">   = help: add `defer destroy(f)` or pass `f` to a function that takes ownership
+</span></code></pre>
+<p><strong>Linearity violation: value consumed twice</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0202]: value `f` consumed twice
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:7:12
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 5 |     let content = read_all(f)
+</span><span class="z-text z-plain">   |                           - first consumption here
+</span><span class="z-text z-plain"> 6 |     
+</span><span class="z-text z-plain"> 7 |     destroy(f)
+</span><span class="z-text z-plain">   |            ^ second consumption here
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = help: after passing `f` to `read_all`, you no longer own it
+</span></code></pre>
+<p><strong>Borrow escape</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0301]: reference cannot escape its region
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:3:12
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 2 |     borrow data as r in R {
+</span><span class="z-text z-plain">   |                       --- region R starts here
+</span><span class="z-text z-plain"> 3 |         return r
+</span><span class="z-text z-plain">   |                ^ cannot return reference with region R
+</span><span class="z-text z-plain"> 4 |     }
+</span><span class="z-text z-plain">   |     - region R ends here
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = help: references are only valid within their borrow region
+</span></code></pre>
+<p><strong>Missing capability</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0401]: function requires capability `Network` which is not available
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:8:5
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 8 |     fetch(url)
+</span><span class="z-text z-plain">   |     ^^^^^^^^^^ requires `Network`
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = note: the current function has capabilities: {File, Alloc}
+</span><span class="z-text z-plain">   = help: add `Network` to the function&#39;s capability declaration:
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 2 | fn process(url: String) with(File, Alloc, Network) -&gt; Result&lt;Data, Error&gt;
+</span><span class="z-text z-plain">   |                                    +++++++++
+</span></code></pre>
+<p><strong>Capability leak through closure</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0402]: closure captures capability `File` but escapes its scope
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:5:18
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 5 |     let handler = fn() { read(&amp;config_file) }
+</span><span class="z-text z-plain">   |                   ^^^^ this closure requires `File`
+</span><span class="z-text z-plain"> 6 |     return handler
+</span><span class="z-text z-plain">   |            ------- closure escapes here
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = help: closures that escape cannot capture capabilities
+</span><span class="z-text z-plain">   = help: pass the file as a parameter instead
+</span></code></pre>
+<p><strong>Mutable borrow conflict</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0302]: cannot borrow `data` as immutable because it is already borrowed as mutable
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:4:17
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 3 |     borrow mut data as m in R {
+</span><span class="z-text z-plain">   |                       - mutable borrow occurs here
+</span><span class="z-text z-plain"> 4 |         let len = length(&amp;data)
+</span><span class="z-text z-plain">   |                          ^^^^^ immutable borrow attempted here
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = help: mutable borrows are exclusive; no other borrows allowed
+</span></code></pre>
+<p><strong>Unsafe operation without capability</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0501]: operation requires `Unsafe` capability
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:6:5
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 6 |     ptr_read(addr)
+</span><span class="z-text z-plain">   |     ^^^^^^^^^^^^^^ unsafe operation
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = note: reading from raw pointers may cause undefined behavior
+</span><span class="z-text z-plain">   = help: add `Unsafe` to the function&#39;s capabilities:
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 2 | fn dangerous(addr: Address[Int]) with(Unsafe) -&gt; Int
+</span><span class="z-text z-plain">   |                                  ++++++++++++
+</span></code></pre>
 
 
     <nav class="previous-next-episodes"><div class="button button--disabled text-align-end">(coming soon)&nbsp;❯</div></nav>

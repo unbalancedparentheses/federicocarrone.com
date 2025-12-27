@@ -449,6 +449,18 @@
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;p&gt;Everything is visible: resource acquisition, cleanup scheduling, error propagation, allocator binding.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;influences&quot;&gt;Influences&lt;&#x2F;h2&gt;
+&lt;p&gt;The kernel calculus is formalized in Lean 4. Coq could serve the same role; we chose Lean for its performance and active development.&lt;&#x2F;p&gt;
+&lt;p&gt;Austral shaped the type system more than any other language. Linear types in Concrete are strict: every value must be consumed exactly once. Rust&#x27;s affine types allow dropping values without explicit consumption; we don&#x27;t. The capability system for effect tracking also comes from Austral.&lt;&#x2F;p&gt;
+&lt;p&gt;From Rust: borrowing, traits, error handling, pattern matching. Concrete uses lexical regions instead of lifetime annotations, which simplifies the model but covers fewer cases. &lt;code&gt;Result&amp;lt;T, E&amp;gt;&lt;&#x2F;code&gt; and the &lt;code&gt;?&lt;&#x2F;code&gt; operator are lifted directly.&lt;&#x2F;p&gt;
+&lt;p&gt;Zig&#x27;s influence shows in explicit allocator passing and defer. Zig functions that allocate take an allocator parameter; Concrete expresses the same idea through &lt;code&gt;with(Alloc)&lt;&#x2F;code&gt; and allocator binding at call sites.&lt;&#x2F;p&gt;
+&lt;p&gt;Go had defer first. Go also shipped gofmt, which ended style debates by making one canonical format. We ship a formatter too.&lt;&#x2F;p&gt;
+&lt;p&gt;The &lt;code&gt;!&lt;&#x2F;code&gt; syntax for impure functions comes from Roc. &lt;code&gt;fn main!()&lt;&#x2F;code&gt; marks impurity at a glance.&lt;&#x2F;p&gt;
+&lt;p&gt;Koka, Eff, and Frank are the algebraic effects languages. Concrete&#x27;s capabilities are a simplified version of their effect systems. Capability polymorphism would bring us closer to their expressiveness; it&#x27;s future work.&lt;&#x2F;p&gt;
+&lt;p&gt;Haskell proved that pure-by-default is practical. Clean had uniqueness types (precursor to linear types) and purity before Haskell did.&lt;&#x2F;p&gt;
+&lt;p&gt;Cyclone pioneered region-based memory, the research line that led to Rust&#x27;s lifetimes and our lexical regions. ATS showed linear types and theorem proving can coexist. Ada&#x2F;SPARK proved formal verification works in production: avionics, rail, security-critical systems.&lt;&#x2F;p&gt;
+&lt;p&gt;CompCert and seL4 established that you can mechanically verify real systems software. A verified C compiler and a verified microkernel. That&#x27;s the standard we&#x27;re aiming for.&lt;&#x2F;p&gt;
+&lt;p&gt;These ideas work. We&#x27;re combining them and proving the combination sound.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;who-should-use-this&quot;&gt;Who Should Use This&lt;&#x2F;h2&gt;
 &lt;p&gt;Concrete trades convenience for explicitness, flexibility for auditability. Prototyping is slower. Some patterns become verbose. You&#x27;ll miss interior mutability for certain data structures.&lt;&#x2F;p&gt;
 &lt;p&gt;But for cryptographic primitives, consensus protocols, financial transaction systems, medical device firmware, the trade is worth it. Strong claims about program behavior, mechanically verified.&lt;&#x2F;p&gt;
@@ -471,6 +483,206 @@
 &lt;tr&gt;&lt;td&gt;&lt;code&gt;destroy(x)&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Consume via destructor&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;code&gt;foreign(&quot;symbol&quot;)&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Foreign function binding&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
 &lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;appendix-a-standard-capabilities&quot;&gt;Appendix A: Standard Capabilities&lt;&#x2F;h2&gt;
+&lt;p&gt;The &lt;code&gt;Std&lt;&#x2F;code&gt; capability (accessed via &lt;code&gt;!&lt;&#x2F;code&gt;) bundles these individual capabilities:&lt;&#x2F;p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Capability&lt;&#x2F;th&gt;&lt;th&gt;Gates&lt;&#x2F;th&gt;&lt;&#x2F;tr&gt;&lt;&#x2F;thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;File&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Open, read, write, close files. Directory operations.&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;Network&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Sockets, HTTP, DNS resolution.&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;Alloc&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Heap allocation. Requires allocator binding at call site.&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;Clock&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;System time, monotonic time, sleep.&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;Random&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Random number generation. Requires explicit seed for reproducibility.&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;Env&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Environment variables, command line arguments.&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;Process&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Spawn processes, exit codes, signals.&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;Console&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Stdin, stdout, stderr.&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
+&lt;p&gt;Capabilities not in &lt;code&gt;Std&lt;&#x2F;code&gt;:&lt;&#x2F;p&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Capability&lt;&#x2F;th&gt;&lt;th&gt;Gates&lt;&#x2F;th&gt;&lt;&#x2F;tr&gt;&lt;&#x2F;thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;Unsafe&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Raw pointer operations, FFI calls, transmute, inline assembly. Never implicit.&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
+&lt;p&gt;A function with no capability annotation is pure. A function with &lt;code&gt;!&lt;&#x2F;code&gt; has access to everything except &lt;code&gt;Unsafe&lt;&#x2F;code&gt;. A function with explicit &lt;code&gt;with(File, Alloc)&lt;&#x2F;code&gt; has exactly those capabilities.&lt;&#x2F;p&gt;
+&lt;p&gt;Capabilities are not hierarchical. &lt;code&gt;Std&lt;&#x2F;code&gt; is a shorthand for a set, not a super-capability. You cannot request &quot;half of Std.&quot;&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;appendix-b-open-questions&quot;&gt;Appendix B: Open Questions&lt;&#x2F;h2&gt;
+&lt;p&gt;These are unresolved design decisions:&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Concurrency&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;No concurrency primitives exist. The language is currently single-threaded. Any future model must preserve:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Linearity (no data races from aliasing)&lt;&#x2F;li&gt;
+&lt;li&gt;Determinism (reproducible execution)&lt;&#x2F;li&gt;
+&lt;li&gt;Effect tracking (concurrency as capability)&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;Candidates: structured concurrency (like Trio&#x2F;libdill), deterministic parallelism (like Haskell&#x27;s &lt;code&gt;par&lt;&#x2F;code&gt;), actor model with linear message passing. Not decided.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Capability Polymorphism&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Currently impossible:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn map&amp;lt;T, U, C&amp;gt;(list: List&amp;lt;T&amp;gt;, f: fn(T) with(C) -&amp;gt; U) with(C) -&amp;gt; List&amp;lt;U&amp;gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This forces duplicating combinators for each capability set. The theory exists (Koka, Eff, Frank), but adds complexity. Open question: is the duplication acceptable, or do we need polymorphism?&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Effect Handlers&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Capabilities track effects but don&#x27;t handle them. Full algebraic effects would allow:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn with_mock_filesystem&amp;lt;T&amp;gt;(f: fn() with(File) -&amp;gt; T) -&amp;gt; T {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    handle File in f() {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        open(path) =&amp;gt; resume(MockFile.new(path))
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        read(file) =&amp;gt; resume(mock_data)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    }
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This enables testing, sandboxing, effect interception. Significant implementation complexity. Not committed.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Module System&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Current design is minimal. Open questions:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Parameterized modules (functors)?&lt;&#x2F;li&gt;
+&lt;li&gt;Module-level capability restrictions?&lt;&#x2F;li&gt;
+&lt;li&gt;Visibility modifiers beyond public&#x2F;private?&lt;&#x2F;li&gt;
+&lt;li&gt;Separate compilation units?&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;&lt;strong&gt;FFI Type Mapping&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;The spec says &quot;C-compatible types&quot; without defining them. Need to specify:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Integer mappings (is &lt;code&gt;Int&lt;&#x2F;code&gt; C&#x27;s &lt;code&gt;int&lt;&#x2F;code&gt; or &lt;code&gt;intptr_t&lt;&#x2F;code&gt;?)&lt;&#x2F;li&gt;
+&lt;li&gt;Struct layout guarantees&lt;&#x2F;li&gt;
+&lt;li&gt;Calling conventions&lt;&#x2F;li&gt;
+&lt;li&gt;Nullable pointer representation&lt;&#x2F;li&gt;
+&lt;li&gt;String encoding at boundaries&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;&lt;strong&gt;Variance&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Generic types have variance implications. &lt;code&gt;List&amp;lt;T&amp;gt;&lt;&#x2F;code&gt; is covariant in &lt;code&gt;T&lt;&#x2F;code&gt;. &lt;code&gt;fn(T) -&amp;gt; U&lt;&#x2F;code&gt; is contravariant in &lt;code&gt;T&lt;&#x2F;code&gt;. The spec doesn&#x27;t address this. For linear types, variance interacts with consumption. Needs formalization.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Macros&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;No macro system. Options:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;None (keep it simple)&lt;&#x2F;li&gt;
+&lt;li&gt;Hygienic macros (Scheme-style)&lt;&#x2F;li&gt;
+&lt;li&gt;Procedural macros (Rust-style)&lt;&#x2F;li&gt;
+&lt;li&gt;Compile-time evaluation (Zig-style comptime)&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;Procedural macros would need capability restrictions. Not decided.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;appendix-c-glossary&quot;&gt;Appendix C: Glossary&lt;&#x2F;h2&gt;
+&lt;p&gt;&lt;strong&gt;Affine type&lt;&#x2F;strong&gt;: A type whose values can be used at most once. Rust&#x27;s ownership model is affine: you can drop a value without consuming it.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Capability&lt;&#x2F;strong&gt;: A token that grants permission to perform an effect. Functions declare required capabilities; callers must have them. Capabilities propagate: if &lt;code&gt;f&lt;&#x2F;code&gt; calls &lt;code&gt;g&lt;&#x2F;code&gt;, and &lt;code&gt;g&lt;&#x2F;code&gt; needs &lt;code&gt;File&lt;&#x2F;code&gt;, then &lt;code&gt;f&lt;&#x2F;code&gt; needs &lt;code&gt;File&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Consumption&lt;&#x2F;strong&gt;: Using a linear value in a way that fulfills its &quot;exactly once&quot; obligation. Methods of consumption: pass to a function taking ownership, return, destructure via pattern match, call &lt;code&gt;destroy()&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Copy type&lt;&#x2F;strong&gt;: A type exempt from linearity. Values can be duplicated freely. Must be explicitly marked. Cannot have destructors or linear fields.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Destruction&lt;&#x2F;strong&gt;: Consuming a linear value by invoking its destructor. &lt;code&gt;destroy(x)&lt;&#x2F;code&gt; calls the type&#x27;s destructor and consumes &lt;code&gt;x&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Effect&lt;&#x2F;strong&gt;: An observable interaction with the world outside pure computation: IO, allocation, mutation, non-determinism. Concrete tracks effects through capabilities.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Elaboration&lt;&#x2F;strong&gt;: The compiler phase that transforms surface syntax into kernel IR. Type checking, linearity checking, and capability checking happen here.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Kernel&lt;&#x2F;strong&gt;: The core calculus formalized in Lean. A small language with mechanically verified properties. The surface language elaborates into it.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Lexical region&lt;&#x2F;strong&gt;: A scope that bounds reference lifetimes. References created in a region cannot escape it. Unlike Rust&#x27;s lifetime parameters, regions are always lexical and never appear in signatures.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Linear type&lt;&#x2F;strong&gt;: A type whose values must be used exactly once. Not zero (leak), not twice (double-use). Concrete&#x27;s default.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Purity&lt;&#x2F;strong&gt;: Absence of effects. A pure function computes a result from its inputs without IO, allocation, or mutation. In Concrete, functions without capability annotations are pure.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Raw pointer&lt;&#x2F;strong&gt;: An &lt;code&gt;Address[T]&lt;&#x2F;code&gt; value. Carries no lifetime or linearity information. Safe to create and hold; unsafe to use.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Reference&lt;&#x2F;strong&gt;: A borrowed view of a value. &lt;code&gt;&amp;amp;T&lt;&#x2F;code&gt; for immutable, &lt;code&gt;&amp;amp;mut T&lt;&#x2F;code&gt; for mutable. The original value is inaccessible while borrowed.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Region&lt;&#x2F;strong&gt;: See lexical region.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Std&lt;&#x2F;strong&gt;: The standard capability set. Shorthand for &lt;code&gt;File&lt;&#x2F;code&gt;, &lt;code&gt;Network&lt;&#x2F;code&gt;, &lt;code&gt;Alloc&lt;&#x2F;code&gt;, &lt;code&gt;Clock&lt;&#x2F;code&gt;, &lt;code&gt;Random&lt;&#x2F;code&gt;, &lt;code&gt;Env&lt;&#x2F;code&gt;, &lt;code&gt;Process&lt;&#x2F;code&gt;, &lt;code&gt;Console&lt;&#x2F;code&gt;. Excludes &lt;code&gt;Unsafe&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Unsafe&lt;&#x2F;strong&gt;: The capability that permits operations the type system cannot verify: FFI, raw pointer dereference, transmute.&lt;&#x2F;p&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;appendix-d-comparison-table&quot;&gt;Appendix D: Comparison Table&lt;&#x2F;h2&gt;
+&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Feature&lt;&#x2F;th&gt;&lt;th&gt;Concrete&lt;&#x2F;th&gt;&lt;th&gt;Rust&lt;&#x2F;th&gt;&lt;th&gt;Zig&lt;&#x2F;th&gt;&lt;th&gt;Austral&lt;&#x2F;th&gt;&lt;th&gt;Go&lt;&#x2F;th&gt;&lt;&#x2F;tr&gt;&lt;&#x2F;thead&gt;&lt;tbody&gt;
+&lt;tr&gt;&lt;td&gt;Memory safety&lt;&#x2F;td&gt;&lt;td&gt;Linear types&lt;&#x2F;td&gt;&lt;td&gt;Ownership + borrow checker&lt;&#x2F;td&gt;&lt;td&gt;Runtime checks (optional)&lt;&#x2F;td&gt;&lt;td&gt;Linear types&lt;&#x2F;td&gt;&lt;td&gt;GC&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Linearity&lt;&#x2F;td&gt;&lt;td&gt;Strict (exactly once)&lt;&#x2F;td&gt;&lt;td&gt;Affine (at most once)&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;Strict&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;GC&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;Yes&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Effect tracking&lt;&#x2F;td&gt;&lt;td&gt;Capabilities&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;Capabilities&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Pure by default&lt;&#x2F;td&gt;&lt;td&gt;Yes&lt;&#x2F;td&gt;&lt;td&gt;No&lt;&#x2F;td&gt;&lt;td&gt;No&lt;&#x2F;td&gt;&lt;td&gt;Yes&lt;&#x2F;td&gt;&lt;td&gt;No&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Explicit allocation&lt;&#x2F;td&gt;&lt;td&gt;Capability + binding&lt;&#x2F;td&gt;&lt;td&gt;Global allocator&lt;&#x2F;td&gt;&lt;td&gt;Allocator parameter&lt;&#x2F;td&gt;&lt;td&gt;No&lt;&#x2F;td&gt;&lt;td&gt;GC&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Null&lt;&#x2F;td&gt;&lt;td&gt;None (&lt;code&gt;Option&amp;lt;T&amp;gt;&lt;&#x2F;code&gt;)&lt;&#x2F;td&gt;&lt;td&gt;None (&lt;code&gt;Option&amp;lt;T&amp;gt;&lt;&#x2F;code&gt;)&lt;&#x2F;td&gt;&lt;td&gt;Optional (&lt;code&gt;?T&lt;&#x2F;code&gt;)&lt;&#x2F;td&gt;&lt;td&gt;None (&lt;code&gt;Option[T]&lt;&#x2F;code&gt;)&lt;&#x2F;td&gt;&lt;td&gt;Yes (&lt;code&gt;nil&lt;&#x2F;code&gt;)&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Exceptions&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;Panic (discouraged)&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;Panic&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Error handling&lt;&#x2F;td&gt;&lt;td&gt;&lt;code&gt;Result&lt;&#x2F;code&gt; + &lt;code&gt;?&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;&lt;code&gt;Result&lt;&#x2F;code&gt; + &lt;code&gt;?&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Error unions&lt;&#x2F;td&gt;&lt;td&gt;&lt;code&gt;Result&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Multiple returns&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Lifetime annotations&lt;&#x2F;td&gt;&lt;td&gt;None (lexical regions)&lt;&#x2F;td&gt;&lt;td&gt;Yes&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;N&#x2F;A (GC)&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Formal verification&lt;&#x2F;td&gt;&lt;td&gt;Kernel in Lean&lt;&#x2F;td&gt;&lt;td&gt;External tools&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Defer&lt;&#x2F;td&gt;&lt;td&gt;Yes&lt;&#x2F;td&gt;&lt;td&gt;No (RAII)&lt;&#x2F;td&gt;&lt;td&gt;Yes&lt;&#x2F;td&gt;&lt;td&gt;No&lt;&#x2F;td&gt;&lt;td&gt;Yes&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Interior mutability&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;&lt;code&gt;Cell&lt;&#x2F;code&gt;, &lt;code&gt;RefCell&lt;&#x2F;code&gt;, etc.&lt;&#x2F;td&gt;&lt;td&gt;Pointers&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;Pointers&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Unsafe escape hatch&lt;&#x2F;td&gt;&lt;td&gt;&lt;code&gt;with(Unsafe)&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;&lt;code&gt;unsafe&lt;&#x2F;code&gt; blocks&lt;&#x2F;td&gt;&lt;td&gt;No safe&#x2F;unsafe distinction&lt;&#x2F;td&gt;&lt;td&gt;&lt;code&gt;Unsafe_Module&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;No distinction&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Macros&lt;&#x2F;td&gt;&lt;td&gt;None (undecided)&lt;&#x2F;td&gt;&lt;td&gt;Procedural + declarative&lt;&#x2F;td&gt;&lt;td&gt;Comptime&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Concurrency&lt;&#x2F;td&gt;&lt;td&gt;None (undecided)&lt;&#x2F;td&gt;&lt;td&gt;&lt;code&gt;async&lt;&#x2F;code&gt;, threads, channels&lt;&#x2F;td&gt;&lt;td&gt;Threads, async&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;Goroutines, channels&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Formatter&lt;&#x2F;td&gt;&lt;td&gt;Ships with language&lt;&#x2F;td&gt;&lt;td&gt;rustfmt (separate)&lt;&#x2F;td&gt;&lt;td&gt;zig fmt&lt;&#x2F;td&gt;&lt;td&gt;None&lt;&#x2F;td&gt;&lt;td&gt;gofmt&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;Grammar&lt;&#x2F;td&gt;&lt;td&gt;LL(1)&lt;&#x2F;td&gt;&lt;td&gt;Complex&lt;&#x2F;td&gt;&lt;td&gt;Simple&lt;&#x2F;td&gt;&lt;td&gt;Simple&lt;&#x2F;td&gt;&lt;td&gt;LALR&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
+&lt;hr &#x2F;&gt;
+&lt;h2 id=&quot;appendix-e-error-messages&quot;&gt;Appendix E: Error Messages&lt;&#x2F;h2&gt;
+&lt;p&gt;These are representative error messages. The actual compiler may differ.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Linearity violation: value not consumed&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;error[E0201]: linear value `f` is never consumed
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;  --&amp;gt; src&#x2F;main.concrete:4:9
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 4 |     let f = open(&amp;quot;data.txt&amp;quot;)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |         ^ this value has type `File` which is linear
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   = help: linear values must be consumed exactly once
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   = help: add `defer destroy(f)` or pass `f` to a function that takes ownership
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;strong&gt;Linearity violation: value consumed twice&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;error[E0202]: value `f` consumed twice
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;  --&amp;gt; src&#x2F;main.concrete:7:12
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 5 |     let content = read_all(f)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |                           - first consumption here
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 6 |     
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 7 |     destroy(f)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |            ^ second consumption here
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   = help: after passing `f` to `read_all`, you no longer own it
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;strong&gt;Borrow escape&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;error[E0301]: reference cannot escape its region
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;  --&amp;gt; src&#x2F;main.concrete:3:12
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 2 |     borrow data as r in R {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |                       --- region R starts here
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 3 |         return r
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |                ^ cannot return reference with region R
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 4 |     }
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |     - region R ends here
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   = help: references are only valid within their borrow region
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;strong&gt;Missing capability&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;error[E0401]: function requires capability `Network` which is not available
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;  --&amp;gt; src&#x2F;main.concrete:8:5
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 8 |     fetch(url)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |     ^^^^^^^^^^ requires `Network`
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   = note: the current function has capabilities: {File, Alloc}
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   = help: add `Network` to the function&amp;#39;s capability declaration:
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 2 | fn process(url: String) with(File, Alloc, Network) -&amp;gt; Result&amp;lt;Data, Error&amp;gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |                                    +++++++++
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;strong&gt;Capability leak through closure&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;error[E0402]: closure captures capability `File` but escapes its scope
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;  --&amp;gt; src&#x2F;main.concrete:5:18
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 5 |     let handler = fn() { read(&amp;amp;config_file) }
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |                   ^^^^ this closure requires `File`
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 6 |     return handler
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |            ------- closure escapes here
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   = help: closures that escape cannot capture capabilities
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   = help: pass the file as a parameter instead
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;strong&gt;Mutable borrow conflict&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;error[E0302]: cannot borrow `data` as immutable because it is already borrowed as mutable
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;  --&amp;gt; src&#x2F;main.concrete:4:17
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 3 |     borrow mut data as m in R {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |                       - mutable borrow occurs here
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 4 |         let len = length(&amp;amp;data)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |                          ^^^^^ immutable borrow attempted here
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   = help: mutable borrows are exclusive; no other borrows allowed
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;strong&gt;Unsafe operation without capability&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;error[E0501]: operation requires `Unsafe` capability
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;  --&amp;gt; src&#x2F;main.concrete:6:5
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 6 |     ptr_read(addr)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |     ^^^^^^^^^^^^^^ unsafe operation
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   = note: reading from raw pointers may cause undefined behavior
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   = help: add `Unsafe` to the function&amp;#39;s capabilities:
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt; 2 | fn dangerous(addr: Address[Int]) with(Unsafe) -&amp;gt; Int
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   |                                  ++++++++++++
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 </content>
         
     </entry>

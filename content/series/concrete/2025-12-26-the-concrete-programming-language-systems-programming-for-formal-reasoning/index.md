@@ -621,6 +621,30 @@ fn main!() {
 
 Everything is visible: resource acquisition, cleanup scheduling, error propagation, allocator binding.
 
+## Influences
+
+The kernel calculus is formalized in Lean 4. Coq could serve the same role; we chose Lean for its performance and active development.
+
+Austral shaped the type system more than any other language. Linear types in Concrete are strict: every value must be consumed exactly once. Rust's affine types allow dropping values without explicit consumption; we don't. The capability system for effect tracking also comes from Austral.
+
+From Rust: borrowing, traits, error handling, pattern matching. Concrete uses lexical regions instead of lifetime annotations, which simplifies the model but covers fewer cases. `Result<T, E>` and the `?` operator are lifted directly.
+
+Zig's influence shows in explicit allocator passing and defer. Zig functions that allocate take an allocator parameter; Concrete expresses the same idea through `with(Alloc)` and allocator binding at call sites.
+
+Go had defer first. Go also shipped gofmt, which ended style debates by making one canonical format. We ship a formatter too.
+
+The `!` syntax for impure functions comes from Roc. `fn main!()` marks impurity at a glance.
+
+Koka, Eff, and Frank are the algebraic effects languages. Concrete's capabilities are a simplified version of their effect systems. Capability polymorphism would bring us closer to their expressiveness; it's future work.
+
+Haskell proved that pure-by-default is practical. Clean had uniqueness types (precursor to linear types) and purity before Haskell did.
+
+Cyclone pioneered region-based memory, the research line that led to Rust's lifetimes and our lexical regions. ATS showed linear types and theorem proving can coexist. Ada/SPARK proved formal verification works in production: avionics, rail, security-critical systems.
+
+CompCert and seL4 established that you can mechanically verify real systems software. A verified C compiler and a verified microkernel. That's the standard we're aiming for.
+
+These ideas work. We're combining them and proving the combination sound.
+
 ## Who Should Use This
 
 Concrete trades convenience for explicitness, flexibility for auditability. Prototyping is slower. Some patterns become verbose. You'll miss interior mutability for certain data structures.
@@ -649,3 +673,264 @@ A language you can trust the way you trust mathematics: not because someone prom
 | `defer expr` | Run `expr` at scope exit |
 | `destroy(x)` | Consume via destructor |
 | `foreign("symbol")` | Foreign function binding |
+
+---
+
+## Appendix A: Standard Capabilities
+
+The `Std` capability (accessed via `!`) bundles these individual capabilities:
+
+| Capability | Gates |
+|------------|-------|
+| `File` | Open, read, write, close files. Directory operations. |
+| `Network` | Sockets, HTTP, DNS resolution. |
+| `Alloc` | Heap allocation. Requires allocator binding at call site. |
+| `Clock` | System time, monotonic time, sleep. |
+| `Random` | Random number generation. Requires explicit seed for reproducibility. |
+| `Env` | Environment variables, command line arguments. |
+| `Process` | Spawn processes, exit codes, signals. |
+| `Console` | Stdin, stdout, stderr. |
+
+Capabilities not in `Std`:
+
+| Capability | Gates |
+|------------|-------|
+| `Unsafe` | Raw pointer operations, FFI calls, transmute, inline assembly. Never implicit. |
+
+A function with no capability annotation is pure. A function with `!` has access to everything except `Unsafe`. A function with explicit `with(File, Alloc)` has exactly those capabilities.
+
+Capabilities are not hierarchical. `Std` is a shorthand for a set, not a super-capability. You cannot request "half of Std."
+
+---
+
+## Appendix B: Open Questions
+
+These are unresolved design decisions:
+
+**Concurrency**
+
+No concurrency primitives exist. The language is currently single-threaded. Any future model must preserve:
+- Linearity (no data races from aliasing)
+- Determinism (reproducible execution)
+- Effect tracking (concurrency as capability)
+
+Candidates: structured concurrency (like Trio/libdill), deterministic parallelism (like Haskell's `par`), actor model with linear message passing. Not decided.
+
+**Capability Polymorphism**
+
+Currently impossible:
+```
+fn map<T, U, C>(list: List<T>, f: fn(T) with(C) -> U) with(C) -> List<U>
+```
+
+This forces duplicating combinators for each capability set. The theory exists (Koka, Eff, Frank), but adds complexity. Open question: is the duplication acceptable, or do we need polymorphism?
+
+**Effect Handlers**
+
+Capabilities track effects but don't handle them. Full algebraic effects would allow:
+```
+fn with_mock_filesystem<T>(f: fn() with(File) -> T) -> T {
+    handle File in f() {
+        open(path) => resume(MockFile.new(path))
+        read(file) => resume(mock_data)
+    }
+}
+```
+
+This enables testing, sandboxing, effect interception. Significant implementation complexity. Not committed.
+
+**Module System**
+
+Current design is minimal. Open questions:
+- Parameterized modules (functors)?
+- Module-level capability restrictions?
+- Visibility modifiers beyond public/private?
+- Separate compilation units?
+
+**FFI Type Mapping**
+
+The spec says "C-compatible types" without defining them. Need to specify:
+- Integer mappings (is `Int` C's `int` or `intptr_t`?)
+- Struct layout guarantees
+- Calling conventions
+- Nullable pointer representation
+- String encoding at boundaries
+
+**Variance**
+
+Generic types have variance implications. `List<T>` is covariant in `T`. `fn(T) -> U` is contravariant in `T`. The spec doesn't address this. For linear types, variance interacts with consumption. Needs formalization.
+
+**Macros**
+
+No macro system. Options:
+- None (keep it simple)
+- Hygienic macros (Scheme-style)
+- Procedural macros (Rust-style)
+- Compile-time evaluation (Zig-style comptime)
+
+Procedural macros would need capability restrictions. Not decided.
+
+---
+
+## Appendix C: Glossary
+
+**Affine type**: A type whose values can be used at most once. Rust's ownership model is affine: you can drop a value without consuming it.
+
+**Capability**: A token that grants permission to perform an effect. Functions declare required capabilities; callers must have them. Capabilities propagate: if `f` calls `g`, and `g` needs `File`, then `f` needs `File`.
+
+**Consumption**: Using a linear value in a way that fulfills its "exactly once" obligation. Methods of consumption: pass to a function taking ownership, return, destructure via pattern match, call `destroy()`.
+
+**Copy type**: A type exempt from linearity. Values can be duplicated freely. Must be explicitly marked. Cannot have destructors or linear fields.
+
+**Destruction**: Consuming a linear value by invoking its destructor. `destroy(x)` calls the type's destructor and consumes `x`.
+
+**Effect**: An observable interaction with the world outside pure computation: IO, allocation, mutation, non-determinism. Concrete tracks effects through capabilities.
+
+**Elaboration**: The compiler phase that transforms surface syntax into kernel IR. Type checking, linearity checking, and capability checking happen here.
+
+**Kernel**: The core calculus formalized in Lean. A small language with mechanically verified properties. The surface language elaborates into it.
+
+**Lexical region**: A scope that bounds reference lifetimes. References created in a region cannot escape it. Unlike Rust's lifetime parameters, regions are always lexical and never appear in signatures.
+
+**Linear type**: A type whose values must be used exactly once. Not zero (leak), not twice (double-use). Concrete's default.
+
+**Purity**: Absence of effects. A pure function computes a result from its inputs without IO, allocation, or mutation. In Concrete, functions without capability annotations are pure.
+
+**Raw pointer**: An `Address[T]` value. Carries no lifetime or linearity information. Safe to create and hold; unsafe to use.
+
+**Reference**: A borrowed view of a value. `&T` for immutable, `&mut T` for mutable. The original value is inaccessible while borrowed.
+
+**Region**: See lexical region.
+
+**Std**: The standard capability set. Shorthand for `File`, `Network`, `Alloc`, `Clock`, `Random`, `Env`, `Process`, `Console`. Excludes `Unsafe`.
+
+**Unsafe**: The capability that permits operations the type system cannot verify: FFI, raw pointer dereference, transmute.
+
+---
+
+## Appendix D: Comparison Table
+
+| Feature | Concrete | Rust | Zig | Austral | Go |
+|---------|----------|------|-----|---------|-----|
+| Memory safety | Linear types | Ownership + borrow checker | Runtime checks (optional) | Linear types | GC |
+| Linearity | Strict (exactly once) | Affine (at most once) | None | Strict | None |
+| GC | None | None | None | None | Yes |
+| Effect tracking | Capabilities | None | None | Capabilities | None |
+| Pure by default | Yes | No | No | Yes | No |
+| Explicit allocation | Capability + binding | Global allocator | Allocator parameter | No | GC |
+| Null | None (`Option<T>`) | None (`Option<T>`) | Optional (`?T`) | None (`Option[T]`) | Yes (`nil`) |
+| Exceptions | None | Panic (discouraged) | None | None | Panic |
+| Error handling | `Result` + `?` | `Result` + `?` | Error unions | `Result` | Multiple returns |
+| Lifetime annotations | None (lexical regions) | Yes | None | None | N/A (GC) |
+| Formal verification | Kernel in Lean | External tools | None | None | None |
+| Defer | Yes | No (RAII) | Yes | No | Yes |
+| Interior mutability | None | `Cell`, `RefCell`, etc. | Pointers | None | Pointers |
+| Unsafe escape hatch | `with(Unsafe)` | `unsafe` blocks | No safe/unsafe distinction | `Unsafe_Module` | No distinction |
+| Macros | None (undecided) | Procedural + declarative | Comptime | None | None |
+| Concurrency | None (undecided) | `async`, threads, channels | Threads, async | None | Goroutines, channels |
+| Formatter | Ships with language | rustfmt (separate) | zig fmt | None | gofmt |
+| Grammar | LL(1) | Complex | Simple | Simple | LALR |
+
+---
+
+## Appendix E: Error Messages
+
+These are representative error messages. The actual compiler may differ.
+
+**Linearity violation: value not consumed**
+```
+error[E0201]: linear value `f` is never consumed
+  --> src/main.concrete:4:9
+   |
+ 4 |     let f = open("data.txt")
+   |         ^ this value has type `File` which is linear
+   |
+   = help: linear values must be consumed exactly once
+   = help: add `defer destroy(f)` or pass `f` to a function that takes ownership
+```
+
+**Linearity violation: value consumed twice**
+```
+error[E0202]: value `f` consumed twice
+  --> src/main.concrete:7:12
+   |
+ 5 |     let content = read_all(f)
+   |                           - first consumption here
+ 6 |     
+ 7 |     destroy(f)
+   |            ^ second consumption here
+   |
+   = help: after passing `f` to `read_all`, you no longer own it
+```
+
+**Borrow escape**
+```
+error[E0301]: reference cannot escape its region
+  --> src/main.concrete:3:12
+   |
+ 2 |     borrow data as r in R {
+   |                       --- region R starts here
+ 3 |         return r
+   |                ^ cannot return reference with region R
+ 4 |     }
+   |     - region R ends here
+   |
+   = help: references are only valid within their borrow region
+```
+
+**Missing capability**
+```
+error[E0401]: function requires capability `Network` which is not available
+  --> src/main.concrete:8:5
+   |
+ 8 |     fetch(url)
+   |     ^^^^^^^^^^ requires `Network`
+   |
+   = note: the current function has capabilities: {File, Alloc}
+   = help: add `Network` to the function's capability declaration:
+   |
+ 2 | fn process(url: String) with(File, Alloc, Network) -> Result<Data, Error>
+   |                                    +++++++++
+```
+
+**Capability leak through closure**
+```
+error[E0402]: closure captures capability `File` but escapes its scope
+  --> src/main.concrete:5:18
+   |
+ 5 |     let handler = fn() { read(&config_file) }
+   |                   ^^^^ this closure requires `File`
+ 6 |     return handler
+   |            ------- closure escapes here
+   |
+   = help: closures that escape cannot capture capabilities
+   = help: pass the file as a parameter instead
+```
+
+**Mutable borrow conflict**
+```
+error[E0302]: cannot borrow `data` as immutable because it is already borrowed as mutable
+  --> src/main.concrete:4:17
+   |
+ 3 |     borrow mut data as m in R {
+   |                       - mutable borrow occurs here
+ 4 |         let len = length(&data)
+   |                          ^^^^^ immutable borrow attempted here
+   |
+   = help: mutable borrows are exclusive; no other borrows allowed
+```
+
+**Unsafe operation without capability**
+```
+error[E0501]: operation requires `Unsafe` capability
+  --> src/main.concrete:6:5
+   |
+ 6 |     ptr_read(addr)
+   |     ^^^^^^^^^^^^^^ unsafe operation
+   |
+   = note: reading from raw pointers may cause undefined behavior
+   = help: add `Unsafe` to the function's capabilities:
+   |
+ 2 | fn dangerous(addr: Address[Int]) with(Unsafe) -> Int
+   |                                  ++++++++++++
+```
