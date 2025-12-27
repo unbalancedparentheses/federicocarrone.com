@@ -49,7 +49,7 @@
       
   <div class="metadata">
     <time title="Published date" datetime="2025-12-26" property="datePublished">December 26, 2025</time>
-    <span title="Reading time" property="timeRequired" content="PT28M">28 minutes read</span>
+    <span title="Reading time" property="timeRequired" content="PT30M">30 minutes read</span>
     
       <span><a href="https://github.com/unbalancedparentheses/federicocarrone.com/edit/main/content/series&#x2F;concrete&#x2F;2025-12-26-the-concrete-programming-language-systems-programming-for-formal-reasoning&#x2F;index.md" title="Submit a patch for this page">Edit</a> this page</span>
       
@@ -65,6 +65,17 @@
 <p>We state this not as an apology but as a feature of our approach. Most language specifications accumulate contradictions silently over years, edge cases where the spec says one thing and the implementation does another, or where two parts of the spec conflict in ways nobody noticed. These contradictions become load-bearing bugs that can never be fixed without breaking existing code.</p>
 <p>By designing Concrete around a formally verified kernel from the start, we force these contradictions into the open. When we formalize a feature in Lean, the proof assistant will reject inconsistencies. Features that seem reasonable on paper will turn out to be unsound, and we'll have to redesign them. This is the point. We'd rather discover that our linearity rules have a hole <em>before</em> a million lines of code depend on the broken behavior.</p>
 <p>The specification and the formalization will co-evolve. As we prove properties in Lean, we'll update this document. As we write this document, we'll discover what needs proving. The goal is convergence: eventually, this specification will be a human-readable projection of a machine-checked artifact.</p>
+<h3 id="stability-promise">Stability Promise</h3>
+<p>The kernel is versioned separately from the surface language. Once the kernel reaches 1.0, it is frozen. New surface features must elaborate to existing kernel constructs. If a feature can't be expressed in the kernel, the feature doesn't ship.</p>
+<h2 id="design-principles">Design Principles</h2>
+<ol>
+<li><strong>Pure by default</strong> — Functions without capability annotations are pure: no side effects, no allocation</li>
+<li><strong>Explicit capabilities</strong> — All effects tracked in function signatures</li>
+<li><strong>Linear by default</strong> — Values consumed exactly once unless marked <code>Copy</code></li>
+<li><strong>No hidden control flow</strong> — All function calls, cleanup, and allocation visible in source</li>
+<li><strong>Fits in your head</strong> — Small enough for one person to fully understand</li>
+<li><strong>LL(1) grammar</strong> — Parseable with single token lookahead, no ambiguity</li>
+</ol>
 <h2 id="the-core-idea">The Core Idea</h2>
 <p>Most languages treat verification as something bolted on after the fact. You write code, then maybe you write tests, maybe you run a linter, maybe you bring in a theorem prover for critical sections. The language itself remains agnostic about provability.</p>
 <p>Concrete inverts this relationship. The language is <em>designed around</em> a verified core, a small kernel calculus formalized in Lean 4 with mechanically-checked proofs of progress, preservation, linearity soundness, and effect soundness. The surface language exists only to elaborate into this kernel.</p>
@@ -193,7 +204,15 @@
 </span><span class="z-text z-plain">}
 </span></code></pre>
 <p>Multiple <code>defer</code> statements execute in reverse order (LIFO). <code>defer</code> runs at scope exit including early returns and error propagation.</p>
-<p>When a value is scheduled with <code>defer destroy(x)</code>, it becomes reserved. You cannot move it, destroy it again, or create borrows that overlap the deferred destruction point.</p>
+<h3 id="defer-reserves-the-value">Defer Reserves the Value</h3>
+<p>When a value is scheduled with <code>defer destroy(x)</code>, it becomes reserved. The rules:</p>
+<ol>
+<li>After <code>defer destroy(x)</code>, you cannot move <code>x</code></li>
+<li>After <code>defer destroy(x)</code>, you cannot destroy <code>x</code> again</li>
+<li>After <code>defer destroy(x)</code>, you cannot <code>defer destroy(x)</code> again</li>
+<li>After <code>defer destroy(x)</code>, you cannot create borrows of <code>x</code> that might overlap the deferred destruction point</li>
+</ol>
+<p>The value is still owned by the current scope until exit, but it is no longer available for use. This prevents double destruction and dangling borrows.</p>
 <h3 id="abort">Abort</h3>
 <p>Abort is immediate process termination, outside normal control flow. Following Zig's model:</p>
 <ul>
@@ -260,6 +279,9 @@
 </span><span class="z-text z-plain">fn map&lt;T, U, C&gt;(list: List&lt;T&gt;, f: fn(T) with(C) -&gt; U) with(C) -&gt; List&lt;U&gt;
 </span></code></pre>
 <p>Each capability set must be concrete. This means generic combinators must be duplicated per capability set. Capability polymorphism is future work; the theory is well-understood (effect polymorphism in Koka, Eff, Frank), but adds complexity to the type system and the Lean formalization.</p>
+<h3 id="parametricity">Parametricity</h3>
+<p>Generic functions cannot accidentally become effectful depending on instantiation. A function <code>fn map&lt;T, U&gt;(list: List&lt;T&gt;, f: fn(T) -&gt; U) -&gt; List&lt;U&gt;</code> is pure regardless of what <code>T</code> and <code>U</code> are. If <code>f</code> requires capabilities, that must be declared in the signature.</p>
+<p>Capabilities are checked before monomorphization. When generic code is specialized to concrete types, capability requirements don't change. A pure generic function stays pure at every instantiation.</p>
 <h2 id="allocation">Allocation</h2>
 <p>Allocation deserves special attention because it's often invisible. In most languages, many operations allocate behind your back: string concatenation, collection growth, closure creation.</p>
 <p>Concrete treats allocation as a capability, with explicit allocator passing inspired by Zig. Functions that allocate declare <code>with(Alloc)</code>. The call site binds which allocator:</p>
@@ -315,7 +337,7 @@
 <p><strong>No garbage collection.</strong> Memory is managed through linear types and explicit destruction. No GC pauses, no unpredictable latency, no hidden memory pressure.</p>
 <p><strong>No implicit control flow.</strong> What you see is what executes. No implicit function calls from operator overloading, no compiler-inserted destructor calls. <code>defer</code> statements are explicit: you write them, you see them, even though their execution occurs at scope exit.</p>
 <p><strong>No implicit allocation.</strong> Allocation requires the <code>Alloc</code> capability. <code>grep with(Alloc)</code> finds every function that might touch the heap.</p>
-<p><strong>No interior mutability.</strong> All mutation flows through <code>&amp;mut</code> references. An immutable reference <code>&amp;T</code> guarantees immutability, no hidden mutation behind an immutable facade.</p>
+<p><strong>No interior mutability.</strong> All mutation flows through <code>&amp;mut</code> references. An immutable reference <code>&amp;T</code> guarantees immutability, no hidden mutation behind an immutable facade. This forbids patterns like shared caches and memoization behind shared references. If you need a cache, pass <code>&amp;mut</code>. If you need lazy initialization, initialize before borrowing. For advanced patterns that genuinely require interior mutability, the standard library provides <code>UnsafeCell&lt;T&gt;</code> gated by the <code>Unsafe</code> capability.</p>
 <p><strong>No reflection, no eval, no runtime metaprogramming.</strong> All code paths are determined at compile time.</p>
 <p><strong>No implicit global state.</strong> All global interactions (file system, network, clock, environment) are mediated through capabilities.</p>
 <p><strong>No variable shadowing.</strong> Each variable name is unique within its scope.</p>
@@ -361,7 +383,24 @@
 </span><span class="z-text z-plain">    ...
 </span><span class="z-text z-plain">}
 </span></code></pre>
-<p>Trait methods take <code>&amp;self</code>, <code>&amp;mut self</code>, or <code>self</code>. If a method takes <code>self</code>, calling it consumes the value.</p>
+<h3 id="receiver-modes-and-linear-types">Receiver Modes and Linear Types</h3>
+<p>Trait methods take the receiver in one of three forms:</p>
+<ul>
+<li><code>&amp;self</code> — borrows the value immutably</li>
+<li><code>&amp;mut self</code> — borrows the value mutably</li>
+<li><code>self</code> — takes ownership, consuming the value</li>
+</ul>
+<p>If a trait method takes <code>self</code>, calling it consumes the value. This follows linear consumption rules:</p>
+<pre class="z-code"><code><span class="z-text z-plain">trait Consume {
+</span><span class="z-text z-plain">    fn consume(self)
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">fn use_once&lt;T: Consume&gt;(x: T) {
+</span><span class="z-text z-plain">    x.consume()  // x is consumed here
+</span><span class="z-text z-plain">    // x.consume()  // ERROR: x already consumed
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>A trait implementation for a linear type must respect the receiver mode. An <code>&amp;self</code> method cannot consume the value. An <code>&amp;mut self</code> method cannot let the value escape. A <code>self</code> method consumes it.</p>
 <h2 id="type-inference">Type Inference</h2>
 <p>Type inference is <strong>local only</strong>. Function signatures must be fully annotated. Inside bodies, local types may be inferred:</p>
 <pre class="z-code"><code><span class="z-text z-plain">fn process(data: List&lt;Int&gt;) with(Alloc) -&gt; List&lt;Int&gt; {
@@ -719,6 +758,7 @@
 </span><span class="z-text z-plain"> 2 | fn dangerous(addr: Address[Int]) with(Unsafe) -&gt; Int
 </span><span class="z-text z-plain">   |                                  ++++++++++++
 </span></code></pre>
+<hr />
 <h2 id="references">References</h2>
 <h3 id="languages">Languages</h3>
 <ul>
@@ -753,84 +793,114 @@
 <li><a href="https://granule-project.github.io/papers/esop22-paper.pdf">Linearity and Uniqueness: An Entente Cordiale</a> — linear vs unique vs affine</li>
 <li><a href="https://www.cs.umd.edu/~mwh/papers/cyclone-safety.pdf">Cyclone: A Safe Dialect of C</a> — region-based memory</li>
 <li><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/08/algeff-tr-2016-v2.pdf">Algebraic Effects for Functional Programming</a> — Leijen's tutorial</li>
+<li><a href="https://www.eff-lang.org/handlers-tutorial.pdf">An Introduction to Algebraic Effects and Handlers</a> — Matija Pretnar</li>
+<li><a href="https://www.microsoft.com/en-us/research/video/typed-continuations-and-the-origin-of-algebraic-effects/">Typed Continuations and the Origin of Algebraic Effects</a> — Daan Leijen</li>
 <li><a href="https://srl.cs.jhu.edu/pubs/SRL2003-02.pdf">Capability Myths Demolished</a> — what capabilities actually provide</li>
-<li><a href="https://www.cs.cmu.edu/~crary/819-f09/Landin66.pdf">The Next 700 Programming Languages</a> — Landin's classic on language design</li>
-<li><a href="https://www.amazon.science/publications/using-lightweight-formal-methods-to-validate-a-key-value-storage-node-in-amazon-s3">Using Lightweight Formal Methods to Validate a Key-Value Storage Node</a> — practical verification at AWS</li>
-<li><a href="https://patpannuto.com/pubs/levy15ownership.pdf">Ownership is Theft: Experiences Building an Embedded OS in Rust</a> — Tock OS on ownership in practice</li>
-<li><a href="https://plv.mpi-sws.org/rustbelt/popl18/paper.pdf">RustBelt: Securing the Foundations of the Rust Programming Language</a> — formal verification of Rust's type system</li>
-<li><a href="https://plv.mpi-sws.org/rustbelt/stacked-borrows/paper.pdf">Stacked Borrows: An Aliasing Model for Rust</a> — Ralf Jung on Rust's aliasing rules</li>
+<li><a href="https://www.cs.cmu.edu/~crary/819-f09/Landin66.pdf">The Next 700 Programming Languages</a> — Landin's classic</li>
+<li><a href="https://www.cs.yale.edu/flint/cs428/doc/HintsPL.pdf">Hints on Programming Language Design</a> — Tony Hoare</li>
+<li><a href="https://www.cs.virginia.edu/~evans/cs655/readings/steele.pdf">Growing a Language</a> — Guy Steele</li>
 <li><a href="https://web.cecs.pdx.edu/~mpj/pubs/polyrec.pdf">A Polymorphic Type System for Extensible Records and Variants</a> — row polymorphism</li>
-<li><a href="https://www.tweag.io/blog/2017-03-13-linear-types/">Retrofitting Linear Types</a> — adding linear types to Haskell</li>
+<li><a href="https://plv.mpi-sws.org/rustbelt/popl18/paper.pdf">RustBelt: Securing the Foundations of the Rust Programming Language</a> — formal verification of Rust</li>
+<li><a href="https://plv.mpi-sws.org/rustbelt/stacked-borrows/paper.pdf">Stacked Borrows: An Aliasing Model for Rust</a> — Ralf Jung on aliasing</li>
+<li><a href="https://patpannuto.com/pubs/levy15ownership.pdf">Ownership is Theft: Experiences Building an Embedded OS in Rust</a> — Tock OS</li>
+<li><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/07/history.pdf">A History of Haskell: Being Lazy with Class</a> — design decisions</li>
+<li><a href="https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf">Why Functional Programming Matters</a> — John Hughes</li>
+<li><a href="https://www.win.tue.nl/~wstomv/edu/2ip30/references/criteria_for_modularization.pdf">On the Criteria To Be Used in Decomposing Systems into Modules</a> — Parnas</li>
+<li><a href="https://clean.cs.ru.nl/download/doc/CleanLangRep.3.0.pdf">Clean Language Report</a> — uniqueness types specification</li>
+<li><a href="https://www.mbsd.cs.ru.nl/publications/papers/2010/deVries-Plasmeijer-uniqueness-simplified.pdf">Uniqueness Typing Simplified</a> — how uniqueness types work</li>
+<li><a href="https://www.amazon.science/publications/using-lightweight-formal-methods-to-validate-a-key-value-storage-node-in-amazon-s3">Using Lightweight Formal Methods to Validate a Key-Value Storage Node</a> — practical verification at AWS</li>
 </ul>
 <h3 id="blog-posts">Blog Posts</h3>
+<p><strong>Language Design Philosophy</strong></p>
+<ul>
+<li><a href="https://www.dreamsongs.com/RiseOfWorseIsBetter.html">Worse is Better</a> — Richard Gabriel on simplicity vs correctness</li>
+<li><a href="https://paulgraham.com/hundred.html">The Hundred-Year Language</a> — Paul Graham</li>
+<li><a href="https://blog.ploeh.dk/2015/04/13/less-is-more-language-features/">Less is more: language features</a> — Mark Seemann on constraints</li>
+<li><a href="https://curtclifton.net/papers/MosessonClifton06.pdf">Out of the Tar Pit</a> — Moseley and Marks on complexity</li>
+<li><a href="https://www.cs.virginia.edu/~evans/cs655/readings/smalltalk.html">Design Principles Behind Smalltalk</a> — Dan Ingalls</li>
+<li><a href="https://cdsmith.wordpress.com/2011/01/09/an-old-article-i-wrote/">What to Know Before Debating Type Systems</a> — Chris Smith</li>
+<li><a href="https://steve-yegge.blogspot.com/2006/03/execution-in-kingdom-of-nouns.html">Execution in the Kingdom of Nouns</a> — Steve Yegge</li>
+<li><a href="https://www.cs.virginia.edu/~cs655/readings/bwk-on-pascal.html">Why Pascal is Not My Favorite Language</a> — Kernighan</li>
+</ul>
 <p><strong>Austral and Linear Types</strong></p>
 <ul>
 <li><a href="https://borretti.me/article/introducing-austral">Introducing Austral</a> — Fernando Borretti's rationale</li>
-<li><a href="https://borretti.me/article/how-australs-linear-type-checker-works">How Austral's Linear Type Checker Works</a> — implementation details</li>
+<li><a href="https://borretti.me/article/how-australs-linear-type-checker-works">How Austral's Linear Type Checker Works</a> — implementation decisions</li>
 <li><a href="https://borretti.me/article/linear-types-and-capabilities">Linear Types and Capabilities</a> — how they compose</li>
 <li><a href="https://borretti.me/article/type-systems-memory-safety">Type Systems for Memory Safety</a> — survey of approaches</li>
 <li><a href="https://borretti.me/article/case-for-compiler-complexity">The Case for Compiler Complexity</a> — why simple isn't always better</li>
-<li><a href="https://homepages.inf.ed.ac.uk/wadler/topics/linear-logic.html">Linear types can change the world!</a> — Wadler's classic</li>
+<li><a href="https://homepages.inf.ed.ac.uk/wadler/topics/linear-logic.html">Linear types can change the world!</a> — Wadler</li>
+<li><a href="https://www.tweag.io/blog/2017-03-13-linear-types/">Retrofitting Linear Types</a> — adding linear types to Haskell</li>
 </ul>
-<p><strong>Rust Ownership and Borrowing</strong></p>
+<p><strong>Rust Design Decisions</strong></p>
 <ul>
 <li><a href="https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/">The Problem with Single-threaded Shared Mutability</a> — why Rust forbids it</li>
 <li><a href="https://limpet.net/mbrubeck/2019/02/07/rust-a-unique-perspective.html">Rust: A unique perspective</a> — ownership from first principles</li>
+<li><a href="https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html#non-lexical-lifetimes">Non-Lexical Lifetimes</a> — why Rust moved beyond lexical scopes</li>
+<li><a href="https://smallcultfollowing.com/babysteps/blog/2018/04/27/an-alias-based-formulation-of-the-borrow-checker/">Polonius: the future of the borrow checker</a> — Niko Matsakis</li>
+<li><a href="https://smallcultfollowing.com/babysteps/blog/2018/11/10/after-nll-moving-from-borrowed-data-and-the-sentinel-pattern/">After NLL: Moving from borrowed data</a> — borrow checker limitations</li>
+<li><a href="https://www.ralfj.de/blog/">Ralf Jung's Blog</a> — Stacked Borrows, unsafe, formal semantics</li>
+<li><a href="https://reberhardt.com/blog/2020/10/05/why-rust.html">Why Rust?</a> — Ryan Eberhardt</li>
 <li><a href="https://rust-unofficial.github.io/too-many-lists/">Learn Rust With Entirely Too Many Linked Lists</a> — ownership through pain</li>
 <li><a href="https://doc.rust-lang.org/nomicon/">The Rustonomicon</a> — dark arts of unsafe Rust</li>
-<li><a href="https://www.ralfj.de/blog/">Ralf Jung's Blog</a> — Stacked Borrows, unsafe, formal semantics</li>
-<li><a href="https://stackoverflow.com/questions/28519997/what-are-rusts-exact-auto-dereferencing-rules">What are Rust's exact auto-dereferencing rules?</a> — surprisingly deep</li>
-<li><a href="https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html#non-lexical-lifetimes">Non-lexical lifetimes</a> — why Rust moved beyond lexical scopes</li>
-<li><a href="https://smallcultfollowing.com/babysteps/blog/2018/04/27/an-alias-based-formulation-of-the-borrow-checker/">Polonius: the future of the borrow checker</a> — Niko Matsakis</li>
-<li><a href="https://smallcultfollowing.com/babysteps/blog/2018/11/10/after-nll-moving-from-borrowed-data-and-the-sentinel-pattern/">After NLL: Moving from borrowed data and the sentinel pattern</a> — borrow checker limitations</li>
-<li><a href="https://docs.rs/dtolnay/latest/dtolnay/macro._02__reference_types.html">Accurate mental model for Rust's reference types</a> — dtolnay</li>
-<li><a href="https://dev.to/worldwidewebster/where-rusts-enum-shines-2cg6">Where Rust's Enum Shines</a> — ADTs in practice</li>
 </ul>
-<p><strong>Zig Design</strong></p>
+<p><strong>Graydon Hoare (Rust creator)</strong></p>
+<ul>
+<li><a href="https://graydon2.dreamwidth.org/307105.html">The Rust I Wanted Had No Future</a> — original vision</li>
+<li><a href="https://graydon2.dreamwidth.org/307291.html">Not Rust</a> — what Rust deliberately avoided</li>
+<li><a href="https://graydon2.dreamwidth.org/253769.html">What next for compiled languages?</a> — language evolution</li>
+<li><a href="https://graydon2.dreamwidth.org/249666.html">Rust prehistory</a> — design origins</li>
+</ul>
+<p><strong>Zig Design Decisions</strong></p>
 <ul>
 <li><a href="https://zig.news/kristoff/allocgate-finalizing-allocators-in-zig-3l99">Allocgate</a> — why Zig's allocator design changed</li>
-<li><a href="https://kristoff.it/blog/what-is-zigs-comptime/">What is Zig's Comptime</a> — compile-time execution</li>
-<li><a href="https://www.scattered-thoughts.net/writing/a-reply-to-zigs-creator-on-undefined-behavior/">A Reply to Zig's Creator on Undefined Behavior</a> — Jamie Brandon</li>
+<li><a href="https://kristoff.it/blog/what-is-zigs-comptime/">What is Zig's Comptime</a> — compile-time execution design</li>
 <li><a href="https://zig.news/kristoff/zigs-io-and-you-2c28">Zig's I/O and You</a> — I/O design</li>
+<li><a href="https://www.scattered-thoughts.net/writing/a-reply-to-zigs-creator-on-undefined-behavior/">A Reply to Zig's Creator on Undefined Behavior</a> — Jamie Brandon</li>
+<li><a href="https://ziglang.org/learn/why_zig_over_c_cpp/">Why Zig When There's Already Rust?</a> — official comparison</li>
 <li><a href="https://zig.news/david_chisnall/zig-vs-c-35eo">Zig vs C++</a> — David Chisnall</li>
-<li><a href="https://ziglang.org/learn/why_zig_over_c_cpp/">Why Zig When There's Already C++, D, and Rust?</a> — official comparison</li>
 </ul>
 <p><strong>Effects and Capabilities</strong></p>
 <ul>
-<li><a href="https://overreacted.io/algebraic-effects-for-the-rest-of-us/">Algebraic Effects for the Rest of Us</a> — Dan Abramov's accessible introduction</li>
-<li><a href="https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/">What Color is Your Function?</a> — Bob Nystrom on why effect tracking matters</li>
-<li><a href="https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/">Structured Concurrency</a> — Nathaniel Smith on structured effects</li>
-<li><a href="https://www.eff-lang.org/learn/faq/">The Effect System FAQ</a> — from the Eff team</li>
-<li><a href="https://www.eff-lang.org/handlers-tutorial.pdf">An Introduction to Algebraic Effects and Handlers</a> — Matija Pretnar</li>
+<li><a href="https://overreacted.io/algebraic-effects-for-the-rest-of-us/">Algebraic Effects for the Rest of Us</a> — Dan Abramov</li>
+<li><a href="https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/">What Color is Your Function?</a> — Bob Nystrom on effect tracking</li>
+<li><a href="https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/">Structured Concurrency</a> — Nathaniel Smith</li>
+<li><a href="https://www.eff-lang.org/learn/faq/">The Effect System FAQ</a> — Eff team</li>
 <li><a href="https://koka-lang.github.io/koka/doc/book.html">Koka: Programming with Row-polymorphic Effect Types</a> — official book</li>
-<li><a href="https://www.microsoft.com/en-us/research/video/typed-continuations-and-the-origin-of-algebraic-effects/">Typed Continuations and the Origin of Algebraic Effects</a> — Daan Leijen</li>
 </ul>
 <p><strong>Roc and Purity</strong></p>
 <ul>
 <li><a href="https://www.roc-lang.org/design_goals.html">Roc Design Philosophy</a> — official goals</li>
-<li><a href="https://www.youtube.com/watch?v=cpQwtwVKAfU">Why Roc?</a> — Richard Feldman at Goto</li>
-<li><a href="https://www.youtube.com/watch?v=3n17wHe5wEw">Functional Programming for Pragmatists</a> — Richard Feldman</li>
-<li><a href="https://www.youtube.com/watch?v=vzfy4EKwG_Y">Outperforming Imperative with Pure Functional Languages</a> — Richard Feldman</li>
+<li><a href="https://www.roc-lang.org/platforms">Why Roc Uses Platform/App Split</a> — effect isolation design</li>
 </ul>
-<p><strong>Memory Management</strong></p>
+<p><strong>Go Design Decisions</strong></p>
 <ul>
-<li><a href="https://www.foonathan.net/2022/08/malloc-overview/">What's a Memory Allocator Anyway?</a> — Jonathan Müller</li>
+<li><a href="https://go.dev/talks/2012/splash.article">Go at Google: Language Design in the Service of Software Engineering</a> — Rob Pike</li>
+<li><a href="https://go.dev/talks/2015/simplicity-is-complicated.slide">Simplicity is Complicated</a> — Rob Pike</li>
+<li><a href="https://go.dev/blog/errors-are-values">Errors are values</a> — Rob Pike</li>
+<li><a href="https://go-proverbs.github.io/">Go Proverbs</a> — design philosophy</li>
+<li><a href="https://go.dev/blog/toward-go2">Toward Go 2</a> — Russ Cox on language evolution</li>
+</ul>
+<p><strong>Memory and Allocators</strong></p>
+<ul>
 <li><a href="https://www.rfleury.com/p/untangling-lifetimes-the-arena-allocator">Untangling Lifetimes: The Arena Allocator</a> — Ryan Fleury</li>
-<li><a href="https://media.handmade-seattle.com/practical-data-oriented-design/">A Practical Guide to Applying Data-Oriented Design</a> — Andrew Kelley</li>
-<li><a href="https://www.gingerbill.org/series/memory-allocation-strategies/">Memory Allocation Strategies</a> — Bill Hall's series</li>
-<li><a href="https://slembcke.github.io/2020/10/12/CustomAllocators.html">Custom Allocators Demystified</a> — Scott Lembcke</li>
-<li><a href="https://fitzgeraldnick.com/2019/11/01/always-bump-downwards.html">Always Bump Downwards</a> — Nick Fitzgerald on bump allocators</li>
+<li><a href="https://www.foonathan.net/2022/08/malloc-overview/">What's a Memory Allocator Anyway?</a> — Jonathan Müller</li>
 <li><a href="https://www.foonathan.net/2022/08/malloc-interface/">malloc() and free() are a bad API</a> — Jonathan Müller</li>
+<li><a href="https://fitzgeraldnick.com/2019/11/01/always-bump-downwards.html">Always Bump Downwards</a> — Nick Fitzgerald</li>
+<li><a href="https://www.gingerbill.org/series/memory-allocation-strategies/">Memory Allocation Strategies</a> — Bill Hall's series</li>
 </ul>
-<p><strong>Formal Methods and Verification</strong></p>
+<p><strong>Error Handling Design</strong></p>
 <ul>
-<li><a href="https://www.hillelwayne.com/post/theorem-prover-showdown/">Proofs About Programs</a> — Hillel Wayne comparing theorem provers</li>
+<li><a href="https://joeduffyblog.com/2016/02/07/the-error-model/">The Error Model</a> — Joe Duffy on Midori's approach</li>
+<li><a href="https://sled.rs/errors">Error Handling in a Correctness-Critical Rust Project</a> — sled database</li>
+</ul>
+<p><strong>Formal Methods in Practice</strong></p>
+<ul>
+<li><a href="https://www.hillelwayne.com/post/theorem-prover-showdown/">Proofs About Programs</a> — Hillel Wayne</li>
 <li><a href="https://brooker.co.za/blog/2022/06/02/formal.html">Formal Methods Only Solve Half My Problems</a> — Marc Brooker at AWS</li>
-<li><a href="https://www.hillelwayne.com/post/using-tla-in-the-real-world/">Using TLA+ in the Real World</a> — Hillel Wayne</li>
-<li><a href="https://www.hillelwayne.com/post/learntla-v2/">TLA+ is More Teachable Than I Thought</a> — Hillel Wayne</li>
 <li><a href="https://cacm.acm.org/magazines/2015/4/184701-how-amazon-web-services-uses-formal-methods/fulltext">How AWS Uses Formal Methods</a> — Communications of the ACM</li>
 <li><a href="https://www.hillelwayne.com/post/where-the-bugs-are/">Where the Bugs Are</a> — where verification helps</li>
-<li><a href="https://sel4.systems/About/seL4-whitepaper.pdf">seL4: Formal Verification of an Operating-System Kernel</a> — white paper</li>
+<li><a href="https://www.hillelwayne.com/post/using-tla-in-the-real-world/">Using TLA+ in the Real World</a> — Hillel Wayne</li>
 <li><a href="https://web.stanford.edu/~engler/ASPLOS24-dave.pdf">Verification at Scale</a> — how to verify real systems</li>
 <li><a href="https://blog.brownplt.org/2024/01/04/compile-your-proofs.html">You Should Compile Your Proofs</a> — on proof engineering</li>
 </ul>
@@ -839,55 +909,35 @@
 <li><a href="https://lean-lang.org/functional_programming_in_lean/">Functional Programming in Lean</a> — official book</li>
 <li><a href="https://lean-lang.org/theorem_proving_in_lean4/">Theorem Proving in Lean 4</a> — official book</li>
 <li><a href="https://github.com/leanprover-community/lean4-metaprogramming-book">Metaprogramming in Lean 4</a> — macros and tactics</li>
-<li><a href="https://lean-lang.org/papers/thesis-leo.pdf">The Lean Type System</a> — Leonardo de Moura's thesis</li>
-<li><a href="https://lean-lang.org/blog/">Lean 4 Release Notes</a> — official blog</li>
 </ul>
-<p><strong>Type Theory and PL Design</strong></p>
+<p><strong>Type System Design</strong></p>
 <ul>
-<li><a href="https://cdsmith.wordpress.com/2011/01/09/an-old-article-i-wrote/">What to Know Before Debating Type Systems</a> — Chris Smith</li>
 <li><a href="https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/">Parse, Don't Validate</a> — Alexis King</li>
-<li><a href="https://alexis.kingmath.org/2018/08/05/no-ifs-ands-or-buts/">No Ifs, Ands, or Buts</a> — Alexis King on totality</li>
 <li><a href="https://lexi-lambda.github.io/blog/2020/11/01/names-are-not-type-safety/">Names Are Not Type Safety</a> — Alexis King</li>
-<li><a href="https://lexi-lambda.github.io/blog/2020/08/13/types-as-axioms-or-playing-with-fire/">Types as Axioms, or: Playing With Fire</a> — Alexis King</li>
-<li><a href="https://blog.ploeh.dk/2015/04/13/less-is-more-language-features/">Less is more: language features</a> — Mark Seemann on constraints</li>
-<li><a href="https://www.youtube.com/watch?v=GqmsQeSzMdw">Constraints Liberate, Liberties Constrain</a> — Runar Bjarnason</li>
-<li><a href="https://www.infoq.com/presentations/Simple-Made-Easy/">Simple Made Easy</a> — Rich Hickey</li>
-<li><a href="http://curtclifton.net/papers/MosessonClifton06.pdf">Out of the Tar Pit</a> — complexity and state</li>
-<li><a href="https://wiki.c2.com/?TheBipolarLispProgrammer">The Bipolar Lisp Programmer</a> — Mark Tarver on language design</li>
+<li><a href="https://lexi-lambda.github.io/blog/2020/08/13/types-as-axioms-or-playing-with-fire/">Types as Axioms</a> — Alexis King</li>
+<li><a href="http://homepages.inf.ed.ac.uk/wadler/papers/expression/expression.txt">The Expression Problem</a> — Philip Wadler</li>
 </ul>
-<p><strong>Go's Decisions</strong></p>
+<p><strong>Bob Harper</strong></p>
 <ul>
-<li><a href="https://go.dev/talks/2012/splash.article">Go at Google: Language Design in the Service of Software Engineering</a> — Rob Pike</li>
-<li><a href="https://go.dev/blog/errors-are-values">Errors are values</a> — Rob Pike</li>
-<li><a href="https://go-proverbs.github.io/">Go Proverbs</a> — design philosophy</li>
-<li><a href="https://go.dev/blog/toward-go2">Toward Go 2</a> — Russ Cox on language evolution</li>
-<li><a href="https://www.youtube.com/watch?v=rFejpH_tAHM">Simplicity is Complicated</a> — Rob Pike</li>
-</ul>
-<p><strong>Clean and Uniqueness Types</strong></p>
-<ul>
-<li><a href="https://clean.cs.ru.nl/download/doc/CleanLangRep.3.0.pdf">Clean Language Report</a> — specification</li>
-<li><a href="https://www.mbsd.cs.ru.nl/publications/papers/2010/deVries-Plasmeijer-uniqueness-simplified.pdf">Uniqueness Typing Simplified</a> — how it works</li>
-</ul>
-<p><strong>Error Handling</strong></p>
-<ul>
-<li><a href="https://joeduffyblog.com/2016/02/07/the-error-model/">The Error Model</a> — Joe Duffy on Midori's approach</li>
-<li><a href="https://www.jonathanturner.org/2015/11/errors-and-exceptions.html">Errors and Exceptions</a> — Jonathan Turner</li>
-<li><a href="https://eiriktsarpalis.wordpress.com/2017/02/19/youre-using-httpclient-wrong/">From Exceptions to Error Values</a> — why exceptions fail</li>
-<li><a href="https://sled.rs/errors">Error Handling in a Correctness-Critical Rust Project</a> — sled database</li>
+<li><a href="https://existentialtype.wordpress.com/2011/03/19/what-if-anything-is-a-programming-paradigm/">What, if anything, is a programming paradigm?</a></li>
+<li><a href="https://existentialtype.wordpress.com/2011/03/19/dynamic-languages-are-static-languages/">Dynamic languages are static languages</a></li>
+<li><a href="https://existentialtype.wordpress.com/2011/04/16/modules-matter-most/">Modules matter most</a></li>
 </ul>
 <h3 id="talks">Talks</h3>
 <ul>
 <li><a href="https://www.youtube.com/watch?v=0jI-AlWEwYI">Effects for Less</a> — Alexis King on effects (essential)</li>
-<li><a href="https://www.youtube.com/watch?v=Unq712gqu2U">The Road to Zig 1.0</a> — Andrew Kelley on Zig's design</li>
-<li><a href="https://www.youtube.com/watch?v=A3AdN7U24iU">Rust: A Language for the Next 40 Years</a> — Carol Nichols</li>
-<li><a href="https://www.youtube.com/watch?v=aKLntZcp27M">RustConf 2018: Closing Keynote</a> — Catherine West on ECS and ownership</li>
-<li><a href="https://www.youtube.com/watch?v=j6IKVbiPxgA">Outperforming Rust with Functional Programming</a> — Richard Feldman</li>
+<li><a href="https://www.youtube.com/watch?v=Unq712gqu2U">The Road to Zig 1.0</a> — Andrew Kelley</li>
 <li><a href="https://www.youtube.com/watch?v=HgtRAbE1nBM">Is It Time to Rewrite the OS in Rust?</a> — Bryan Cantrill</li>
 <li><a href="https://www.youtube.com/watch?v=IOiZatlZtGU">Propositions as Types</a> — Philip Wadler</li>
-<li><a href="https://www.youtube.com/watch?v=wNa3MMbhwS4">Dependent Types in Haskell</a> — Stephanie Weirich</li>
 <li><a href="https://www.youtube.com/watch?v=nV3r1rB5_6E">Correctness by Construction</a> — Derek Dreyer on RustBelt</li>
-<li><a href="https://www.youtube.com/watch?v=WFtnJk3GGiU">What We Talk About When We Talk About Monads</a> — Bartosz Milewski</li>
+<li><a href="https://www.infoq.com/presentations/Simple-Made-Easy/">Simple Made Easy</a> — Rich Hickey</li>
+<li><a href="https://www.youtube.com/watch?v=GqmsQeSzMdw">Constraints Liberate, Liberties Constrain</a> — Runar Bjarnason</li>
+<li><a href="https://www.youtube.com/watch?v=_ahvzDzKdB0">Growing a Language</a> — Guy Steele (watch this)</li>
 <li><a href="https://www.youtube.com/watch?v=7GcrT0SBSnI">Why Algebraic Effects Matter</a> — Daan Leijen</li>
+<li><a href="https://www.youtube.com/watch?v=vzfy4EKwG_Y">Outperforming Imperative with Pure Functional Languages</a> — Richard Feldman</li>
+<li><a href="https://www.youtube.com/watch?v=cpQwtwVKAfU">Why Roc?</a> — Richard Feldman</li>
+<li><a href="https://www.youtube.com/watch?v=pW-SOdj4Kkk">Preventing the Collapse of Civilization</a> — Jonathan Blow on why new languages matter</li>
+<li><a href="https://www.youtube.com/watch?v=TH9VCN6UkyQ">Ideas about a new programming language for games</a> — Jonathan Blow on Jai</li>
 <li><a href="https://www.youtube.com/watch?v=t0mhvd3-60Y">Linear Types for Low-latency, High-throughput Systems</a> — Jean-Philippe Bernardy</li>
 <li><a href="https://www.youtube.com/watch?v=Sj3b8Sltx1s">seL4 and Formal Verification</a> — Gernot Heiser</li>
 </ul>
