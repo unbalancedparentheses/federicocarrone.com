@@ -16,13 +16,25 @@
           <guid>https://federicocarrone.com/series/concrete/the-concrete-programming-language-systems-programming-for-formal-reasoning/</guid>
           <description xml:base="https://federicocarrone.com/series/concrete/the-concrete-programming-language-systems-programming-for-formal-reasoning/">&lt;p&gt;There&#x27;s a tension at the heart of systems programming. We want languages expressive enough to build complex systems, yet simple enough to reason about with confidence. We want performance without sacrificing safety. We want the freedom to write low-level code and the guarantees that come from formal verification.&lt;&#x2F;p&gt;
 &lt;p&gt;Concrete is an attempt to resolve these tensions through commitment to a single organizing principle: &lt;strong&gt;every design choice must answer the question, can a machine reason about this?&lt;&#x2F;strong&gt;&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;on-this-specification&quot;&gt;On This Specification&lt;&#x2F;h2&gt;
+&lt;p&gt;This document describes what we&#x27;re building, not what we&#x27;ve finished building. The kernel formalization in Lean is ongoing work. Until that formalization is complete, this specification likely contains mistakes, ambiguities, and internal contradictions.&lt;&#x2F;p&gt;
+&lt;p&gt;We state this not as an apology but as a feature of our approach. Most language specifications accumulate contradictions silently over years, edge cases where the spec says one thing and the implementation does another, or where two parts of the spec conflict in ways nobody noticed. These contradictions become load-bearing bugs that can never be fixed without breaking existing code.&lt;&#x2F;p&gt;
+&lt;p&gt;By designing Concrete around a formally verified kernel from the start, we force these contradictions into the open. When we formalize a feature in Lean, the proof assistant will reject inconsistencies. Features that seem reasonable on paper will turn out to be unsound, and we&#x27;ll have to redesign them. This is the point. We&#x27;d rather discover that our linearity rules have a hole &lt;em&gt;before&lt;&#x2F;em&gt; a million lines of code depend on the broken behavior.&lt;&#x2F;p&gt;
+&lt;p&gt;The specification and the formalization will co-evolve. As we prove properties in Lean, we&#x27;ll update this document. As we write this document, we&#x27;ll discover what needs proving. The goal is convergence: eventually, this specification will be a human-readable projection of a machine-checked artifact.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;the-core-idea&quot;&gt;The Core Idea&lt;&#x2F;h2&gt;
 &lt;p&gt;Most languages treat verification as something bolted on after the fact. You write code, then maybe you write tests, maybe you run a linter, maybe you bring in a theorem prover for critical sections. The language itself remains agnostic about provability.&lt;&#x2F;p&gt;
-&lt;p&gt;Concrete inverts this relationship. The language is &lt;em&gt;designed around&lt;&#x2F;em&gt; a verified core, a small kernel calculus formalized in Lean with mechanically-checked proofs of progress, preservation, linearity soundness, and effect soundness. The surface language exists only to elaborate into this kernel. If your program type-checks, it&#x27;s correct by construction.&lt;&#x2F;p&gt;
+&lt;p&gt;Concrete inverts this relationship. The language is &lt;em&gt;designed around&lt;&#x2F;em&gt; a verified core, a small kernel calculus formalized in Lean with mechanically-checked proofs of progress, preservation, linearity soundness, and effect soundness. The surface language exists only to elaborate into this kernel.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;what-correct-means&quot;&gt;What &quot;Correct&quot; Means&lt;&#x2F;h3&gt;
+&lt;p&gt;When we say a type-checked program is &quot;correct by construction,&quot; we mean correct with respect to specific properties:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Memory safety&lt;&#x2F;strong&gt;: no use-after-free, no double-free, no dangling references&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Resource safety&lt;&#x2F;strong&gt;: linear values consumed exactly once, no leaks&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Effect correctness&lt;&#x2F;strong&gt;: declared capabilities match actual effects&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;We do not guarantee termination. Recursive functions may diverge. We do not guarantee liveness or deadlock freedom. These properties are outside the current verification scope. The kernel proves progress (well-typed programs don&#x27;t get stuck) and preservation (types are maintained during evaluation), which together yield memory and resource safety, not total correctness.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;the-trust-boundary&quot;&gt;The Trust Boundary&lt;&#x2F;h3&gt;
-&lt;p&gt;Precision about what&#x27;s verified matters. The kernel type system and its properties are mechanically checked in Lean. What remains trusted: the Lean proof checker itself, the elaborator (surface language to kernel), and the code generator (kernel to machine code). Verifying the elaborator and code generator is future work.&lt;&#x2F;p&gt;
+&lt;p&gt;The kernel type system and its properties are mechanically checked in Lean. What remains trusted: the Lean proof checker itself, the elaborator (surface language to kernel), and the code generator (kernel to machine code). Verifying the elaborator and code generator is future work.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;the-compilation-pipeline&quot;&gt;The Compilation Pipeline&lt;&#x2F;h2&gt;
-&lt;p&gt;Understanding how Concrete programs become executables clarifies what guarantees you get and where:&lt;&#x2F;p&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;Source Code (.concrete)
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;       ↓
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   Lexer&#x2F;Parser (LL(1) recursive descent)
@@ -45,261 +57,7 @@
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;       ↓
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;   Machine Code
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;The kernel checkpoint is the semantic gate. Everything before it transforms syntax; everything after it preserves meaning. The kernel checker verifies that the elaborated program satisfies linearity, capabilities, and effect constraints—properties proven sound in Lean.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;what-you-re-giving-up&quot;&gt;What You&#x27;re Giving Up&lt;&#x2F;h2&gt;
-&lt;p&gt;Concrete is not a general-purpose language for every project. It&#x27;s designed for code that &lt;em&gt;must&lt;&#x2F;em&gt; be correct: cryptographic implementations, financial systems, safety-critical software, blockchain infrastructure, anything where bugs have consequences measured in dollars or lives.&lt;&#x2F;p&gt;
-&lt;p&gt;To get there, Concrete eliminates entire categories of language features:&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;No garbage collection.&lt;&#x2F;strong&gt; Memory is managed through linear types and explicit destruction. Every resource is consumed exactly once. No GC pauses, no unpredictable latency, no hidden memory pressure.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;No hidden control flow.&lt;&#x2F;strong&gt; When you read Concrete code, what you see is what executes. There are no implicit function calls from operator overloading, no invisible destructor insertion, no exception unwinding behind your back. If a function is called, you see it. If cleanup happens, you see the &lt;code&gt;defer&lt;&#x2F;code&gt; statement.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;No implicit allocation.&lt;&#x2F;strong&gt; Allocation requires the &lt;code&gt;Alloc&lt;&#x2F;code&gt; capability, and the caller explicitly binds which allocator to use. &lt;code&gt;grep with(Alloc)&lt;&#x2F;code&gt; finds every function that might touch the heap.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;No interior mutability.&lt;&#x2F;strong&gt; All mutation flows through &lt;code&gt;&amp;amp;mut&lt;&#x2F;code&gt; references. An immutable reference &lt;code&gt;&amp;amp;T&lt;&#x2F;code&gt; actually guarantees immutability—no &lt;code&gt;Cell&lt;&#x2F;code&gt;, no &lt;code&gt;RefCell&lt;&#x2F;code&gt;, no &lt;code&gt;UnsafeCell&lt;&#x2F;code&gt; escape hatches in safe code. If you need a cache, pass &lt;code&gt;&amp;amp;mut&lt;&#x2F;code&gt;. If you need lazy initialization, initialize before borrowing. For advanced patterns that genuinely require interior mutability, unsafe primitives gated by the &lt;code&gt;Unsafe&lt;&#x2F;code&gt; capability exist, but safe code cannot accidentally acquire interior mutability.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;No reflection, no eval, no runtime metaprogramming.&lt;&#x2F;strong&gt; All code paths are determined at compile time. This breaks certain patterns but makes verification tractable.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;No global state.&lt;&#x2F;strong&gt; All state is passed explicitly or accessed through capabilities.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;No variable shadowing.&lt;&#x2F;strong&gt; Each variable name is unique within its scope. This prevents a class of subtle bugs and makes code more auditable.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;No null.&lt;&#x2F;strong&gt; Optional values use &lt;code&gt;Option&amp;lt;T&amp;gt;&lt;&#x2F;code&gt;. No billion-dollar mistakes.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;No undefined behavior.&lt;&#x2F;strong&gt; Kernel semantics are fully defined and proven sound.&lt;&#x2F;p&gt;
-&lt;p&gt;The result is a language that restricts what you can express in exchange for mechanical guarantees about what your code actually does.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;capabilities-making-effects-legible&quot;&gt;Capabilities: Making Effects Legible&lt;&#x2F;h2&gt;
-&lt;p&gt;The capability system is where Concrete&#x27;s design philosophy becomes most visible. Rather than treating side effects as the default and purity as an opt-in annotation, Concrete is &lt;strong&gt;pure by default&lt;&#x2F;strong&gt;. A function without capability annotations cannot perform IO, cannot allocate, cannot mutate external state. It&#x27;s a mathematical function that computes a result from its inputs, nothing more.&lt;&#x2F;p&gt;
-&lt;p&gt;Purity in Concrete means no side effects and no heap allocation. Stack allocation and compile-time constants are permitted. Notably, Concrete does not guarantee termination—recursive functions may diverge. This is intentional: systems programming sometimes requires non-termination, but side effects must remain explicit.&lt;&#x2F;p&gt;
-&lt;p&gt;When a function needs to perform effects, it declares exactly which ones:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn read_file(path: String) with(FileRead) -&amp;gt; String {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn process_with_network() with(FileRead, Network, Alloc) -&amp;gt; Result {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Capabilities propagate monotonically through the call graph. If &lt;code&gt;f&lt;&#x2F;code&gt; calls &lt;code&gt;g&lt;&#x2F;code&gt;, and &lt;code&gt;g&lt;&#x2F;code&gt; requires &lt;code&gt;FileRead&lt;&#x2F;code&gt;, then &lt;code&gt;f&lt;&#x2F;code&gt; must declare &lt;code&gt;FileRead&lt;&#x2F;code&gt; too. There&#x27;s no implicit granting, no ambient authority. The compiler enforces this transitively, making all effects visible in signatures.&lt;&#x2F;p&gt;
-&lt;h3 id=&quot;the-std-capability&quot;&gt;The &lt;code&gt;Std&lt;&#x2F;code&gt; Capability&lt;&#x2F;h3&gt;
-&lt;p&gt;For application entry points and prototyping, Concrete provides a shorthand. The &lt;code&gt;!&lt;&#x2F;code&gt; suffix declares the &lt;code&gt;Std&lt;&#x2F;code&gt; capability:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn main!() {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    println(&amp;quot;Hello&amp;quot;)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;This desugars to &lt;code&gt;fn main() with(Std)&lt;&#x2F;code&gt;. The &lt;code&gt;Std&lt;&#x2F;code&gt; capability includes common platform effects—file operations, network, clock, environment, random, and allocation—but explicitly excludes &lt;code&gt;Unsafe&lt;&#x2F;code&gt;. Library code should prefer explicit capability lists; &lt;code&gt;!&lt;&#x2F;code&gt; is a convenience for applications.&lt;&#x2F;p&gt;
-&lt;h3 id=&quot;security-model&quot;&gt;Security Model&lt;&#x2F;h3&gt;
-&lt;p&gt;Capabilities don&#x27;t sandbox code—if a dependency declares &lt;code&gt;with(Network)&lt;&#x2F;code&gt;, it gets network access. What they provide is &lt;strong&gt;auditability&lt;&#x2F;strong&gt;. You can grep your codebase for &lt;code&gt;with(Network)&lt;&#x2F;code&gt; and find every function that touches the network. You can verify that your JSON parser has no capabilities at all. You can review dependency updates by diffing capability declarations.&lt;&#x2F;p&gt;
-&lt;p&gt;The &lt;code&gt;Unsafe&lt;&#x2F;code&gt; capability surfaces all unsafe operations through the same system. There&#x27;s no &lt;code&gt;unsafe&lt;&#x2F;code&gt; keyword; instead, unsafe operations require declaring &lt;code&gt;with(Unsafe)&lt;&#x2F;code&gt;, and that requirement propagates like any other capability. Your trust boundaries become grep-able.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;linear-types-resources-as-values&quot;&gt;Linear Types: Resources as Values&lt;&#x2F;h2&gt;
-&lt;p&gt;All values in Concrete are linear by default. A linear value must be consumed exactly once—not zero times (that&#x27;s a leak), not twice (that&#x27;s a double-free). Consumption happens when you pass the value to a function that takes ownership, return it, destructure it via pattern matching, or explicitly call &lt;code&gt;destroy(x)&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn example!() {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let f = open(&amp;quot;data.txt&amp;quot;)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer destroy(f)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let content = read(&amp;amp;f)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; destroy(f) runs here because of defer
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;If &lt;code&gt;f&lt;&#x2F;code&gt; isn&#x27;t consumed on all paths, the program is rejected. If you try to use &lt;code&gt;f&lt;&#x2F;code&gt; after moving it, the program is rejected. This is compile-time enforcement, not runtime checking.&lt;&#x2F;p&gt;
-&lt;p&gt;Some types—integers, booleans, floats—are explicitly marked &lt;code&gt;Copy&lt;&#x2F;code&gt; and escape linear restrictions:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;type Copy Int
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;type Copy Bool
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;type Copy Float64
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;But the default is linearity, which forces you to think about resource ownership as you write code rather than hoping the runtime sorts it out.&lt;&#x2F;p&gt;
-&lt;h3 id=&quot;destructors&quot;&gt;Destructors&lt;&#x2F;h3&gt;
-&lt;p&gt;A linear type may define a destructor that executes when &lt;code&gt;destroy(x)&lt;&#x2F;code&gt; is called:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;type File {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    handle: FileHandle
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;destroy File with(FileClose) {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    platform_close(self.handle)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;The destructor takes ownership of &lt;code&gt;self&lt;&#x2F;code&gt;, may require capabilities, and runs exactly once when explicitly invoked. Crucially, &lt;code&gt;destroy(x)&lt;&#x2F;code&gt; is only valid if the type defines a destructor. A type without a destructor cannot be destroyed—it must be consumed by moving, returning, or destructuring. This prevents accidental discard and forces resource handling through program logic.&lt;&#x2F;p&gt;
-&lt;h3 id=&quot;defer-explicit-cleanup&quot;&gt;Defer: Explicit Cleanup&lt;&#x2F;h3&gt;
-&lt;p&gt;The &lt;code&gt;defer&lt;&#x2F;code&gt; statement makes cleanup explicit. Unlike languages where destructors run implicitly at scope boundaries, Concrete requires you to write &lt;code&gt;defer destroy(f)&lt;&#x2F;code&gt;. You see the cleanup in the source. The compiler never secretly inserts destructor calls.&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn process_files!() {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let f1 = open(&amp;quot;a.txt&amp;quot;)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer destroy(f1)           &#x2F;&#x2F; you see this
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let f2 = open(&amp;quot;b.txt&amp;quot;)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer destroy(f2)           &#x2F;&#x2F; you see this
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; When scope exits:
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; 1. destroy(f2) runs
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; 2. destroy(f1) runs
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Multiple &lt;code&gt;defer&lt;&#x2F;code&gt; statements execute in reverse order (LIFO). &lt;code&gt;defer&lt;&#x2F;code&gt; runs at scope exit including early returns and error propagation. It&#x27;s deterministic—not &quot;eventually&quot; like GC finalizers.&lt;&#x2F;p&gt;
-&lt;p&gt;When a value is scheduled with &lt;code&gt;defer destroy(x)&lt;&#x2F;code&gt;, it becomes reserved. You cannot move it, destroy it again, or create borrows that might overlap the deferred destruction point.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;borrowing-without-lifetime-annotations&quot;&gt;Borrowing Without Lifetime Annotations&lt;&#x2F;h2&gt;
-&lt;p&gt;Concrete&#x27;s borrowing system draws from Rust but simplifies it. References exist within lexical regions—scopes that bound their lifetime. You can have multiple immutable borrows or one mutable borrow. References can&#x27;t escape their region.&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;borrow f as fref in R {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; fref has type &amp;amp;[File, R]
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; f is unusable in this block
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let len = length(fref)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;&#x2F;&#x2F; f is usable again
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;The key difference from Rust: no lifetime parameters in function signatures. Functions that accept references are generic over the region, but this genericity is implicit:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn length&amp;lt;R&amp;gt;(file: &amp;amp;[File, R]) -&amp;gt; Uint {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;The function cannot store the reference because it has no way to name &lt;code&gt;R&lt;&#x2F;code&gt; outside the call. The region system ensures references can&#x27;t outlive their source, but you don&#x27;t annotate lifetimes everywhere.&lt;&#x2F;p&gt;
-&lt;p&gt;For single-expression borrows, the region is anonymous:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;let len = length(&amp;amp;f)  &#x2F;&#x2F; borrows f for just this call
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;h3 id=&quot;borrowing-rules&quot;&gt;Borrowing Rules&lt;&#x2F;h3&gt;
-&lt;p&gt;The rules are strict but comprehensible:&lt;&#x2F;p&gt;
-&lt;ol&gt;
-&lt;li&gt;While borrowed, the original is unusable&lt;&#x2F;li&gt;
-&lt;li&gt;Multiple immutable borrows are allowed&lt;&#x2F;li&gt;
-&lt;li&gt;Mutable borrows are exclusive—one &lt;code&gt;&amp;amp;mut T&lt;&#x2F;code&gt; at a time, no simultaneous &lt;code&gt;&amp;amp;T&lt;&#x2F;code&gt;&lt;&#x2F;li&gt;
-&lt;li&gt;References cannot escape their region&lt;&#x2F;li&gt;
-&lt;li&gt;Nested borrows of the same owned value are forbidden&lt;&#x2F;li&gt;
-&lt;li&gt;Borrowing a reference is allowed, but the derived reference can&#x27;t outlive the original&#x27;s region&lt;&#x2F;li&gt;
-&lt;&#x2F;ol&gt;
-&lt;p&gt;Closures may not capture references if the closure escapes the borrow region. This ensures references never outlive their lexical scope.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;allocation-as-a-capability&quot;&gt;Allocation as a Capability&lt;&#x2F;h2&gt;
-&lt;p&gt;Allocation deserves special attention because it&#x27;s so often invisible. In most languages, many operations allocate behind your back—string concatenation, collection growth, closure creation. You find out about allocation pressure through profiling or by hitting OOM.&lt;&#x2F;p&gt;
-&lt;p&gt;Concrete treats allocation as a capability. Functions that may allocate declare &lt;code&gt;with(Alloc)&lt;&#x2F;code&gt;. The call site binds which allocator to use:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn main!() {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let arena = Arena.new()
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer arena.deinit()
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let list = create_list&amp;lt;Int&amp;gt;() with(Alloc = arena)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    push(&amp;amp;mut list, 42) with(Alloc = arena)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Inside a function with &lt;code&gt;with(Alloc)&lt;&#x2F;code&gt;, allocation &quot;just works&quot;—the bound allocator propagates through nested calls. But at the boundary, you see exactly where allocation happens and which allocator serves it.&lt;&#x2F;p&gt;
-&lt;p&gt;Allocator binding is lexically scoped. A nested binding may shadow an outer one. Closures capture allocator bindings only if invoked within the lexical scope where the binding is in effect—if a closure escapes, it must accept an explicit allocator parameter.&lt;&#x2F;p&gt;
-&lt;p&gt;Stack allocation does not require the &lt;code&gt;Alloc&lt;&#x2F;code&gt; capability:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn example() {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let x: Int = 42                    &#x2F;&#x2F; stack
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let arr: [100]Uint8 = zeroed()     &#x2F;&#x2F; stack
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;This makes allocation-free code provably allocation-free.&lt;&#x2F;p&gt;
-&lt;h3 id=&quot;allocator-types&quot;&gt;Allocator Types&lt;&#x2F;h3&gt;
-&lt;p&gt;Concrete provides several allocator types out of the box:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;&#x2F;&#x2F; General-purpose heap allocator
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;let gpa = GeneralPurposeAllocator.new()
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;defer gpa.deinit()
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;&#x2F;&#x2F; Arena allocator — free everything at once
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;let arena = Arena.new(gpa)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;defer arena.deinit()
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;&#x2F;&#x2F; Fixed buffer allocator — no heap, uses stack memory
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;let buf: [1024]Uint8 = zeroed()
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;let fba = FixedBufferAllocator.new(&amp;amp;buf)
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;All allocators implement a common &lt;code&gt;Allocator&lt;&#x2F;code&gt; trait with &lt;code&gt;alloc&lt;&#x2F;code&gt;, &lt;code&gt;free&lt;&#x2F;code&gt;, and &lt;code&gt;realloc&lt;&#x2F;code&gt; methods.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;error-handling&quot;&gt;Error Handling&lt;&#x2F;h2&gt;
-&lt;p&gt;Errors are values, not exceptions:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn parse(input: String) -&amp;gt; Result&amp;lt;Config, ParseError&amp;gt; {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn load_config!() -&amp;gt; Result&amp;lt;Config, Error&amp;gt; {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let f = open(&amp;quot;config.toml&amp;quot;)?
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer destroy(f)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let content = read(&amp;amp;f)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let config = parse(content)?
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    Ok(config)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;The &lt;code&gt;?&lt;&#x2F;code&gt; operator propagates errors. When &lt;code&gt;?&lt;&#x2F;code&gt; triggers an early return, all &lt;code&gt;defer&lt;&#x2F;code&gt; statements in scope run before returning. This interaction is crucial—cleanup happens even on error paths, and you can see exactly where.&lt;&#x2F;p&gt;
-&lt;p&gt;There are no exceptions and no panic mechanism in the core language. If the runtime terminates due to an unrecoverable fault, deferred expressions are not guaranteed to run.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;pattern-matching&quot;&gt;Pattern Matching&lt;&#x2F;h2&gt;
-&lt;p&gt;Exhaustive pattern matching with linear type awareness:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn describe(opt: Option&amp;lt;Int&amp;gt;) -&amp;gt; String {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    match opt {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        Some(n) =&amp;gt; format(&amp;quot;Got {}&amp;quot;, n),
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        None =&amp;gt; &amp;quot;Nothing&amp;quot;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    }
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Linear types in patterns must be consumed:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn handle!(result: Result&amp;lt;Data, File&amp;gt;) {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    match result {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        Ok(data) =&amp;gt; use_data(data),
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        Err(f) =&amp;gt; destroy(f)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    }
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Both branches consume their linear values. Borrowing in patterns is also supported:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn peek(opt: &amp;amp;Option&amp;lt;Int&amp;gt;) -&amp;gt; Int {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    match opt {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        &amp;amp;Some(n) =&amp;gt; n,
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        &amp;amp;None =&amp;gt; 0
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    }
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;h2 id=&quot;traits-and-bounded-polymorphism&quot;&gt;Traits and Bounded Polymorphism&lt;&#x2F;h2&gt;
-&lt;p&gt;Traits provide bounded polymorphism:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;trait Ord {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    fn compare(&amp;amp;self, other: &amp;amp;Self) -&amp;gt; Ordering
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;trait Show {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    fn show(&amp;amp;self) -&amp;gt; String
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn sort&amp;lt;T: Ord&amp;gt;(list: List&amp;lt;T&amp;gt;) with(Alloc) -&amp;gt; List&amp;lt;T&amp;gt; {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn sort_and_print&amp;lt;T: Ord + Show&amp;gt;(list: List&amp;lt;T&amp;gt;) with(Alloc, Console) -&amp;gt; List&amp;lt;T&amp;gt; {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let sorted = sort(list)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    print_all(&amp;amp;sorted)
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    sorted
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Trait methods may take the receiver as &lt;code&gt;&amp;amp;self&lt;&#x2F;code&gt;, &lt;code&gt;&amp;amp;mut self&lt;&#x2F;code&gt;, or &lt;code&gt;self&lt;&#x2F;code&gt;. If a trait method takes &lt;code&gt;self&lt;&#x2F;code&gt;, calling it consumes the value following linear consumption rules. Trait implementations for linear types are allowed—they just must respect the receiver mode.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;generics-and-parametricity&quot;&gt;Generics and Parametricity&lt;&#x2F;h2&gt;
-&lt;p&gt;Generic functions cannot accidentally become effectful depending on instantiation. Capabilities are checked before monomorphization and are invariant under instantiation:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn map&amp;lt;T, U&amp;gt;(list: List&amp;lt;T&amp;gt;, f: fn(T) -&amp;gt; U) -&amp;gt; List&amp;lt;U&amp;gt; {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;This function is pure regardless of what &lt;code&gt;T&lt;&#x2F;code&gt; and &lt;code&gt;U&lt;&#x2F;code&gt; are. If &lt;code&gt;f&lt;&#x2F;code&gt; requires capabilities, that must be declared:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn map_io&amp;lt;T, U&amp;gt;(list: List&amp;lt;T&amp;gt;, f: fn(T) with(IO) -&amp;gt; U) with(IO) -&amp;gt; List&amp;lt;U&amp;gt; {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;There&#x27;s no capability polymorphism—you cannot be generic over capability sets. Each capability set must be concrete. This simplifies the type system and avoids questions about capability set operations at the type level.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;type-inference&quot;&gt;Type Inference&lt;&#x2F;h2&gt;
-&lt;p&gt;Type inference is &lt;strong&gt;local only&lt;&#x2F;strong&gt;:&lt;&#x2F;p&gt;
-&lt;ul&gt;
-&lt;li&gt;Function signatures must be fully annotated (parameters, return type, capabilities)&lt;&#x2F;li&gt;
-&lt;li&gt;Inside function bodies, local variable types may be inferred from their initializers&lt;&#x2F;li&gt;
-&lt;li&gt;Type information flows in one direction (from annotations to inference, never backward)&lt;&#x2F;li&gt;
-&lt;&#x2F;ul&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn process(data: List&amp;lt;Int&amp;gt;) with(Alloc) -&amp;gt; List&amp;lt;Int&amp;gt; {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let doubled = map(data, fn(x) { x * 2 })  &#x2F;&#x2F; type inferred
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let filtered = filter(doubled, fn(x) { x &amp;gt; 0 })  &#x2F;&#x2F; type inferred
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    filtered
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;This keeps type errors local and makes signatures self-documenting. You can always understand a function&#x27;s interface without reading its body.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;modules&quot;&gt;Modules&lt;&#x2F;h2&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;module FileSystem
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;public fn open(path: String) with(FileOpen) -&amp;gt; Result&amp;lt;File, IOError&amp;gt; {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;public fn read&amp;lt;R&amp;gt;(file: &amp;amp;[File, R]) with(FileRead) -&amp;gt; String {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;private fn validate(path: String) -&amp;gt; Bool {
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Visibility is &lt;code&gt;public&lt;&#x2F;code&gt; or &lt;code&gt;private&lt;&#x2F;code&gt; (the default). Types, functions, and constants can be marked either way.&lt;&#x2F;p&gt;
-&lt;p&gt;Capabilities are part of a function&#x27;s signature and therefore part of the public API contract. Changing the required capability set of a public function is a breaking change.&lt;&#x2F;p&gt;
-&lt;p&gt;Imports support aliasing and selective imports:&lt;&#x2F;p&gt;
-&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;import FileSystem
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;import FileSystem.{open, read, write}
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;import FileSystem as FS
-&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The kernel checkpoint is the semantic gate. Everything before it transforms syntax; everything after it preserves meaning.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;types&quot;&gt;Types&lt;&#x2F;h2&gt;
 &lt;h3 id=&quot;primitives&quot;&gt;Primitives&lt;&#x2F;h3&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;Bool
@@ -307,8 +65,8 @@
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;Uint, Uint8, Uint16, Uint32, Uint64
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;Float32, Float64
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;Char, String
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;Unit
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;All primitive numeric types and &lt;code&gt;Bool&lt;&#x2F;code&gt; are &lt;code&gt;Copy&lt;&#x2F;code&gt;. &lt;code&gt;String&lt;&#x2F;code&gt; is linear.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;algebraic-data-types&quot;&gt;Algebraic Data Types&lt;&#x2F;h3&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;type Option&amp;lt;T&amp;gt; {
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    Some(T),
@@ -331,85 +89,327 @@
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    y: Float64
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;A record is &lt;code&gt;Copy&lt;&#x2F;code&gt; only if explicitly marked and all fields are &lt;code&gt;Copy&lt;&#x2F;code&gt;:&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;standard-library-types&quot;&gt;Standard Library Types&lt;&#x2F;h3&gt;
+&lt;p&gt;For domains where precision matters, the standard library includes:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Decimal&lt;&#x2F;strong&gt;: fixed-point decimal arithmetic for financial calculations&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;BigInt&lt;&#x2F;strong&gt;: arbitrary-precision integers&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;BigDecimal&lt;&#x2F;strong&gt;: arbitrary-precision decimals&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;These avoid floating-point representation errors in financial systems and cryptographic applications.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;linearity-and-copy&quot;&gt;Linearity and Copy&lt;&#x2F;h2&gt;
+&lt;p&gt;All values in Concrete are linear by default. A linear value must be consumed exactly once, not zero times (that&#x27;s a leak), not twice (that&#x27;s a double-free). Consumption happens when you pass the value to a function that takes ownership, return it, destructure it via pattern matching, or explicitly call &lt;code&gt;destroy(x)&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn example!() {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let f = open(&amp;quot;data.txt&amp;quot;)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer destroy(f)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let content = read(&amp;amp;f)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; destroy(f) runs here because of defer
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;If &lt;code&gt;f&lt;&#x2F;code&gt; isn&#x27;t consumed on all paths, the program is rejected. If you try to use &lt;code&gt;f&lt;&#x2F;code&gt; after moving it, the program is rejected. This is compile-time enforcement, not runtime checking.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;the-copy-marker&quot;&gt;The Copy Marker&lt;&#x2F;h3&gt;
+&lt;p&gt;Some types escape linear restrictions. The rules for &lt;code&gt;Copy&lt;&#x2F;code&gt; are:&lt;&#x2F;p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Copy is explicit and opt-in.&lt;&#x2F;strong&gt; You must mark a type as &lt;code&gt;Copy&lt;&#x2F;code&gt;; it is never inferred.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Copy is structural.&lt;&#x2F;strong&gt; A type can be &lt;code&gt;Copy&lt;&#x2F;code&gt; only if all its fields are &lt;code&gt;Copy&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Copy types cannot have destructors.&lt;&#x2F;strong&gt; If a type defines &lt;code&gt;destroy&lt;&#x2F;code&gt;, it cannot be &lt;code&gt;Copy&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Copy types cannot contain linear fields.&lt;&#x2F;strong&gt; A &lt;code&gt;Copy&lt;&#x2F;code&gt; record with a &lt;code&gt;File&lt;&#x2F;code&gt; field is rejected.&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;type Copy Point {
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    x: Float64,
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    y: Float64
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;For generic types, linearity depends on the type parameter. &lt;code&gt;Option&amp;lt;Int&amp;gt;&lt;&#x2F;code&gt; is &lt;code&gt;Copy&lt;&#x2F;code&gt; because &lt;code&gt;Int&lt;&#x2F;code&gt; is. &lt;code&gt;Option&amp;lt;File&amp;gt;&lt;&#x2F;code&gt; is linear because &lt;code&gt;File&lt;&#x2F;code&gt; is.&lt;&#x2F;p&gt;
-&lt;h3 id=&quot;standard-library-types&quot;&gt;Standard Library Types&lt;&#x2F;h3&gt;
-&lt;p&gt;For domains where precision matters, the standard library includes:&lt;&#x2F;p&gt;
+&lt;p&gt;The primitive numeric types and &lt;code&gt;Bool&lt;&#x2F;code&gt; are built-in &lt;code&gt;Copy&lt;&#x2F;code&gt; types. &lt;code&gt;String&lt;&#x2F;code&gt; is linear. For generic types, linearity depends on the type parameter: &lt;code&gt;Option&amp;lt;Int&amp;gt;&lt;&#x2F;code&gt; is &lt;code&gt;Copy&lt;&#x2F;code&gt; because &lt;code&gt;Int&lt;&#x2F;code&gt; is; &lt;code&gt;Option&amp;lt;File&amp;gt;&lt;&#x2F;code&gt; is linear because &lt;code&gt;File&lt;&#x2F;code&gt; is.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;code&gt;Copy&lt;&#x2F;code&gt; is not an escape hatch from thinking about resources. It&#x27;s a marker for types that have no cleanup requirements and can be freely duplicated.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;destructors&quot;&gt;Destructors&lt;&#x2F;h3&gt;
+&lt;p&gt;A linear type may define a destructor:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;type File {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    handle: FileHandle
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;destroy File with(File) {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    close_handle(self.handle)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The destructor takes ownership of &lt;code&gt;self&lt;&#x2F;code&gt;, may require capabilities, and runs exactly once when explicitly invoked. &lt;code&gt;destroy(x)&lt;&#x2F;code&gt; is only valid if the type defines a destructor. A type without a destructor must be consumed by moving, returning, or destructuring.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;defer&quot;&gt;Defer&lt;&#x2F;h3&gt;
+&lt;p&gt;The &lt;code&gt;defer&lt;&#x2F;code&gt; statement schedules cleanup at scope exit:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn process_files!() {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let f1 = open(&amp;quot;a.txt&amp;quot;)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer destroy(f1)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let f2 = open(&amp;quot;b.txt&amp;quot;)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer destroy(f2)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; When scope exits:
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; 1. destroy(f2) runs
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; 2. destroy(f1) runs
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Multiple &lt;code&gt;defer&lt;&#x2F;code&gt; statements execute in reverse order (LIFO). &lt;code&gt;defer&lt;&#x2F;code&gt; runs at scope exit including early returns and error propagation.&lt;&#x2F;p&gt;
+&lt;p&gt;When a value is scheduled with &lt;code&gt;defer destroy(x)&lt;&#x2F;code&gt;, it becomes reserved. You cannot move it, destroy it again, or create borrows that overlap the deferred destruction point.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;abort&quot;&gt;Abort&lt;&#x2F;h3&gt;
+&lt;p&gt;Abort is immediate process termination, outside normal control flow:&lt;&#x2F;p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Decimal&lt;&#x2F;strong&gt; — Fixed-point decimal arithmetic for financial calculations&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;strong&gt;BigInt&lt;&#x2F;strong&gt; — Arbitrary-precision integers&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;strong&gt;BigDecimal&lt;&#x2F;strong&gt; — Arbitrary-precision decimals&lt;&#x2F;li&gt;
+&lt;li&gt;Out-of-memory conditions trigger abort&lt;&#x2F;li&gt;
+&lt;li&gt;Stack overflow triggers abort&lt;&#x2F;li&gt;
+&lt;li&gt;Explicit &lt;code&gt;abort()&lt;&#x2F;code&gt; terminates immediately&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Deferred cleanup does not run on abort&lt;&#x2F;strong&gt;&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
-&lt;p&gt;These avoid floating-point representation errors in financial systems and cryptographic applications.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;determinism&quot;&gt;Determinism&lt;&#x2F;h2&gt;
-&lt;h3 id=&quot;reproducible-builds&quot;&gt;Reproducible Builds&lt;&#x2F;h3&gt;
-&lt;p&gt;Concrete aims for &lt;strong&gt;bit-for-bit reproducible builds&lt;&#x2F;strong&gt;:&lt;&#x2F;p&gt;
+&lt;p&gt;This matches Zig&#x27;s behavior: &lt;code&gt;defer&lt;&#x2F;code&gt; is for normal control flow, not catastrophic failure. Abort is outside language semantics. The process stops. There are no guarantees about state after abort begins.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;borrowing&quot;&gt;Borrowing&lt;&#x2F;h2&gt;
+&lt;p&gt;References let you use values without consuming them. References exist within lexical regions that bound their lifetime.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;borrow f as fref in R {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; fref has type &amp;amp;[File, R]
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    &#x2F;&#x2F; f is unusable in this block
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let len = length(fref)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;&#x2F;&#x2F; f is usable again
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Unlike Rust, no lifetime parameters in function signatures. Functions that accept references are generic over the region, but implicitly:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn length&amp;lt;R&amp;gt;(file: &amp;amp;[File, R]) -&amp;gt; Uint {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The function cannot store the reference because it cannot name &lt;code&gt;R&lt;&#x2F;code&gt; outside the call.&lt;&#x2F;p&gt;
+&lt;p&gt;For single-expression borrows, the region is anonymous:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;let len = length(&amp;amp;f)  &#x2F;&#x2F; borrows f for just this call
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h3 id=&quot;borrowing-rules&quot;&gt;Borrowing Rules&lt;&#x2F;h3&gt;
+&lt;ol&gt;
+&lt;li&gt;While borrowed, the original is unusable&lt;&#x2F;li&gt;
+&lt;li&gt;Multiple immutable borrows allowed&lt;&#x2F;li&gt;
+&lt;li&gt;Mutable borrows exclusive: one &lt;code&gt;&amp;amp;mut T&lt;&#x2F;code&gt; at a time, no simultaneous &lt;code&gt;&amp;amp;T&lt;&#x2F;code&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;References cannot escape their region&lt;&#x2F;li&gt;
+&lt;li&gt;Nested borrows of the same owned value forbidden&lt;&#x2F;li&gt;
+&lt;li&gt;Derived references can&#x27;t outlive the original&#x27;s region&lt;&#x2F;li&gt;
+&lt;&#x2F;ol&gt;
+&lt;p&gt;Closures cannot capture references if the closure escapes the borrow region.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;capabilities&quot;&gt;Capabilities&lt;&#x2F;h2&gt;
+&lt;p&gt;Concrete is &lt;strong&gt;pure by default&lt;&#x2F;strong&gt;. A function without capability annotations cannot perform IO, cannot allocate, cannot mutate external state. It computes a result from its inputs, nothing more.&lt;&#x2F;p&gt;
+&lt;p&gt;Purity means no side effects and no heap allocation. Stack allocation and compile-time constants are permitted. Non-termination is possible; purity does not imply totality.&lt;&#x2F;p&gt;
+&lt;p&gt;When a function needs effects, it declares them:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn read_file(path: String) with(File) -&amp;gt; String {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn process_data() with(File, Network, Alloc) -&amp;gt; Result {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Capabilities propagate monotonically. If &lt;code&gt;f&lt;&#x2F;code&gt; calls &lt;code&gt;g&lt;&#x2F;code&gt;, and &lt;code&gt;g&lt;&#x2F;code&gt; requires &lt;code&gt;File&lt;&#x2F;code&gt;, then &lt;code&gt;f&lt;&#x2F;code&gt; must declare &lt;code&gt;File&lt;&#x2F;code&gt; too. No implicit granting, no ambient authority. The compiler enforces this transitively.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;the-std-capability&quot;&gt;The Std Capability&lt;&#x2F;h3&gt;
+&lt;p&gt;For application entry points, Concrete provides a shorthand. The &lt;code&gt;!&lt;&#x2F;code&gt; suffix declares the &lt;code&gt;Std&lt;&#x2F;code&gt; capability:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn main!() {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    println(&amp;quot;Hello&amp;quot;)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This desugars to &lt;code&gt;fn main() with(Std)&lt;&#x2F;code&gt;. &lt;code&gt;Std&lt;&#x2F;code&gt; includes file operations, network, clock, environment, random, and allocation, but excludes &lt;code&gt;Unsafe&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;Library code should prefer explicit capability lists.&lt;&#x2F;strong&gt; This is a social convention, not a mechanical enforcement. The compiler won&#x27;t reject a library function that uses &lt;code&gt;Std&lt;&#x2F;code&gt;. But explicit capabilities make dependencies auditable. &lt;code&gt;Std&lt;&#x2F;code&gt; is a convenience for applications, not a license for libraries.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;security-model&quot;&gt;Security Model&lt;&#x2F;h3&gt;
+&lt;p&gt;Capabilities don&#x27;t sandbox code. If a dependency declares &lt;code&gt;with(Network)&lt;&#x2F;code&gt;, it gets network access. What they provide is &lt;strong&gt;auditability&lt;&#x2F;strong&gt;. You can grep for &lt;code&gt;with(Network)&lt;&#x2F;code&gt; and find every function that touches the network. You can verify that your JSON parser has no capabilities. You can review dependency updates by diffing capability declarations.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;capability-polymorphism&quot;&gt;Capability Polymorphism&lt;&#x2F;h3&gt;
+&lt;p&gt;Currently, you cannot be generic over capability sets:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;&#x2F;&#x2F; Not allowed
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn map&amp;lt;T, U, C&amp;gt;(list: List&amp;lt;T&amp;gt;, f: fn(T) with(C) -&amp;gt; U) with(C) -&amp;gt; List&amp;lt;U&amp;gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Each capability set must be concrete. This means generic combinators must be duplicated per capability set. Capability polymorphism is future work; the theory is well-understood (effect polymorphism in Koka, Eff, Frank), but adds complexity to the type system and the Lean formalization.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;allocation&quot;&gt;Allocation&lt;&#x2F;h2&gt;
+&lt;p&gt;Allocation deserves special attention because it&#x27;s often invisible. In most languages, many operations allocate behind your back: string concatenation, collection growth, closure creation.&lt;&#x2F;p&gt;
+&lt;p&gt;Concrete treats allocation as a capability. Functions that allocate declare &lt;code&gt;with(Alloc)&lt;&#x2F;code&gt;. The call site binds which allocator:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn main!() {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let arena = Arena.new()
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer arena.deinit()
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let list = create_list&amp;lt;Int&amp;gt;() with(Alloc = arena)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    push(&amp;amp;mut list, 42) with(Alloc = arena)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Inside &lt;code&gt;with(Alloc)&lt;&#x2F;code&gt;, the bound allocator propagates through nested calls. At the boundary, you see exactly where allocation happens and which allocator serves it.&lt;&#x2F;p&gt;
+&lt;p&gt;Stack allocation does not require &lt;code&gt;Alloc&lt;&#x2F;code&gt;:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn example() {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let x: Int = 42                    &#x2F;&#x2F; stack
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let arr: [100]Uint8 = zeroed()     &#x2F;&#x2F; stack
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Allocation-free code is provably allocation-free.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;allocator-types&quot;&gt;Allocator Types&lt;&#x2F;h3&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;&#x2F;&#x2F; General-purpose heap allocator
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;let gpa = GeneralPurposeAllocator.new()
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;defer gpa.deinit()
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;&#x2F;&#x2F; Arena allocator, free everything at once
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;let arena = Arena.new(gpa)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;defer arena.deinit()
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;&#x2F;&#x2F; Fixed buffer allocator, no heap
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;let buf: [1024]Uint8 = zeroed()
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;let fba = FixedBufferAllocator.new(&amp;amp;buf)
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;All allocators implement a common &lt;code&gt;Allocator&lt;&#x2F;code&gt; trait.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;error-handling&quot;&gt;Error Handling&lt;&#x2F;h2&gt;
+&lt;p&gt;Errors are values:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn parse(input: String) -&amp;gt; Result&amp;lt;Config, ParseError&amp;gt; {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn load_config!() -&amp;gt; Result&amp;lt;Config, Error&amp;gt; {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let f = open(&amp;quot;config.toml&amp;quot;)?
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer destroy(f)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let content = read(&amp;amp;f)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let config = parse(content)?
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    Ok(config)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The &lt;code&gt;?&lt;&#x2F;code&gt; operator propagates errors. When &lt;code&gt;?&lt;&#x2F;code&gt; triggers an early return, all &lt;code&gt;defer&lt;&#x2F;code&gt; statements in scope run first. Cleanup happens even on error paths.&lt;&#x2F;p&gt;
+&lt;p&gt;No exceptions. No panic. Unrecoverable faults (out-of-memory, stack overflow, explicit abort) terminate immediately without running deferred cleanup.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;what-you-re-giving-up&quot;&gt;What You&#x27;re Giving Up&lt;&#x2F;h2&gt;
+&lt;p&gt;Concrete is not a general-purpose language. It&#x27;s for code that must be correct: cryptographic implementations, financial systems, safety-critical software, blockchain infrastructure.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;No garbage collection.&lt;&#x2F;strong&gt; Memory is managed through linear types and explicit destruction. No GC pauses, no unpredictable latency, no hidden memory pressure.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;No implicit control flow.&lt;&#x2F;strong&gt; What you see is what executes. No implicit function calls from operator overloading, no compiler-inserted destructor calls. &lt;code&gt;defer&lt;&#x2F;code&gt; statements are explicit: you write them, you see them, even though their execution occurs at scope exit.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;No implicit allocation.&lt;&#x2F;strong&gt; Allocation requires the &lt;code&gt;Alloc&lt;&#x2F;code&gt; capability. &lt;code&gt;grep with(Alloc)&lt;&#x2F;code&gt; finds every function that might touch the heap.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;No interior mutability.&lt;&#x2F;strong&gt; All mutation flows through &lt;code&gt;&amp;amp;mut&lt;&#x2F;code&gt; references. An immutable reference &lt;code&gt;&amp;amp;T&lt;&#x2F;code&gt; guarantees immutability, no hidden mutation behind an immutable facade.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;No reflection, no eval, no runtime metaprogramming.&lt;&#x2F;strong&gt; All code paths are determined at compile time.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;No implicit global state.&lt;&#x2F;strong&gt; All global interactions (file system, network, clock, environment) are mediated through capabilities.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;No variable shadowing.&lt;&#x2F;strong&gt; Each variable name is unique within its scope.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;No null.&lt;&#x2F;strong&gt; Optional values use &lt;code&gt;Option&amp;lt;T&amp;gt;&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;No undefined behavior in safe code.&lt;&#x2F;strong&gt; Kernel semantics are fully defined and proven sound. The &lt;code&gt;Unsafe&lt;&#x2F;code&gt; capability explicitly reintroduces the possibility of undefined behavior for FFI and low-level operations.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;No concurrency primitives.&lt;&#x2F;strong&gt; The language provides no threads, no async&#x2F;await, no channels. Concurrency is a library concern. This may change, but any future concurrency model must preserve determinism and linearity, likely through structured or deterministic concurrency. This is a design constraint, not an open question.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;pattern-matching&quot;&gt;Pattern Matching&lt;&#x2F;h2&gt;
+&lt;p&gt;Exhaustive pattern matching with linear type awareness:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn describe(opt: Option&amp;lt;Int&amp;gt;) -&amp;gt; String {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    match opt {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        Some(n) =&amp;gt; format(&amp;quot;Got {}&amp;quot;, n),
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        None =&amp;gt; &amp;quot;Nothing&amp;quot;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    }
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Linear types in patterns must be consumed:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn handle!(result: Result&amp;lt;Data, File&amp;gt;) {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    match result {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        Ok(data) =&amp;gt; use_data(data),
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        Err(f) =&amp;gt; destroy(f)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    }
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Borrowing in patterns:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn peek(opt: &amp;amp;Option&amp;lt;Int&amp;gt;) -&amp;gt; Int {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    match opt {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        &amp;amp;Some(n) =&amp;gt; n,
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;        &amp;amp;None =&amp;gt; 0
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    }
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;traits&quot;&gt;Traits&lt;&#x2F;h2&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;trait Ord {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    fn compare(&amp;amp;self, other: &amp;amp;Self) -&amp;gt; Ordering
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;trait Show {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    fn show(&amp;amp;self) -&amp;gt; String
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn sort&amp;lt;T: Ord&amp;gt;(list: List&amp;lt;T&amp;gt;) with(Alloc) -&amp;gt; List&amp;lt;T&amp;gt; {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Trait methods take &lt;code&gt;&amp;amp;self&lt;&#x2F;code&gt;, &lt;code&gt;&amp;amp;mut self&lt;&#x2F;code&gt;, or &lt;code&gt;self&lt;&#x2F;code&gt;. If a method takes &lt;code&gt;self&lt;&#x2F;code&gt;, calling it consumes the value.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;type-inference&quot;&gt;Type Inference&lt;&#x2F;h2&gt;
+&lt;p&gt;Type inference is &lt;strong&gt;local only&lt;&#x2F;strong&gt;. Function signatures must be fully annotated. Inside bodies, local types may be inferred:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn process(data: List&amp;lt;Int&amp;gt;) with(Alloc) -&amp;gt; List&amp;lt;Int&amp;gt; {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let doubled = map(data, fn(x) { x * 2 })  &#x2F;&#x2F; inferred
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let filtered = filter(doubled, fn(x) { x &amp;gt; 0 })  &#x2F;&#x2F; inferred
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    filtered
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;You can always understand a function&#x27;s interface without reading its body.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;modules&quot;&gt;Modules&lt;&#x2F;h2&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;module FileSystem
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;public fn open(path: String) with(File) -&amp;gt; Result&amp;lt;File, IOError&amp;gt; {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;public fn read&amp;lt;R&amp;gt;(file: &amp;amp;[File, R]) with(File) -&amp;gt; String {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;private fn validate(path: String) -&amp;gt; Bool {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    ...
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Visibility is &lt;code&gt;public&lt;&#x2F;code&gt; or &lt;code&gt;private&lt;&#x2F;code&gt; (default). Capabilities are part of the signature and the public API contract.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;import FileSystem
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;import FileSystem.{open, read, write}
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;import FileSystem as FS
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;unsafe-and-ffi&quot;&gt;Unsafe and FFI&lt;&#x2F;h2&gt;
+&lt;p&gt;The &lt;code&gt;Unsafe&lt;&#x2F;code&gt; capability gates operations the type system cannot verify: foreign function calls, raw pointer operations, type transmutation, inline assembly, and linearity bypasses.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn transmute&amp;lt;T, U&amp;gt;(value: T) with(Unsafe) -&amp;gt; U
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn ptr_read&amp;lt;T&amp;gt;(ptr: Address[T]) with(Unsafe) -&amp;gt; T
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn ptr_write&amp;lt;T&amp;gt;(ptr: Address[T], value: T) with(Unsafe)
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;code&gt;Unsafe&lt;&#x2F;code&gt; propagates through the call graph like any other capability. Grep for &lt;code&gt;with(Unsafe)&lt;&#x2F;code&gt; to find all trust boundaries.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;raw-pointers&quot;&gt;Raw Pointers&lt;&#x2F;h3&gt;
+&lt;p&gt;Raw pointers exist for FFI and low-level memory manipulation:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;Address[T]       &#x2F;&#x2F; raw pointer to T
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Raw pointers are &lt;code&gt;Copy&lt;&#x2F;code&gt;. They carry no lifetime information and no linearity guarantees. This is safe because:&lt;&#x2F;p&gt;
 &lt;ul&gt;
-&lt;li&gt;Same source code + same compiler version = identical binary&lt;&#x2F;li&gt;
-&lt;li&gt;No timestamps, random seeds, or environment-dependent data embedded in output&lt;&#x2F;li&gt;
-&lt;li&gt;Build order does not affect output&lt;&#x2F;li&gt;
+&lt;li&gt;Creating a raw pointer is safe. &lt;code&gt;address_of(r)&lt;&#x2F;code&gt; extracts an address.&lt;&#x2F;li&gt;
+&lt;li&gt;Holding a raw pointer is safe. It&#x27;s a number.&lt;&#x2F;li&gt;
+&lt;li&gt;Using a raw pointer requires &lt;code&gt;Unsafe&lt;&#x2F;code&gt;. Dereference, arithmetic, and casting are gated.&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
-&lt;h3 id=&quot;perfect-replayability&quot;&gt;Perfect Replayability&lt;&#x2F;h3&gt;
-&lt;p&gt;For debugging, Concrete supports &lt;strong&gt;deterministic replay&lt;&#x2F;strong&gt;:&lt;&#x2F;p&gt;
-&lt;ul&gt;
-&lt;li&gt;All sources of non-determinism are explicit and controllable&lt;&#x2F;li&gt;
-&lt;li&gt;Random number generation requires &lt;code&gt;Random&lt;&#x2F;code&gt; capability with explicit seed&lt;&#x2F;li&gt;
-&lt;li&gt;System time requires &lt;code&gt;Clock&lt;&#x2F;code&gt; capability&lt;&#x2F;li&gt;
-&lt;li&gt;Given the same inputs and capability bindings, execution is identical&lt;&#x2F;li&gt;
-&lt;&#x2F;ul&gt;
-&lt;p&gt;This enables reproducing Heisenbugs that depend on timing or randomness. When your program behaves the same way every time given the same inputs, debugging becomes tractable.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;the-grammar-as-guarantee&quot;&gt;The Grammar as Guarantee&lt;&#x2F;h2&gt;
-&lt;p&gt;Concrete uses an LL(1) grammar. Every parsing decision can be made with a single token of lookahead. No ambiguity, no backtracking, no lexer hacks.&lt;&#x2F;p&gt;
-&lt;p&gt;This might seem like an implementation detail, but it has consequences for the developer experience. Simple tooling can parse Concrete—any LL(1) parser generator works. Syntax errors are local and comprehensible. There are no parser edge cases that behave differently in different tools.&lt;&#x2F;p&gt;
-&lt;p&gt;The grammar enforces stylistic constraints: keywords are reserved, statements and expressions are syntactically distinct, blocks use braces, standard operator precedence is built in. You can&#x27;t invent surprising syntax.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;compilation-targets&quot;&gt;Compilation Targets&lt;&#x2F;h2&gt;
-&lt;p&gt;Concrete supports multiple backends:&lt;&#x2F;p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Native&lt;&#x2F;strong&gt; — Direct machine code via MLIR&#x2F;LLVM&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;strong&gt;C&lt;&#x2F;strong&gt; — Portable C output for maximum platform support&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;strong&gt;WebAssembly&lt;&#x2F;strong&gt; — For browser and edge deployment&lt;&#x2F;li&gt;
-&lt;&#x2F;ul&gt;
-&lt;p&gt;Cross-compilation is a first-class feature. Specify target at build time.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;tooling&quot;&gt;Tooling&lt;&#x2F;h2&gt;
-&lt;p&gt;Unlike languages where essential tooling is an afterthought or third-party dependency, Concrete ships with built-in tools:&lt;&#x2F;p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Package manager&lt;&#x2F;strong&gt; — Dependency resolution and versioning&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;strong&gt;Formatter&lt;&#x2F;strong&gt; — Canonical code formatting (one true style)&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;strong&gt;Linter&lt;&#x2F;strong&gt; — Static analysis and style checking&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;strong&gt;Test runner&lt;&#x2F;strong&gt; — Built-in test framework&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;strong&gt;REPL&lt;&#x2F;strong&gt; — Interactive evaluation for debugging and exploration&lt;&#x2F;li&gt;
-&lt;&#x2F;ul&gt;
-&lt;p&gt;These are part of the language distribution, not external dependencies with their own versioning and compatibility concerns.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;profiling-and-tracing&quot;&gt;Profiling and Tracing&lt;&#x2F;h2&gt;
-&lt;p&gt;Profiling and tracing are first-class features:&lt;&#x2F;p&gt;
-&lt;ul&gt;
-&lt;li&gt;Built into the runtime, not bolted on&lt;&#x2F;li&gt;
-&lt;li&gt;Low overhead when disabled&lt;&#x2F;li&gt;
-&lt;li&gt;Structured output for tooling integration&lt;&#x2F;li&gt;
-&lt;&#x2F;ul&gt;
-&lt;p&gt;While code is read more often than written, it is executed even more often than read. Performance visibility matters, especially for systems programming.&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn to_ptr&amp;lt;T&amp;gt;(r: &amp;amp;T) -&amp;gt; Address[T] {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    address_of(r)  &#x2F;&#x2F; safe
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn deref&amp;lt;T&amp;gt;(ptr: Address[T]) with(Unsafe) -&amp;gt; T {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    read_ptr(ptr)  &#x2F;&#x2F; unsafe: no guarantee ptr is valid
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;&lt;code&gt;Copy&lt;&#x2F;code&gt; does not imply usable. Raw pointers can be freely duplicated because they carry no guarantees. Safety is enforced at the point of use, not at the point of creation.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;foreign-functions&quot;&gt;Foreign Functions&lt;&#x2F;h3&gt;
+&lt;p&gt;Declare foreign functions with &lt;code&gt;Unsafe&lt;&#x2F;code&gt; and the &lt;code&gt;foreign&lt;&#x2F;code&gt; directive:&lt;&#x2F;p&gt;
+&lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn malloc(size: Uint) with(Unsafe) -&amp;gt; Address[Unit] =
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    foreign(&amp;quot;malloc&amp;quot;)
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn free(ptr: Address[Unit]) with(Unsafe) =
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    foreign(&amp;quot;free&amp;quot;)
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The compiler generates calling convention glue and links the symbol. Foreign signatures are restricted to C-compatible types. Details of the type mapping are deferred to a future FFI specification.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;implementation&quot;&gt;Implementation&lt;&#x2F;h2&gt;
+&lt;h3 id=&quot;determinism&quot;&gt;Determinism&lt;&#x2F;h3&gt;
+&lt;p&gt;Concrete aims for &lt;strong&gt;bit-for-bit reproducible builds&lt;&#x2F;strong&gt;: same source + same compiler = identical binary. No timestamps, random seeds, or environment-dependent data in output.&lt;&#x2F;p&gt;
+&lt;p&gt;For debugging, &lt;strong&gt;deterministic replay&lt;&#x2F;strong&gt;: random generation requires &lt;code&gt;Random&lt;&#x2F;code&gt; with explicit seed, system time requires &lt;code&gt;Clock&lt;&#x2F;code&gt;. Same inputs produce identical execution.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;the-grammar&quot;&gt;The Grammar&lt;&#x2F;h3&gt;
+&lt;p&gt;LL(1). Every parsing decision with a single token of lookahead. No ambiguity, no backtracking.&lt;&#x2F;p&gt;
+&lt;p&gt;This is a permanent design constraint, not an implementation detail. Future language evolution is bounded by what LL(1) can express. We accept this constraint for tooling simplicity and error message quality.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;compilation-targets&quot;&gt;Compilation Targets&lt;&#x2F;h3&gt;
+&lt;p&gt;&lt;strong&gt;Native&lt;&#x2F;strong&gt; via MLIR&#x2F;LLVM, &lt;strong&gt;C&lt;&#x2F;strong&gt; for portability, &lt;strong&gt;WebAssembly&lt;&#x2F;strong&gt; for browser and edge. Cross-compilation is first-class.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;tooling&quot;&gt;Tooling&lt;&#x2F;h3&gt;
+&lt;p&gt;Concrete ships with package manager, formatter, linter, test runner, and REPL. Part of the distribution, not external dependencies.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;what-you-can-say-about-programs&quot;&gt;What You Can Say About Programs&lt;&#x2F;h2&gt;
-&lt;p&gt;If a program type-checks in Concrete, you gain mechanical knowledge about it:&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;&quot;This function is pure.&quot;&lt;&#x2F;strong&gt; No capabilities declared. The compiler proves it performs no side effects, no IO, no mutation, no allocation. You can reason about it as a mathematical function.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;&quot;This resource is used exactly once.&quot;&lt;&#x2F;strong&gt; Linear type. The compiler proves no leaks, no double-free, no use-after-free.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;&quot;These are the only effects this code can perform.&quot;&lt;&#x2F;strong&gt; Capability set is explicit. It cannot secretly touch the network or file system.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;&quot;This code cannot escape the type system.&quot;&lt;&#x2F;strong&gt; Unsafe operations require &lt;code&gt;with(Unsafe)&lt;&#x2F;code&gt;. You can grep for all trust boundaries.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;&quot;Allocation happens here, using this allocator.&quot;&lt;&#x2F;strong&gt; Call site binds the allocator. No hidden heap activity.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;&quot;Cleanup happens here.&quot;&lt;&#x2F;strong&gt; &lt;code&gt;defer destroy(x)&lt;&#x2F;code&gt; is visible. The compiler doesn&#x27;t insert invisible destructor calls.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;strong&gt;&quot;This build is reproducible.&quot;&lt;&#x2F;strong&gt; Same inputs, same binary. Debugging is tractable.&lt;&#x2F;p&gt;
-&lt;p&gt;These are mechanical guarantees derived from the type system, which is itself proven sound in Lean. Not best practices, not conventions—proofs.&lt;&#x2F;p&gt;
-&lt;h2 id=&quot;example-file-processing&quot;&gt;Example: File Processing&lt;&#x2F;h2&gt;
+&lt;p&gt;If a program type-checks:&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;&quot;This function is pure.&quot;&lt;&#x2F;strong&gt; No capabilities declared. No side effects, no IO, no allocation.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;&quot;This resource is used exactly once.&quot;&lt;&#x2F;strong&gt; Linear type. No leaks, no double-free, no use-after-free.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;&quot;These are the only effects this code can perform.&quot;&lt;&#x2F;strong&gt; Capability set is explicit and complete.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;&quot;This code cannot escape the type system.&quot;&lt;&#x2F;strong&gt; Unsafe operations require &lt;code&gt;with(Unsafe)&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;&quot;Allocation happens here, using this allocator.&quot;&lt;&#x2F;strong&gt; Call site binds the allocator.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;&quot;Cleanup happens here.&quot;&lt;&#x2F;strong&gt; &lt;code&gt;defer destroy(x)&lt;&#x2F;code&gt; is visible.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;strong&gt;&quot;This build is reproducible.&quot;&lt;&#x2F;strong&gt; Same inputs, same binary.&lt;&#x2F;p&gt;
+&lt;p&gt;Mechanical guarantees from a type system proven sound in Lean. Not conventions, proofs.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;example&quot;&gt;Example&lt;&#x2F;h2&gt;
 &lt;pre class=&quot;z-code&quot;&gt;&lt;code&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;module Main
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;import FileSystem.{open, read, write}
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;import Parse.{parse_csv}
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;
-&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn process_file(input_path: String, output_path: String) with(Std) -&amp;gt; Result&amp;lt;(), Error&amp;gt; {
+&lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;fn process_file(input_path: String, output_path: String) with(File, Alloc) -&amp;gt; Result&amp;lt;Unit, Error&amp;gt; {
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    let in_file = open(input_path)?
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    defer destroy(in_file)
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    
@@ -438,28 +438,28 @@
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;    }
 &lt;&#x2F;span&gt;&lt;span class=&quot;z-text z-plain&quot;&gt;}
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
-&lt;p&gt;Everything is visible: resource acquisition, cleanup scheduling, error propagation, allocator binding. No hidden control flow.&lt;&#x2F;p&gt;
+&lt;p&gt;Everything is visible: resource acquisition, cleanup scheduling, error propagation, allocator binding.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;who-should-use-this&quot;&gt;Who Should Use This&lt;&#x2F;h2&gt;
-&lt;p&gt;Concrete is not for every project. It trades convenience for explicitness, flexibility for auditability. Prototyping is slower. Some patterns become verbose or impossible. You&#x27;ll miss interior mutability when building certain data structures. You&#x27;ll miss runtime reflection when building serialization libraries.&lt;&#x2F;p&gt;
-&lt;p&gt;But for code where correctness is paramount—cryptographic primitives, consensus protocols, financial transaction systems, medical device firmware—the trade is worth it. You get a language where you can make strong claims about program behavior and those claims are mechanically verified.&lt;&#x2F;p&gt;
-&lt;p&gt;The verified kernel means the language semantics won&#x27;t drift. The capability system means effects are auditable. The linear types mean resources are managed with precision. The LL(1) grammar means tooling is straightforward. Reproducible builds mean debugging is tractable.&lt;&#x2F;p&gt;
-&lt;p&gt;Concrete aims to be a language you can trust the way you trust mathematics: not because someone promises it works, but because you can check the proof yourself.&lt;&#x2F;p&gt;
+&lt;p&gt;Concrete trades convenience for explicitness, flexibility for auditability. Prototyping is slower. Some patterns become verbose. You&#x27;ll miss interior mutability for certain data structures.&lt;&#x2F;p&gt;
+&lt;p&gt;But for cryptographic primitives, consensus protocols, financial transaction systems, medical device firmware, the trade is worth it. Strong claims about program behavior, mechanically verified.&lt;&#x2F;p&gt;
+&lt;p&gt;A language you can trust the way you trust mathematics: not because someone promises it works, but because you can check the proof.&lt;&#x2F;p&gt;
 &lt;hr &#x2F;&gt;
 &lt;h2 id=&quot;quick-reference&quot;&gt;Quick Reference&lt;&#x2F;h2&gt;
 &lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Annotation&lt;&#x2F;th&gt;&lt;th&gt;Meaning&lt;&#x2F;th&gt;&lt;&#x2F;tr&gt;&lt;&#x2F;thead&gt;&lt;tbody&gt;
-&lt;tr&gt;&lt;td&gt;&lt;code&gt;fn foo() -&amp;gt; T&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Pure function, no capabilities, no allocation&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;fn foo() -&amp;gt; T&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Pure function, no capabilities&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;code&gt;fn foo!() -&amp;gt; T&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Shorthand for &lt;code&gt;with(Std)&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;code&gt;fn foo() with(C) -&amp;gt; T&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Requires capability set &lt;code&gt;C&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;code&gt;with(Alloc)&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Function may allocate&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;code&gt;with(Alloc = a)&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Bind allocator &lt;code&gt;a&lt;&#x2F;code&gt; at call site&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;code&gt;T&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Linear type, must be consumed exactly once&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;code&gt;type Copy T&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Unrestricted type, can be copied or ignored&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;T&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Linear type, consumed exactly once&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;type Copy T&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Unrestricted type, freely duplicated&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;code&gt;&amp;amp;T&lt;&#x2F;code&gt; or &lt;code&gt;&amp;amp;[T, R]&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Immutable reference in region &lt;code&gt;R&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;code&gt;&amp;amp;mut T&lt;&#x2F;code&gt; or &lt;code&gt;&amp;amp;mut [T, R]&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Mutable reference in region &lt;code&gt;R&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;&amp;amp;mut T&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Mutable reference&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;Address[T]&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Raw pointer (unsafe to use)&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;code&gt;borrow x as y in R { }&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Explicit borrow with named region&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;code&gt;defer expr&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Run &lt;code&gt;expr&lt;&#x2F;code&gt; when scope exits&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;code&gt;destroy(x)&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Consume &lt;code&gt;x&lt;&#x2F;code&gt; via destructor&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;code&gt;destroy T with(C) { }&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Define destructor for type &lt;code&gt;T&lt;&#x2F;code&gt; requiring capability &lt;code&gt;C&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;defer expr&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Run &lt;code&gt;expr&lt;&#x2F;code&gt; at scope exit&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;destroy(x)&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Consume via destructor&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;code&gt;foreign(&quot;symbol&quot;)&lt;&#x2F;code&gt;&lt;&#x2F;td&gt;&lt;td&gt;Foreign function binding&lt;&#x2F;td&gt;&lt;&#x2F;tr&gt;
 &lt;&#x2F;tbody&gt;&lt;&#x2F;table&gt;
 </description>
       </item>
