@@ -686,6 +686,16 @@ This is a permanent design constraint, not an implementation detail. Future lang
 
 Concrete ships with package manager, formatter, linter, test runner, and REPL. Part of the distribution, not external dependencies.
 
+### Profiling and Tracing
+
+Profiling and tracing are first-class:
+
+- Built into the runtime, not bolted on
+- Low overhead when disabled
+- Structured output for tooling integration
+
+Code is read more often than written, but executed more often than read. Performance visibility matters for systems programming.
+
 ## What You Can Say About Programs
 
 If a program type-checks:

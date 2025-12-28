@@ -49,7 +49,7 @@
       
   <div class="metadata">
     <time title="Published date" datetime="2025-12-26" property="datePublished">December 26, 2025</time>
-    <span title="Reading time" property="timeRequired" content="PT33M">33 minutes read</span>
+    <span title="Reading time" property="timeRequired" content="PT34M">34 minutes read</span>
     
       <span><a href="https://github.com/unbalancedparentheses/federicocarrone.com/edit/main/content/series&#x2F;concrete&#x2F;2025-12-26-the-concrete-programming-language-systems-programming-for-formal-reasoning&#x2F;index.md" title="Submit a patch for this page">Edit</a> this page</span>
       
@@ -531,6 +531,14 @@
 <p><strong>Native</strong> via MLIR/LLVM, <strong>C</strong> for portability, <strong>WebAssembly</strong> for browser and edge. Cross-compilation is first-class.</p>
 <h3 id="tooling">Tooling</h3>
 <p>Concrete ships with package manager, formatter, linter, test runner, and REPL. Part of the distribution, not external dependencies.</p>
+<h3 id="profiling-and-tracing">Profiling and Tracing</h3>
+<p>Profiling and tracing are first-class:</p>
+<ul>
+<li>Built into the runtime, not bolted on</li>
+<li>Low overhead when disabled</li>
+<li>Structured output for tooling integration</li>
+</ul>
+<p>Code is read more often than written, but executed more often than read. Performance visibility matters for systems programming.</p>
 <h2 id="what-you-can-say-about-programs">What You Can Say About Programs</h2>
 <p>If a program type-checks:</p>
 <p><strong>"This function is pure."</strong> No capabilities declared. No side effects, no IO, no allocation.</p>
