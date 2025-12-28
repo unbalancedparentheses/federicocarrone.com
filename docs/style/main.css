@@ -682,3 +682,75 @@ article {
     outline: var(--border-width) var(--color-accent) dotted;
   }
 }
+
+/* Table of Contents */
+.toc {
+  margin-block: var(--space-large);
+  padding: var(--space);
+  background: var(--color-dark-blue);
+  border: var(--border-width) var(--border-color) solid;
+
+  h2 {
+    font-size: 1.1em;
+    margin-block: 0 var(--space);
+  }
+
+  ul {
+    margin: 0;
+    padding-inline-start: var(--space-large);
+  }
+
+  li {
+    margin-block: var(--space-very-small);
+  }
+
+  a {
+    color: var(--color-dark);
+
+    &:hover, &:focus {
+      color: var(--color-accent);
+    }
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-light: #1a1a1a;
+    --color-lighter: #252525;
+    --color-light-darker: #999;
+    --color-dark: #e0e0e0;
+    --color-dark-lighter: #444;
+    --color-dark-blue: #252525;
+    --color-accent: #e04545;
+    --color-accent-darker: #c03030;
+    --color-accent2: #8b1e23;
+  }
+
+  code {
+    background: #2a2a2a;
+  }
+}
+
+/* Print styles */
+@media print {
+  #menu, footer, .toc {
+    display: none;
+  }
+
+  body {
+    font-size: 12pt;
+    background: white;
+    color: black;
+  }
+
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    border: 1px solid #ccc;
+  }
+}
