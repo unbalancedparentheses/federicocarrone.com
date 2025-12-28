@@ -8,7 +8,7 @@ keywords=["crypto"]
 pinned = false
 +++
 
-# Crypto and the 21st Century
+# Crypto and the accelerated and chaotic 21st Century
 
 We believe crypto has been incredibly successful at providing a trustless financial layer for the 21st century. In particular it has found product market fit in two main areas:
 
