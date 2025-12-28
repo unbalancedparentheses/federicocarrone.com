@@ -26,15 +26,6 @@ The specification and the formalization will co-evolve. As we prove properties i
 
 The kernel is versioned separately from the surface language. Once the kernel reaches 1.0, it is frozen. New surface features must elaborate to existing kernel constructs. If a feature can't be expressed in the kernel, the feature doesn't ship.
 
-## Design Principles
-
-1. **Pure by default** — Functions without capability annotations are pure: no side effects, no allocation
-2. **Explicit capabilities** — All effects tracked in function signatures
-3. **Linear by default** — Values consumed exactly once unless marked `Copy`
-4. **No hidden control flow** — All function calls, cleanup, and allocation visible in source
-5. **Fits in your head** — Small enough for one person to fully understand
-6. **LL(1) grammar** — Parseable with single token lookahead, no ambiguity
-
 ## The Core Idea
 
 Most languages treat verification as something bolted on after the fact. You write code, then maybe you write tests, maybe you run a linter, maybe you bring in a theorem prover for critical sections. The language itself remains agnostic about provability.
@@ -54,6 +45,17 @@ We do not guarantee termination. Recursive functions may diverge. We do not guar
 ### The Trust Boundary
 
 The kernel type system and its properties are mechanically checked in Lean. What remains trusted: the Lean proof checker itself, the elaborator (surface language to kernel), and the code generator (kernel to machine code). Verifying the elaborator and code generator is future work.
+
+## Design Principles
+
+From this kernel-centric design, six principles follow:
+
+1. **Pure by default** — Functions without capability annotations are pure: no side effects, no allocation
+2. **Explicit capabilities** — All effects tracked in function signatures
+3. **Linear by default** — Values consumed exactly once unless marked `Copy`
+4. **No hidden control flow** — All function calls, cleanup, and allocation visible in source
+5. **Fits in your head** — Small enough for one person to fully understand
+6. **LL(1) grammar** — Parseable with single token lookahead, no ambiguity
 
 ## The Compilation Pipeline
 
@@ -82,6 +84,20 @@ Source Code (.concrete)
 ```
 
 The kernel checkpoint is the semantic gate. Everything before it transforms syntax; everything after it preserves meaning.
+
+## No Hidden Control Flow
+
+When you read Concrete code, what you see is what executes.
+
+**No implicit function calls.** Operators are not overloaded methods. `a + b` on integers is primitive addition, not a call to `Add::add`. There are no implicit conversions that invoke code.
+
+**No implicit destruction.** The compiler never inserts destructor calls. Rust's RAII inserts `drop()` at scope boundaries invisibly; Concrete requires you to write `defer destroy(x)`. You see the cleanup in the source.
+
+**No implicit allocation.** Allocation happens when you call a function with `Alloc` capability bound to an allocator. String concatenation, collection growth, closure capture—if they allocate, you see `with(Alloc)` in the signature.
+
+**No invisible error handling.** Errors propagate only where `?` appears. There are no exceptions unwinding the stack behind your back.
+
+The cost is verbosity. The benefit is that reading the code tells you what the code does. For auditing, debugging, and formal verification, this tradeoff is correct.
 
 ## Types
 
@@ -218,18 +234,9 @@ When a value is scheduled with `defer destroy(x)`, it becomes reserved. The rule
 
 The value is still owned by the current scope until exit, but it is no longer available for use. This prevents double destruction and dangling borrows.
 
-### Abort
-
-Abort is immediate process termination, outside normal control flow. Following Zig's model:
-
-- Out-of-memory conditions trigger abort
-- Stack overflow triggers abort  
-- Explicit `abort()` terminates immediately
-- **Deferred cleanup does not run on abort**
-
-`defer` is for normal control flow, not catastrophic failure. Abort is outside language semantics. The process stops. There are no guarantees about state after abort begins.
-
 ## Borrowing
+
+Borrowing defers consumption without extending lifetime or weakening linearity.
 
 References let you use values without consuming them. Concrete's borrowing model draws from Rust but simplifies it: references exist within lexical regions that bound their lifetime, with no lifetime parameters in function signatures.
 
@@ -275,7 +282,7 @@ Closures cannot capture references if the closure escapes the borrow region. Thi
 
 A capability is a static permission annotation on a function. It declares which effects the function may perform. Capabilities are not runtime values—they cannot be created, passed, stored, or inspected at runtime. They exist only at the type level, checked by the compiler and erased before execution.
 
-Capabilities are predefined names. Users cannot define new capabilities or create composite capability types. Function signatures may combine predefined capabilities using `+` in the `with()` clause, but only among names exported by the platform's capability universe. There is no capability arithmetic, no capability inheritance, no way to forge a capability your caller didn't have.
+Capabilities are predefined names. Users cannot define new capabilities or create composite capability types. Function signatures may combine predefined capabilities using `+` in the `with()` clause, but only among names exported by the platform's capability universe. The set of capabilities is fixed per target platform and finite—user code cannot extend it. There is no capability arithmetic, no capability inheritance, no way to forge a capability your caller didn't have.
 
 Capabilities that can be manufactured at runtime aren't capabilities—they're tokens.
 
@@ -435,15 +442,24 @@ fn load_config!() -> Result<Config, Error> {
 
 The `?` operator propagates errors. When `?` triggers an early return, all `defer` statements in scope run first. Cleanup happens even on error paths.
 
-No exceptions. No panic. Unrecoverable faults (out-of-memory, stack overflow, explicit abort) terminate immediately without running deferred cleanup.
+No exceptions. No panic.
+
+### Abort
+
+Abort is immediate process termination, outside normal control flow and outside the language's semantic model. Following Zig's approach:
+
+- Out-of-memory conditions trigger abort
+- Stack overflow triggers abort
+- Explicit `abort()` terminates immediately
+- **Deferred cleanup does not run on abort**
+
+`defer` is for normal control flow, not catastrophic failure. Abort is the escape hatch when `Result` isn't enough. The process stops. There are no guarantees about state after abort begins.
 
 ## What You're Giving Up
 
 Concrete is not a general-purpose language. It's for code that must be correct: cryptographic implementations, financial systems, safety-critical software, blockchain infrastructure.
 
 **No garbage collection.** Memory is managed through linear types and explicit destruction. No GC pauses, no unpredictable latency, no hidden memory pressure.
-
-**No implicit control flow.** What you see is what executes. No implicit function calls from operator overloading, no compiler-inserted destructor calls. `defer` statements are explicit: you write them, you see them, even though their execution occurs at scope exit.
 
 **No implicit allocation.** Allocation requires the `Alloc` capability. `grep with(Alloc)` finds every function that might touch the heap.
 
