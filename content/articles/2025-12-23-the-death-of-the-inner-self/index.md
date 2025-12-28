@@ -5,7 +5,7 @@ description = "Many features of human experience that feel natural are historica
 [taxonomies]
 keywords=["consciousness", "coordination", "individuality"]
 [extra]
-pinned = false
+pinned = true
 +++
 
 I am working on a series of articles that connect biology, computation, philosophy, the history of the West and the formation of individuality. The core argument is simple: many features of human life that appear stable and natural are historically produced. As society accelerates a number of these features begin to lose their function and their permanence. This is just a draft of what I'm working on.
