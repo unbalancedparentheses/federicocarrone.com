@@ -267,13 +267,27 @@ let len = length(&f)  // borrows f for just this call
 5. Nested borrows of the same owned value forbidden
 6. Derived references can't outlive the original's region
 
-Closures cannot capture references if the closure escapes the borrow region.
+Closures cannot capture references if the closure escapes the borrow region. This ensures references never outlive their lexical scope.
 
 ## Capabilities
 
+### What Capabilities Are
+
+A capability is a static permission annotation on a function. It declares which effects the function may perform. Capabilities are not runtime values—they cannot be created, passed, stored, or inspected at runtime. They exist only at the type level, checked by the compiler and erased before execution.
+
+Capabilities are predefined names. Users cannot define new capabilities or create composite capability types. Function signatures may combine predefined capabilities using `+` in the `with()` clause, but only among names exported by the platform's capability universe. There is no capability arithmetic, no capability inheritance, no way to forge a capability your caller didn't have.
+
+Capabilities that can be manufactured at runtime aren't capabilities—they're tokens.
+
+### Purity
+
 Concrete is **pure by default**, following Austral's approach to effect tracking. A function without capability annotations cannot perform IO, cannot allocate, cannot mutate external state. It computes a result from its inputs, nothing more.
 
-Purity means no side effects and no heap allocation. Stack allocation and compile-time constants are permitted. Non-termination is possible; purity does not imply totality.
+Purity in Concrete has a precise definition: a function is pure if and only if it declares no capabilities and does not require `Alloc`. Equivalently, purity means an empty capability set.
+
+Pure functions may use stack allocation and compile-time constants—these are not effects. Pure functions may diverge—termination is orthogonal to purity. A non-terminating function that performs no IO and touches no heap is still pure. This separates effect-freedom (what Concrete tracks) from totality (which Concrete does not guarantee).
+
+Purity enables equational reasoning: a pure function called twice with the same arguments yields the same result. Totality would enable stronger claims about program termination, but enforcing it would require restricting recursion, which conflicts with systems programming.
 
 When a function needs effects, it declares them:
 
@@ -353,6 +367,21 @@ fn example() {
 
 Allocation-free code is provably allocation-free.
 
+### Allocator Binding Scope
+
+Allocator binding is lexically scoped. A binding applies within the static extent of the call being evaluated and any nested calls that require `with(Alloc)`.
+
+A nested binding may shadow an outer binding:
+
+```
+fn outer() with(Alloc) {
+    inner()                         // uses outer binding
+    inner() with(Alloc = arena2)    // shadows within this call
+}
+```
+
+Closures capture allocator bindings only if the closure is invoked within the lexical scope where the binding is in effect. If a closure escapes that scope, it cannot rely on an implicit allocator binding and must instead accept an explicit allocator parameter or be rejected by the type checker.
+
 ### Allocator Types
 
 ```
@@ -370,6 +399,20 @@ let fba = FixedBufferAllocator.new(&buf)
 ```
 
 All allocators implement a common `Allocator` trait.
+
+### Allocator Interface
+
+```
+trait Allocator {
+    fn alloc<T>(&mut self, count: Uint) -> Result<&mut [T], AllocError>
+    fn free<T>(&mut self, ptr: &mut [T])
+    fn realloc<T>(&mut self, ptr: &mut [T], new_count: Uint) -> Result<&mut [T], AllocError>
+}
+```
+
+The interface is minimal. `alloc` returns a mutable slice or fails. `free` releases memory. `realloc` resizes in place or relocates. All three take `&mut self`—allocators are stateful resources, not ambient services.
+
+Custom allocators implement this trait. The standard library allocators (`GeneralPurposeAllocator`, `Arena`, `FixedBufferAllocator`) are implementations, not special cases.
 
 ## Error Handling
 
@@ -406,7 +449,14 @@ Concrete is not a general-purpose language. It's for code that must be correct: 
 
 **No interior mutability.** All mutation flows through `&mut` references. An immutable reference `&T` guarantees immutability, no hidden mutation behind an immutable facade. This forbids patterns like shared caches and memoization behind shared references. If you need a cache, pass `&mut`. If you need lazy initialization, initialize before borrowing. For advanced patterns that genuinely require interior mutability, the standard library provides `UnsafeCell<T>` gated by the `Unsafe` capability.
 
-**No reflection, no eval, no runtime metaprogramming.** All code paths are determined at compile time.
+**No reflection, no eval, no runtime metaprogramming.** All code paths are determined at compile time. There is no way to inspect types at runtime, call methods by name dynamically, or generate code during execution.
+
+If macros are added in a future version, they will be constrained to preserve the "can a machine reason about this?" principle:
+
+- **Hygienic** — no accidental variable capture
+- **Phase-separated** — macro expansion completes before type checking
+- **Syntactic** — macros transform syntax trees, not strings
+- **Capability-tracked** — procedural macros that execute arbitrary code at compile time will require capability annotations, extending effect tracking to the compile-time phase
 
 **No implicit global state.** All global interactions (file system, network, clock, environment) are mediated through capabilities.
 
@@ -417,6 +467,26 @@ Concrete is not a general-purpose language. It's for code that must be correct: 
 **No undefined behavior in safe code.** Kernel semantics are fully defined and proven sound. The `Unsafe` capability explicitly reintroduces the possibility of undefined behavior for FFI and low-level operations.
 
 **No concurrency primitives.** The language provides no threads, no async/await, no channels. Concurrency is a library concern. This may change, but any future concurrency model must preserve determinism and linearity, likely through structured or deterministic concurrency. This is a design constraint, not an open question.
+
+### Anti-Features Summary
+
+| Concrete does not have | Rationale |
+|------------------------|-----------|
+| Garbage collection | Predictable latency, explicit resource management |
+| Hidden control flow | Auditability, debuggability |
+| Hidden allocation | Performance visibility, allocator control |
+| Interior mutability | Simple reasoning, verification tractability |
+| Reflection / eval | Static analysis, all paths known at compile time |
+| Global mutable state | Effect tracking, reproducibility |
+| Variable shadowing | Clarity, fewer subtle bugs |
+| Null | Type safety via `Option<T>` |
+| Exceptions | Errors as values, explicit propagation |
+| Implicit conversions | No silent data loss or coercion |
+| Function overloading | Except through traits with explicit bounds |
+| Uninitialized variables | Memory safety |
+| Macros | Undecided; if added, will be hygienic and capability-aware |
+| Concurrency primitives | Undecided; must preserve linearity and determinism |
+| Undefined behavior (in safe code) | Kernel semantics fully defined |
 
 ## Pattern Matching
 
@@ -526,7 +596,13 @@ private fn validate(path: String) -> Bool {
 }
 ```
 
-Visibility is `public` or `private` (default). Capabilities are part of the signature and the public API contract.
+Visibility is `public` or `private` (default). 
+
+### Capabilities as Public Contract
+
+Capabilities are part of a function's signature and therefore part of the public API contract. Changing the required capability set of a public function is a breaking change. This applies in both directions: adding a capability requirement breaks callers who don't have it; removing one changes the function's guarantees.
+
+When reviewing dependency updates, diff the capability declarations. A library that adds `with(Network)` to a function that previously had none is a significant change, even if the types remain identical.
 
 ```
 import FileSystem
