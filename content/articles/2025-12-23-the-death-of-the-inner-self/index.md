@@ -1,9 +1,9 @@
 +++
 title = "The Death of the Inner Self"
 date = "2025-12-23"
-description = ""
+description = "Many features of human experience that feel natural are historically produced. Individuality and consciousness belong to this category. They emerged through specific cultural practices to solve problems of coordination, responsibility, and long-term planning. Computation and capital now solve these problems faster, at larger scales, through external processes. As decision-making, memory, and meaning-production migrate into automated feedback loops, the inner self loses its function. These essays trace the construction of modern subjectivity and examine what happens as the conditions that produced it dissolve."
 [taxonomies]
-keywords=["consciousness"]
+keywords=["consciousness", "coordination", "individuality"]
 [extra]
 pinned = false
 +++
