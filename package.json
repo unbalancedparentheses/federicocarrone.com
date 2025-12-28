@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "build-css": "lightningcss static/style/main.css --minify -o static/style/min/main.css"
+  },
   "devDependencies": {
     "lightningcss-cli": "^1.30.2"
   }

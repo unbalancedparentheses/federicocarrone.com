@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+  <meta
+  http-equiv="content-security-policy"
+  content="default-src 'self'; child-src 'self' https://www.youtube-nocookie.com; script-src 'self' https://cloud.umami.is; connect-src 'self' https://api-gateway.umami.dev"
+  >
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>The Concrete Programming Language: Systems Programming for Formal Reasoning</title>
+
+  <link rel="stylesheet" href="https://federicocarrone.com/style/min/main.css?h=9c42f150ed77525ba8cd" />
+  <link rel="stylesheet" href="https://federicocarrone.com/style/min/syntax-theme.css?h=ef9797b0398b3ffe9058" />
+
+  <meta name="author" content="Federico Carrone" />
+  <meta name="description" content="federicocarrone.com" />
+  <meta property="og:title" content="The Concrete Programming Language: Systems Programming for Formal Reasoning — from the series Concrete" />
+  <meta property="og:site_name" content="federicocarrone.com" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://federicocarrone.com/series/concrete/the-concrete-programming-language-systems-programming-for-formal-reasoning/" />
+
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="062ee306-b2e8-479b-80fd-1afeefa0bb29"></script>
+</head>
+<body class="content-grid">
+
+<nav id="menu" class="full-width content-grid">
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="https://federicocarrone.com/articles/">Articles</a></li>
+    <li><a href="https://federicocarrone.com/series/">Series</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+</nav>
+
+<main vocab="https://schema.org">
+
+  <article class="series-episode" typeof="Article">
+    <header>
+      <h1 property="name">The Concrete Programming Language: Systems Programming for Formal Reasoning</h1>
+
+      <nav property="isPartOf" typeof="CreativeWorkSeries">
+        <p>From the series <a href="/series/concrete/" property="url"><span property="name">Concrete</span></a>.</p>
+      </nav>
+
+      
+  <div class="metadata">
+    <time title="Published date" datetime="2025-12-26" property="datePublished">December 26, 2025</time>
+    <span title="Reading time" property="timeRequired" content="PT34M">34 minutes read</span>
+    
+      <span><a href="https://github.com/unbalancedparentheses/federicocarrone.com/edit/main/content/series&#x2F;concrete&#x2F;2025-12-26-the-concrete-programming-language-systems-programming-for-formal-reasoning&#x2F;index.md" title="Submit a patch for this page">Edit</a> this page</span>
+      
+    
+  </div>
+
+    </header>
+
+    <p>There's a tension at the heart of systems programming. We want languages expressive enough to build complex systems, yet simple enough to reason about with confidence. We want performance without sacrificing safety. We want the freedom to write low-level code and the guarantees that come from formal verification.</p>
+<p>Concrete is an attempt to resolve these tensions through commitment to a single organizing principle: <strong>every design choice must answer the question, can a machine reason about this?</strong></p>
+<h2 id="on-this-specification">On This Specification</h2>
+<p>This document describes what we're building, not what we've finished building. The kernel formalization in Lean is ongoing work. Until that formalization is complete, this specification likely contains mistakes, ambiguities, and internal contradictions.</p>
+<p>We state this not as an apology but as a feature of our approach. Most language specifications accumulate contradictions silently over years, edge cases where the spec says one thing and the implementation does another, or where two parts of the spec conflict in ways nobody noticed. These contradictions become load-bearing bugs that can never be fixed without breaking existing code.</p>
+<p>By designing Concrete around a formally verified kernel from the start, we force these contradictions into the open. When we formalize a feature in Lean, the proof assistant will reject inconsistencies. Features that seem reasonable on paper will turn out to be unsound, and we'll have to redesign them. This is the point. We'd rather discover that our linearity rules have a hole <em>before</em> a million lines of code depend on the broken behavior.</p>
+<p>The specification and the formalization will co-evolve. As we prove properties in Lean, we'll update this document. As we write this document, we'll discover what needs proving. The goal is convergence: eventually, this specification will be a human-readable projection of a machine-checked artifact.</p>
+<h3 id="stability-promise">Stability Promise</h3>
+<p>The kernel is versioned separately from the surface language. Once the kernel reaches 1.0, it is frozen. New surface features must elaborate to existing kernel constructs. If a feature can't be expressed in the kernel, the feature doesn't ship.</p>
+<h2 id="the-core-idea">The Core Idea</h2>
+<p>Most languages treat verification as something bolted on after the fact. You write code, then maybe you write tests, maybe you run a linter, maybe you bring in a theorem prover for critical sections. The language itself remains agnostic about provability.</p>
+<p>Concrete inverts this relationship. The language is <em>designed around</em> a verified core, a small kernel calculus formalized in Lean 4 with mechanically-checked proofs of progress, preservation, linearity soundness, and effect soundness. The surface language exists only to elaborate into this kernel.</p>
+<h3 id="what-correct-means">What "Correct" Means</h3>
+<p>When we say a type-checked program is "correct by construction," we mean correct with respect to specific properties:</p>
+<ul>
+<li><strong>Memory safety</strong>: no use-after-free, no double-free, no dangling references</li>
+<li><strong>Resource safety</strong>: linear values consumed exactly once, no leaks</li>
+<li><strong>Effect correctness</strong>: declared capabilities match actual effects</li>
+</ul>
+<p>We do not guarantee termination. Recursive functions may diverge. We do not guarantee liveness or deadlock freedom. These properties are outside the current verification scope. The kernel proves progress (well-typed programs don't get stuck) and preservation (types are maintained during evaluation), which together yield memory and resource safety, not total correctness.</p>
+<h3 id="the-trust-boundary">The Trust Boundary</h3>
+<p>The kernel type system and its properties are mechanically checked in Lean. What remains trusted: the Lean proof checker itself, the elaborator (surface language to kernel), and the code generator (kernel to machine code). Verifying the elaborator and code generator is future work.</p>
+<h2 id="design-principles">Design Principles</h2>
+<p>From this kernel-centric design, six principles follow:</p>
+<ol>
+<li><strong>Pure by default</strong> — Functions without capability annotations are pure: no side effects, no allocation</li>
+<li><strong>Explicit capabilities</strong> — All effects tracked in function signatures</li>
+<li><strong>Linear by default</strong> — Values consumed exactly once unless marked <code>Copy</code></li>
+<li><strong>No hidden control flow</strong> — All function calls, cleanup, and allocation visible in source</li>
+<li><strong>Fits in your head</strong> — Small enough for one person to fully understand</li>
+<li><strong>LL(1) grammar</strong> — Parseable with single token lookahead, no ambiguity</li>
+</ol>
+<h2 id="the-compilation-pipeline">The Compilation Pipeline</h2>
+<pre class="z-code"><code><span class="z-text z-plain">Source Code (.concrete)
+</span><span class="z-text z-plain">       ↓
+</span><span class="z-text z-plain">   Lexer/Parser (LL(1) recursive descent)
+</span><span class="z-text z-plain">       ↓
+</span><span class="z-text z-plain">   Surface AST
+</span><span class="z-text z-plain">       ↓
+</span><span class="z-text z-plain">   Elaboration
+</span><span class="z-text z-plain">     - Type checking
+</span><span class="z-text z-plain">     - Linearity checking
+</span><span class="z-text z-plain">     - Capability checking
+</span><span class="z-text z-plain">     - Borrow/region checking
+</span><span class="z-text z-plain">     - Defer insertion points
+</span><span class="z-text z-plain">     - Allocator binding resolution
+</span><span class="z-text z-plain">       ↓
+</span><span class="z-text z-plain">   Kernel IR (core calculus)
+</span><span class="z-text z-plain">       ↓
+</span><span class="z-text z-plain">   Kernel Checker ← proven sound in Lean
+</span><span class="z-text z-plain">       ↓
+</span><span class="z-text z-plain">   Code Generation
+</span><span class="z-text z-plain">       ↓
+</span><span class="z-text z-plain">   Machine Code
+</span></code></pre>
+<p>The kernel checkpoint is the semantic gate. Everything before it transforms syntax; everything after it preserves meaning.</p>
+<h2 id="no-hidden-control-flow">No Hidden Control Flow</h2>
+<p>When you read Concrete code, what you see is what executes.</p>
+<p><strong>No implicit function calls.</strong> Operators are not overloaded methods. <code>a + b</code> on integers is primitive addition, not a call to <code>Add::add</code>. There are no implicit conversions that invoke code.</p>
+<p><strong>No implicit destruction.</strong> The compiler never inserts destructor calls. Rust's RAII inserts <code>drop()</code> at scope boundaries invisibly; Concrete requires you to write <code>defer destroy(x)</code>. You see the cleanup in the source.</p>
+<p><strong>No implicit allocation.</strong> Allocation happens when you call a function with <code>Alloc</code> capability bound to an allocator. String concatenation, collection growth, closure capture—if they allocate, you see <code>with(Alloc)</code> in the signature.</p>
+<p><strong>No invisible error handling.</strong> Errors propagate only where <code>?</code> appears. There are no exceptions unwinding the stack behind your back.</p>
+<p>The cost is verbosity. The benefit is that reading the code tells you what the code does. For auditing, debugging, and formal verification, this tradeoff is correct.</p>
+<h2 id="types">Types</h2>
+<h3 id="primitives">Primitives</h3>
+<pre class="z-code"><code><span class="z-text z-plain">Bool
+</span><span class="z-text z-plain">Int, Int8, Int16, Int32, Int64
+</span><span class="z-text z-plain">Uint, Uint8, Uint16, Uint32, Uint64
+</span><span class="z-text z-plain">Float32, Float64
+</span><span class="z-text z-plain">Char, String
+</span><span class="z-text z-plain">Unit
+</span></code></pre>
+<h3 id="algebraic-data-types">Algebraic Data Types</h3>
+<pre class="z-code"><code><span class="z-text z-plain">type Option&lt;T&gt; {
+</span><span class="z-text z-plain">    Some(T),
+</span><span class="z-text z-plain">    None
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">type Result&lt;T, E&gt; {
+</span><span class="z-text z-plain">    Ok(T),
+</span><span class="z-text z-plain">    Err(E)
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">type List&lt;T&gt; {
+</span><span class="z-text z-plain">    Nil,
+</span><span class="z-text z-plain">    Cons(T, List&lt;T&gt;)
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<h3 id="records">Records</h3>
+<pre class="z-code"><code><span class="z-text z-plain">type Point {
+</span><span class="z-text z-plain">    x: Float64,
+</span><span class="z-text z-plain">    y: Float64
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<h3 id="standard-library-types">Standard Library Types</h3>
+<p>For domains where precision matters, the standard library includes:</p>
+<ul>
+<li><strong>Decimal</strong>: fixed-point decimal arithmetic for financial calculations</li>
+<li><strong>BigInt</strong>: arbitrary-precision integers</li>
+<li><strong>BigDecimal</strong>: arbitrary-precision decimals</li>
+</ul>
+<p>These avoid floating-point representation errors in financial systems and cryptographic applications.</p>
+<h2 id="linearity-and-copy">Linearity and Copy</h2>
+<p>All values in Concrete are linear by default. A linear value must be consumed exactly once, not zero times (that's a leak), not twice (that's a double-free). This is closer to Austral's strict linearity than Rust's affine types, which allow values to be dropped without explicit consumption.</p>
+<p>Consumption happens when you pass the value to a function that takes ownership, return it, destructure it via pattern matching, or explicitly call <code>destroy(x)</code>.</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn example!() {
+</span><span class="z-text z-plain">    let f = open(&quot;data.txt&quot;)
+</span><span class="z-text z-plain">    defer destroy(f)
+</span><span class="z-text z-plain">    let content = read(&amp;f)
+</span><span class="z-text z-plain">    // destroy(f) runs here because of defer
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>If <code>f</code> isn't consumed on all paths, the program is rejected. If you try to use <code>f</code> after moving it, the program is rejected. This is compile-time enforcement, not runtime checking.</p>
+<h3 id="the-copy-marker">The Copy Marker</h3>
+<p>Some types escape linear restrictions. The rules for <code>Copy</code> are:</p>
+<ol>
+<li><strong>Copy is explicit and opt-in.</strong> You must mark a type as <code>Copy</code>; it is never inferred.</li>
+<li><strong>Copy is structural.</strong> A type can be <code>Copy</code> only if all its fields are <code>Copy</code>.</li>
+<li><strong>Copy types cannot have destructors.</strong> If a type defines <code>destroy</code>, it cannot be <code>Copy</code>.</li>
+<li><strong>Copy types cannot contain linear fields.</strong> A <code>Copy</code> record with a <code>File</code> field is rejected.</li>
+</ol>
+<pre class="z-code"><code><span class="z-text z-plain">type Copy Point {
+</span><span class="z-text z-plain">    x: Float64,
+</span><span class="z-text z-plain">    y: Float64
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>The primitive numeric types and <code>Bool</code> are built-in <code>Copy</code> types. <code>String</code> is linear. For generic types, linearity depends on the type parameter: <code>Option&lt;Int&gt;</code> is <code>Copy</code> because <code>Int</code> is; <code>Option&lt;File&gt;</code> is linear because <code>File</code> is.</p>
+<p><code>Copy</code> is not an escape hatch from thinking about resources. It's a marker for types that have no cleanup requirements and can be freely duplicated.</p>
+<h3 id="destructors">Destructors</h3>
+<p>A linear type may define a destructor:</p>
+<pre class="z-code"><code><span class="z-text z-plain">type File {
+</span><span class="z-text z-plain">    handle: FileHandle
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">destroy File with(File) {
+</span><span class="z-text z-plain">    close_handle(self.handle)
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>The destructor takes ownership of <code>self</code>, may require capabilities, and runs exactly once when explicitly invoked. <code>destroy(x)</code> is only valid if the type defines a destructor. A type without a destructor must be consumed by moving, returning, or destructuring.</p>
+<h3 id="defer">Defer</h3>
+<p>The <code>defer</code> statement schedules cleanup at scope exit, borrowed directly from Zig and Go:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn process_files!() {
+</span><span class="z-text z-plain">    let f1 = open(&quot;a.txt&quot;)
+</span><span class="z-text z-plain">    defer destroy(f1)
+</span><span class="z-text z-plain">    
+</span><span class="z-text z-plain">    let f2 = open(&quot;b.txt&quot;)
+</span><span class="z-text z-plain">    defer destroy(f2)
+</span><span class="z-text z-plain">    
+</span><span class="z-text z-plain">    // When scope exits:
+</span><span class="z-text z-plain">    // 1. destroy(f2) runs
+</span><span class="z-text z-plain">    // 2. destroy(f1) runs
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>Multiple <code>defer</code> statements execute in reverse order (LIFO). <code>defer</code> runs at scope exit including early returns and error propagation.</p>
+<h3 id="defer-reserves-the-value">Defer Reserves the Value</h3>
+<p>When a value is scheduled with <code>defer destroy(x)</code>, it becomes reserved. The rules:</p>
+<ol>
+<li>After <code>defer destroy(x)</code>, you cannot move <code>x</code></li>
+<li>After <code>defer destroy(x)</code>, you cannot destroy <code>x</code> again</li>
+<li>After <code>defer destroy(x)</code>, you cannot <code>defer destroy(x)</code> again</li>
+<li>After <code>defer destroy(x)</code>, you cannot create borrows of <code>x</code> that might overlap the deferred destruction point</li>
+</ol>
+<p>The value is still owned by the current scope until exit, but it is no longer available for use. This prevents double destruction and dangling borrows.</p>
+<h2 id="borrowing">Borrowing</h2>
+<p>Borrowing defers consumption without extending lifetime or weakening linearity.</p>
+<p>References let you use values without consuming them. Concrete's borrowing model draws from Rust but simplifies it: references exist within lexical regions that bound their lifetime, with no lifetime parameters in function signatures.</p>
+<pre class="z-code"><code><span class="z-text z-plain">borrow f as fref in R {
+</span><span class="z-text z-plain">    // fref has type &amp;[File, R]
+</span><span class="z-text z-plain">    // f is unusable in this block
+</span><span class="z-text z-plain">    let len = length(fref)
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">// f is usable again
+</span></code></pre>
+<p>Functions that accept references are generic over the region, but implicitly:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn length&lt;R&gt;(file: &amp;[File, R]) -&gt; Uint {
+</span><span class="z-text z-plain">    ...
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>The function cannot store the reference because it cannot name <code>R</code> outside the call.</p>
+<p>For single-expression borrows, the region is anonymous:</p>
+<pre class="z-code"><code><span class="z-text z-plain">let len = length(&amp;f)  // borrows f for just this call
+</span></code></pre>
+<h3 id="borrowing-rules">Borrowing Rules</h3>
+<ol>
+<li>While borrowed, the original is unusable</li>
+<li>Multiple immutable borrows allowed</li>
+<li>Mutable borrows exclusive: one <code>&amp;mut T</code> at a time, no simultaneous <code>&amp;T</code></li>
+<li>References cannot escape their region</li>
+<li>Nested borrows of the same owned value forbidden</li>
+<li>Derived references can't outlive the original's region</li>
+</ol>
+<p>Closures cannot capture references if the closure escapes the borrow region. This ensures references never outlive their lexical scope.</p>
+<h2 id="capabilities">Capabilities</h2>
+<h3 id="what-capabilities-are">What Capabilities Are</h3>
+<p>A capability is a static permission annotation on a function. It declares which effects the function may perform. Capabilities are not runtime values—they cannot be created, passed, stored, or inspected at runtime. They exist only at the type level, checked by the compiler and erased before execution.</p>
+<p>Capabilities are predefined names. Users cannot define new capabilities or create composite capability types. Function signatures may combine predefined capabilities using <code>+</code> in the <code>with()</code> clause, but only among names exported by the platform's capability universe. The set of capabilities is fixed per target platform and finite—user code cannot extend it. There is no capability arithmetic, no capability inheritance, no way to forge a capability your caller didn't have.</p>
+<p>Capabilities that can be manufactured at runtime aren't capabilities—they're tokens.</p>
+<h3 id="purity">Purity</h3>
+<p>Concrete is <strong>pure by default</strong>, following Austral's approach to effect tracking. A function without capability annotations cannot perform IO, cannot allocate, cannot mutate external state. It computes a result from its inputs, nothing more.</p>
+<p>Purity in Concrete has a precise definition: a function is pure if and only if it declares no capabilities and does not require <code>Alloc</code>. Equivalently, purity means an empty capability set.</p>
+<p>Pure functions may use stack allocation and compile-time constants—these are not effects. Pure functions may diverge—termination is orthogonal to purity. A non-terminating function that performs no IO and touches no heap is still pure. This separates effect-freedom (what Concrete tracks) from totality (which Concrete does not guarantee).</p>
+<p>Purity enables equational reasoning: a pure function called twice with the same arguments yields the same result. Totality would enable stronger claims about program termination, but enforcing it would require restricting recursion, which conflicts with systems programming.</p>
+<p>When a function needs effects, it declares them:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn read_file(path: String) with(File) -&gt; String {
+</span><span class="z-text z-plain">    ...
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">fn process_data() with(File, Network, Alloc) -&gt; Result {
+</span><span class="z-text z-plain">    ...
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>Capabilities propagate monotonically. If <code>f</code> calls <code>g</code>, and <code>g</code> requires <code>File</code>, then <code>f</code> must declare <code>File</code> too. No implicit granting, no ambient authority. The compiler enforces this transitively.</p>
+<h3 id="the-std-capability">The Std Capability</h3>
+<p>For application entry points, Concrete provides a shorthand. The <code>!</code> suffix declares the <code>Std</code> capability:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn main!() {
+</span><span class="z-text z-plain">    println(&quot;Hello&quot;)
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>This desugars to <code>fn main() with(Std)</code>. <code>Std</code> includes file operations, network, clock, environment, random, and allocation, but excludes <code>Unsafe</code>.</p>
+<p><strong>Library code should prefer explicit capability lists.</strong> This is a social convention, not a mechanical enforcement. The compiler won't reject a library function that uses <code>Std</code>. But explicit capabilities make dependencies auditable. <code>Std</code> is a convenience for applications, not a license for libraries.</p>
+<h3 id="security-model">Security Model</h3>
+<p>Capabilities don't sandbox code. If a dependency declares <code>with(Network)</code>, it gets network access. What they provide is <strong>auditability</strong>. You can grep for <code>with(Network)</code> and find every function that touches the network. You can verify that your JSON parser has no capabilities. You can review dependency updates by diffing capability declarations.</p>
+<h3 id="capability-polymorphism">Capability Polymorphism</h3>
+<p>Currently, you cannot be generic over capability sets:</p>
+<pre class="z-code"><code><span class="z-text z-plain">// Not allowed
+</span><span class="z-text z-plain">fn map&lt;T, U, C&gt;(list: List&lt;T&gt;, f: fn(T) with(C) -&gt; U) with(C) -&gt; List&lt;U&gt;
+</span></code></pre>
+<p>Each capability set must be concrete. This means generic combinators must be duplicated per capability set. Capability polymorphism is future work; the theory is well-understood (effect polymorphism in Koka, Eff, Frank), but adds complexity to the type system and the Lean formalization.</p>
+<h3 id="parametricity">Parametricity</h3>
+<p>Generic functions cannot accidentally become effectful depending on instantiation. A function <code>fn map&lt;T, U&gt;(list: List&lt;T&gt;, f: fn(T) -&gt; U) -&gt; List&lt;U&gt;</code> is pure regardless of what <code>T</code> and <code>U</code> are. If <code>f</code> requires capabilities, that must be declared in the signature.</p>
+<p>Capabilities are checked before monomorphization. When generic code is specialized to concrete types, capability requirements don't change. A pure generic function stays pure at every instantiation.</p>
+<h2 id="allocation">Allocation</h2>
+<p>Allocation deserves special attention because it's often invisible. In most languages, many operations allocate behind your back: string concatenation, collection growth, closure creation.</p>
+<p>Concrete treats allocation as a capability, with explicit allocator passing inspired by Zig. Functions that allocate declare <code>with(Alloc)</code>. The call site binds which allocator:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn main!() {
+</span><span class="z-text z-plain">    let arena = Arena.new()
+</span><span class="z-text z-plain">    defer arena.deinit()
+</span><span class="z-text z-plain">    
+</span><span class="z-text z-plain">    let list = create_list&lt;Int&gt;() with(Alloc = arena)
+</span><span class="z-text z-plain">    push(&amp;mut list, 42) with(Alloc = arena)
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>Inside <code>with(Alloc)</code>, the bound allocator propagates through nested calls. At the boundary, you see exactly where allocation happens and which allocator serves it.</p>
+<p>Stack allocation does not require <code>Alloc</code>:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn example() {
+</span><span class="z-text z-plain">    let x: Int = 42                    // stack
+</span><span class="z-text z-plain">    let arr: [100]Uint8 = zeroed()     // stack
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>Allocation-free code is provably allocation-free.</p>
+<h3 id="allocator-binding-scope">Allocator Binding Scope</h3>
+<p>Allocator binding is lexically scoped. A binding applies within the static extent of the call being evaluated and any nested calls that require <code>with(Alloc)</code>.</p>
+<p>A nested binding may shadow an outer binding:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn outer() with(Alloc) {
+</span><span class="z-text z-plain">    inner()                         // uses outer binding
+</span><span class="z-text z-plain">    inner() with(Alloc = arena2)    // shadows within this call
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>Closures capture allocator bindings only if the closure is invoked within the lexical scope where the binding is in effect. If a closure escapes that scope, it cannot rely on an implicit allocator binding and must instead accept an explicit allocator parameter or be rejected by the type checker.</p>
+<h3 id="allocator-types">Allocator Types</h3>
+<pre class="z-code"><code><span class="z-text z-plain">// General-purpose heap allocator
+</span><span class="z-text z-plain">let gpa = GeneralPurposeAllocator.new()
+</span><span class="z-text z-plain">defer gpa.deinit()
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">// Arena allocator, free everything at once
+</span><span class="z-text z-plain">let arena = Arena.new(gpa)
+</span><span class="z-text z-plain">defer arena.deinit()
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">// Fixed buffer allocator, no heap
+</span><span class="z-text z-plain">let buf: [1024]Uint8 = zeroed()
+</span><span class="z-text z-plain">let fba = FixedBufferAllocator.new(&amp;buf)
+</span></code></pre>
+<p>All allocators implement a common <code>Allocator</code> trait.</p>
+<h3 id="allocator-interface">Allocator Interface</h3>
+<pre class="z-code"><code><span class="z-text z-plain">trait Allocator {
+</span><span class="z-text z-plain">    fn alloc&lt;T&gt;(&amp;mut self, count: Uint) -&gt; Result&lt;&amp;mut [T], AllocError&gt;
+</span><span class="z-text z-plain">    fn free&lt;T&gt;(&amp;mut self, ptr: &amp;mut [T])
+</span><span class="z-text z-plain">    fn realloc&lt;T&gt;(&amp;mut self, ptr: &amp;mut [T], new_count: Uint) -&gt; Result&lt;&amp;mut [T], AllocError&gt;
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>The interface is minimal. <code>alloc</code> returns a mutable slice or fails. <code>free</code> releases memory. <code>realloc</code> resizes in place or relocates. All three take <code>&amp;mut self</code>—allocators are stateful resources, not ambient services.</p>
+<p>Custom allocators implement this trait. The standard library allocators (<code>GeneralPurposeAllocator</code>, <code>Arena</code>, <code>FixedBufferAllocator</code>) are implementations, not special cases.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>Errors are values, using <code>Result&lt;T, E&gt;</code> like Rust and the <code>?</code> operator for propagation:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn parse(input: String) -&gt; Result&lt;Config, ParseError&gt; {
+</span><span class="z-text z-plain">    ...
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">fn load_config!() -&gt; Result&lt;Config, Error&gt; {
+</span><span class="z-text z-plain">    let f = open(&quot;config.toml&quot;)?
+</span><span class="z-text z-plain">    defer destroy(f)
+</span><span class="z-text z-plain">    
+</span><span class="z-text z-plain">    let content = read(&amp;f)
+</span><span class="z-text z-plain">    let config = parse(content)?
+</span><span class="z-text z-plain">    Ok(config)
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>The <code>?</code> operator propagates errors. When <code>?</code> triggers an early return, all <code>defer</code> statements in scope run first. Cleanup happens even on error paths.</p>
+<p>No exceptions. No panic.</p>
+<h3 id="abort">Abort</h3>
+<p>Abort is immediate process termination, outside normal control flow and outside the language's semantic model. Following Zig's approach:</p>
+<ul>
+<li>Out-of-memory conditions trigger abort</li>
+<li>Stack overflow triggers abort</li>
+<li>Explicit <code>abort()</code> terminates immediately</li>
+<li><strong>Deferred cleanup does not run on abort</strong></li>
+</ul>
+<p><code>defer</code> is for normal control flow, not catastrophic failure. Abort is the escape hatch when <code>Result</code> isn't enough. The process stops. There are no guarantees about state after abort begins.</p>
+<h2 id="what-you-re-giving-up">What You're Giving Up</h2>
+<p>Concrete is not a general-purpose language. It's for code that must be correct: cryptographic implementations, financial systems, safety-critical software, blockchain infrastructure.</p>
+<p><strong>No garbage collection.</strong> Memory is managed through linear types and explicit destruction. No GC pauses, no unpredictable latency, no hidden memory pressure.</p>
+<p><strong>No implicit allocation.</strong> Allocation requires the <code>Alloc</code> capability. <code>grep with(Alloc)</code> finds every function that might touch the heap.</p>
+<p><strong>No interior mutability.</strong> All mutation flows through <code>&amp;mut</code> references. An immutable reference <code>&amp;T</code> guarantees immutability, no hidden mutation behind an immutable facade. This forbids patterns like shared caches and memoization behind shared references. If you need a cache, pass <code>&amp;mut</code>. If you need lazy initialization, initialize before borrowing. For advanced patterns that genuinely require interior mutability, the standard library provides <code>UnsafeCell&lt;T&gt;</code> gated by the <code>Unsafe</code> capability.</p>
+<p><strong>No reflection, no eval, no runtime metaprogramming.</strong> All code paths are determined at compile time. There is no way to inspect types at runtime, call methods by name dynamically, or generate code during execution.</p>
+<p>If macros are added in a future version, they will be constrained to preserve the "can a machine reason about this?" principle:</p>
+<ul>
+<li><strong>Hygienic</strong> — no accidental variable capture</li>
+<li><strong>Phase-separated</strong> — macro expansion completes before type checking</li>
+<li><strong>Syntactic</strong> — macros transform syntax trees, not strings</li>
+<li><strong>Capability-tracked</strong> — procedural macros that execute arbitrary code at compile time will require capability annotations, extending effect tracking to the compile-time phase</li>
+</ul>
+<p><strong>No implicit global state.</strong> All global interactions (file system, network, clock, environment) are mediated through capabilities.</p>
+<p><strong>No variable shadowing.</strong> Each variable name is unique within its scope.</p>
+<p><strong>No null.</strong> Optional values use <code>Option&lt;T&gt;</code>.</p>
+<p><strong>No undefined behavior in safe code.</strong> Kernel semantics are fully defined and proven sound. The <code>Unsafe</code> capability explicitly reintroduces the possibility of undefined behavior for FFI and low-level operations.</p>
+<p><strong>No concurrency primitives.</strong> The language provides no threads, no async/await, no channels. Concurrency is a library concern. This may change, but any future concurrency model must preserve determinism and linearity, likely through structured or deterministic concurrency. This is a design constraint, not an open question.</p>
+<h3 id="anti-features-summary">Anti-Features Summary</h3>
+<table><thead><tr><th>Concrete does not have</th><th>Rationale</th></tr></thead><tbody>
+<tr><td>Garbage collection</td><td>Predictable latency, explicit resource management</td></tr>
+<tr><td>Hidden control flow</td><td>Auditability, debuggability</td></tr>
+<tr><td>Hidden allocation</td><td>Performance visibility, allocator control</td></tr>
+<tr><td>Interior mutability</td><td>Simple reasoning, verification tractability</td></tr>
+<tr><td>Reflection / eval</td><td>Static analysis, all paths known at compile time</td></tr>
+<tr><td>Global mutable state</td><td>Effect tracking, reproducibility</td></tr>
+<tr><td>Variable shadowing</td><td>Clarity, fewer subtle bugs</td></tr>
+<tr><td>Null</td><td>Type safety via <code>Option&lt;T&gt;</code></td></tr>
+<tr><td>Exceptions</td><td>Errors as values, explicit propagation</td></tr>
+<tr><td>Implicit conversions</td><td>No silent data loss or coercion</td></tr>
+<tr><td>Function overloading</td><td>Except through traits with explicit bounds</td></tr>
+<tr><td>Uninitialized variables</td><td>Memory safety</td></tr>
+<tr><td>Macros</td><td>Undecided; if added, will be hygienic and capability-aware</td></tr>
+<tr><td>Concurrency primitives</td><td>Undecided; must preserve linearity and determinism</td></tr>
+<tr><td>Undefined behavior (in safe code)</td><td>Kernel semantics fully defined</td></tr>
+</tbody></table>
+<h2 id="pattern-matching">Pattern Matching</h2>
+<p>Exhaustive pattern matching with linear type awareness:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn describe(opt: Option&lt;Int&gt;) -&gt; String {
+</span><span class="z-text z-plain">    match opt {
+</span><span class="z-text z-plain">        Some(n) =&gt; format(&quot;Got {}&quot;, n),
+</span><span class="z-text z-plain">        None =&gt; &quot;Nothing&quot;
+</span><span class="z-text z-plain">    }
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>Linear types in patterns must be consumed:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn handle!(result: Result&lt;Data, File&gt;) {
+</span><span class="z-text z-plain">    match result {
+</span><span class="z-text z-plain">        Ok(data) =&gt; use_data(data),
+</span><span class="z-text z-plain">        Err(f) =&gt; destroy(f)
+</span><span class="z-text z-plain">    }
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>Borrowing in patterns:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn peek(opt: &amp;Option&lt;Int&gt;) -&gt; Int {
+</span><span class="z-text z-plain">    match opt {
+</span><span class="z-text z-plain">        &amp;Some(n) =&gt; n,
+</span><span class="z-text z-plain">        &amp;None =&gt; 0
+</span><span class="z-text z-plain">    }
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<h2 id="traits">Traits</h2>
+<p>Traits provide bounded polymorphism, similar to Rust's trait system:</p>
+<pre class="z-code"><code><span class="z-text z-plain">trait Ord {
+</span><span class="z-text z-plain">    fn compare(&amp;self, other: &amp;Self) -&gt; Ordering
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">trait Show {
+</span><span class="z-text z-plain">    fn show(&amp;self) -&gt; String
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">fn sort&lt;T: Ord&gt;(list: List&lt;T&gt;) with(Alloc) -&gt; List&lt;T&gt; {
+</span><span class="z-text z-plain">    ...
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<h3 id="receiver-modes-and-linear-types">Receiver Modes and Linear Types</h3>
+<p>Trait methods take the receiver in one of three forms:</p>
+<ul>
+<li><code>&amp;self</code> — borrows the value immutably</li>
+<li><code>&amp;mut self</code> — borrows the value mutably</li>
+<li><code>self</code> — takes ownership, consuming the value</li>
+</ul>
+<p>If a trait method takes <code>self</code>, calling it consumes the value. This follows linear consumption rules:</p>
+<pre class="z-code"><code><span class="z-text z-plain">trait Consume {
+</span><span class="z-text z-plain">    fn consume(self)
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">fn use_once&lt;T: Consume&gt;(x: T) {
+</span><span class="z-text z-plain">    x.consume()  // x is consumed here
+</span><span class="z-text z-plain">    // x.consume()  // ERROR: x already consumed
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>A trait implementation for a linear type must respect the receiver mode. An <code>&amp;self</code> method cannot consume the value. An <code>&amp;mut self</code> method cannot let the value escape. A <code>self</code> method consumes it.</p>
+<h2 id="type-inference">Type Inference</h2>
+<p>Type inference is <strong>local only</strong>. Function signatures must be fully annotated. Inside bodies, local types may be inferred:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn process(data: List&lt;Int&gt;) with(Alloc) -&gt; List&lt;Int&gt; {
+</span><span class="z-text z-plain">    let doubled = map(data, fn(x) { x * 2 })  // inferred
+</span><span class="z-text z-plain">    let filtered = filter(doubled, fn(x) { x &gt; 0 })  // inferred
+</span><span class="z-text z-plain">    filtered
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>You can always understand a function's interface without reading its body.</p>
+<h2 id="modules">Modules</h2>
+<pre class="z-code"><code><span class="z-text z-plain">module FileSystem
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">public fn open(path: String) with(File) -&gt; Result&lt;File, IOError&gt; {
+</span><span class="z-text z-plain">    ...
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">public fn read&lt;R&gt;(file: &amp;[File, R]) with(File) -&gt; String {
+</span><span class="z-text z-plain">    ...
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">private fn validate(path: String) -&gt; Bool {
+</span><span class="z-text z-plain">    ...
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>Visibility is <code>public</code> or <code>private</code> (default).</p>
+<h3 id="capabilities-as-public-contract">Capabilities as Public Contract</h3>
+<p>Capabilities are part of a function's signature and therefore part of the public API contract. Changing the required capability set of a public function is a breaking change. This applies in both directions: adding a capability requirement breaks callers who don't have it; removing one changes the function's guarantees.</p>
+<p>When reviewing dependency updates, diff the capability declarations. A library that adds <code>with(Network)</code> to a function that previously had none is a significant change, even if the types remain identical.</p>
+<pre class="z-code"><code><span class="z-text z-plain">import FileSystem
+</span><span class="z-text z-plain">import FileSystem.{open, read, write}
+</span><span class="z-text z-plain">import FileSystem as FS
+</span></code></pre>
+<h2 id="unsafe-and-ffi">Unsafe and FFI</h2>
+<p>The <code>Unsafe</code> capability gates operations the type system cannot verify: foreign function calls, raw pointer operations, type transmutation, inline assembly, and linearity bypasses.</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn transmute&lt;T, U&gt;(value: T) with(Unsafe) -&gt; U
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">fn ptr_read&lt;T&gt;(ptr: Address[T]) with(Unsafe) -&gt; T
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">fn ptr_write&lt;T&gt;(ptr: Address[T], value: T) with(Unsafe)
+</span></code></pre>
+<p><code>Unsafe</code> propagates through the call graph like any other capability. Grep for <code>with(Unsafe)</code> to find all trust boundaries.</p>
+<h3 id="raw-pointers">Raw Pointers</h3>
+<p>Raw pointers exist for FFI and low-level memory manipulation:</p>
+<pre class="z-code"><code><span class="z-text z-plain">Address[T]       // raw pointer to T
+</span></code></pre>
+<p>Raw pointers are <code>Copy</code>. They carry no lifetime information and no linearity guarantees. This is safe because:</p>
+<ul>
+<li>Creating a raw pointer is safe. <code>address_of(r)</code> extracts an address.</li>
+<li>Holding a raw pointer is safe. It's a number.</li>
+<li>Using a raw pointer requires <code>Unsafe</code>. Dereference, arithmetic, and casting are gated.</li>
+</ul>
+<pre class="z-code"><code><span class="z-text z-plain">fn to_ptr&lt;T&gt;(r: &amp;T) -&gt; Address[T] {
+</span><span class="z-text z-plain">    address_of(r)  // safe
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">fn deref&lt;T&gt;(ptr: Address[T]) with(Unsafe) -&gt; T {
+</span><span class="z-text z-plain">    read_ptr(ptr)  // unsafe: no guarantee ptr is valid
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p><code>Copy</code> does not imply usable. Raw pointers can be freely duplicated because they carry no guarantees. Safety is enforced at the point of use, not at the point of creation.</p>
+<h3 id="foreign-functions">Foreign Functions</h3>
+<p>Declare foreign functions with <code>Unsafe</code> and the <code>foreign</code> directive:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn malloc(size: Uint) with(Unsafe) -&gt; Address[Unit] =
+</span><span class="z-text z-plain">    foreign(&quot;malloc&quot;)
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">fn free(ptr: Address[Unit]) with(Unsafe) =
+</span><span class="z-text z-plain">    foreign(&quot;free&quot;)
+</span></code></pre>
+<p>The compiler generates calling convention glue and links the symbol. Foreign signatures are restricted to C-compatible types. Details of the type mapping are deferred to a future FFI specification.</p>
+<h2 id="implementation">Implementation</h2>
+<h3 id="determinism">Determinism</h3>
+<p>Concrete aims for <strong>bit-for-bit reproducible builds</strong>: same source + same compiler = identical binary. No timestamps, random seeds, or environment-dependent data in output.</p>
+<p>For debugging, <strong>deterministic replay</strong>: random generation requires <code>Random</code> with explicit seed, system time requires <code>Clock</code>. Same inputs produce identical execution.</p>
+<h3 id="the-grammar">The Grammar</h3>
+<p>LL(1). Every parsing decision with a single token of lookahead. No ambiguity, no backtracking.</p>
+<p>This is a permanent design constraint, not an implementation detail. Future language evolution is bounded by what LL(1) can express. We accept this constraint for tooling simplicity and error message quality.</p>
+<h3 id="compilation-targets">Compilation Targets</h3>
+<p><strong>Native</strong> via MLIR/LLVM, <strong>C</strong> for portability, <strong>WebAssembly</strong> for browser and edge. Cross-compilation is first-class.</p>
+<h3 id="tooling">Tooling</h3>
+<p>Concrete ships with package manager, formatter, linter, test runner, and REPL. Part of the distribution, not external dependencies.</p>
+<h3 id="profiling-and-tracing">Profiling and Tracing</h3>
+<p>Profiling and tracing are first-class:</p>
+<ul>
+<li>Built into the runtime, not bolted on</li>
+<li>Low overhead when disabled</li>
+<li>Structured output for tooling integration</li>
+</ul>
+<p>Code is read more often than written, but executed more often than read. Performance visibility matters for systems programming.</p>
+<h2 id="what-you-can-say-about-programs">What You Can Say About Programs</h2>
+<p>If a program type-checks:</p>
+<p><strong>"This function is pure."</strong> No capabilities declared. No side effects, no IO, no allocation.</p>
+<p><strong>"This resource is used exactly once."</strong> Linear type. No leaks, no double-free, no use-after-free.</p>
+<p><strong>"These are the only effects this code can perform."</strong> Capability set is explicit and complete.</p>
+<p><strong>"This code cannot escape the type system."</strong> Unsafe operations require <code>with(Unsafe)</code>.</p>
+<p><strong>"Allocation happens here, using this allocator."</strong> Call site binds the allocator.</p>
+<p><strong>"Cleanup happens here."</strong> <code>defer destroy(x)</code> is visible.</p>
+<p><strong>"This build is reproducible."</strong> Same inputs, same binary.</p>
+<p>Mechanical guarantees from a type system proven sound in Lean. Not conventions, proofs.</p>
+<h2 id="example">Example</h2>
+<pre class="z-code"><code><span class="z-text z-plain">module Main
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">import FileSystem.{open, read, write}
+</span><span class="z-text z-plain">import Parse.{parse_csv}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">fn process_file(input_path: String, output_path: String) with(File, Alloc) -&gt; Result&lt;Unit, Error&gt; {
+</span><span class="z-text z-plain">    let in_file = open(input_path)?
+</span><span class="z-text z-plain">    defer destroy(in_file)
+</span><span class="z-text z-plain">    
+</span><span class="z-text z-plain">    let content = read(&amp;in_file)
+</span><span class="z-text z-plain">    let data = parse_csv(content)?
+</span><span class="z-text z-plain">    let output = transform(&amp;data)
+</span><span class="z-text z-plain">    
+</span><span class="z-text z-plain">    let out_file = open(output_path)?
+</span><span class="z-text z-plain">    defer destroy(out_file)
+</span><span class="z-text z-plain">    
+</span><span class="z-text z-plain">    write(&amp;mut out_file, output)
+</span><span class="z-text z-plain">    Ok(())
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">fn transform(data: &amp;List&lt;Row&gt;) -&gt; String {
+</span><span class="z-text z-plain">    ...
+</span><span class="z-text z-plain">}
+</span><span class="z-text z-plain">
+</span><span class="z-text z-plain">fn main!() {
+</span><span class="z-text z-plain">    let arena = Arena.new()
+</span><span class="z-text z-plain">    defer arena.deinit()
+</span><span class="z-text z-plain">    
+</span><span class="z-text z-plain">    match process_file(&quot;input.csv&quot;, &quot;output.txt&quot;) with(Alloc = arena) {
+</span><span class="z-text z-plain">        Ok(()) =&gt; println(&quot;Done&quot;),
+</span><span class="z-text z-plain">        Err(e) =&gt; println(&quot;Error: &quot; + e.message())
+</span><span class="z-text z-plain">    }
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>Everything is visible: resource acquisition, cleanup scheduling, error propagation, allocator binding.</p>
+<h2 id="influences">Influences</h2>
+<p>The kernel calculus is formalized in Lean 4. Coq could serve the same role; we chose Lean for its performance and active development.</p>
+<p>Austral shaped the type system more than any other language. Linear types in Concrete are strict: every value must be consumed exactly once. Rust's affine types allow dropping values without explicit consumption; we don't. The capability system for effect tracking also comes from Austral.</p>
+<p>From Rust: borrowing, traits, error handling, pattern matching. Concrete uses lexical regions instead of lifetime annotations, which simplifies the model but covers fewer cases. <code>Result&lt;T, E&gt;</code> and the <code>?</code> operator are lifted directly.</p>
+<p>Zig's influence shows in explicit allocator passing and defer. Zig functions that allocate take an allocator parameter; Concrete expresses the same idea through <code>with(Alloc)</code> and allocator binding at call sites.</p>
+<p>Go had defer first. Go also shipped gofmt, which ended style debates by making one canonical format. We ship a formatter too.</p>
+<p>The <code>!</code> syntax for impure functions comes from Roc. <code>fn main!()</code> marks impurity at a glance.</p>
+<p>Koka, Eff, and Frank are the algebraic effects languages. Concrete's capabilities are a simplified version of their effect systems. Capability polymorphism would bring us closer to their expressiveness; it's future work.</p>
+<p>Haskell proved that pure-by-default is practical. Clean had uniqueness types (precursor to linear types) and purity before Haskell did.</p>
+<p>Cyclone pioneered region-based memory, the research line that led to Rust's lifetimes and our lexical regions. ATS showed linear types and theorem proving can coexist. Ada/SPARK proved formal verification works in production: avionics, rail, security-critical systems.</p>
+<p>CompCert and seL4 established that you can mechanically verify real systems software. A verified C compiler and a verified microkernel. That's the standard we're aiming for.</p>
+<p>These ideas work. We're combining them and proving the combination sound.</p>
+<h2 id="who-should-use-this">Who Should Use This</h2>
+<p>Concrete trades convenience for explicitness, flexibility for auditability. Prototyping is slower. Some patterns become verbose. You'll miss interior mutability for certain data structures.</p>
+<p>But for cryptographic primitives, consensus protocols, financial transaction systems, medical device firmware, the trade is worth it. Strong claims about program behavior, mechanically verified.</p>
+<p>A language you can trust the way you trust mathematics: not because someone promises it works, but because you can check the proof.</p>
+<hr />
+<h2 id="quick-reference">Quick Reference</h2>
+<table><thead><tr><th>Annotation</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>fn foo() -&gt; T</code></td><td>Pure function, no capabilities</td></tr>
+<tr><td><code>fn foo!() -&gt; T</code></td><td>Shorthand for <code>with(Std)</code></td></tr>
+<tr><td><code>fn foo() with(C) -&gt; T</code></td><td>Requires capability set <code>C</code></td></tr>
+<tr><td><code>with(Alloc)</code></td><td>Function may allocate</td></tr>
+<tr><td><code>with(Alloc = a)</code></td><td>Bind allocator <code>a</code> at call site</td></tr>
+<tr><td><code>T</code></td><td>Linear type, consumed exactly once</td></tr>
+<tr><td><code>type Copy T</code></td><td>Unrestricted type, freely duplicated</td></tr>
+<tr><td><code>&amp;T</code> or <code>&amp;[T, R]</code></td><td>Immutable reference in region <code>R</code></td></tr>
+<tr><td><code>&amp;mut T</code></td><td>Mutable reference</td></tr>
+<tr><td><code>Address[T]</code></td><td>Raw pointer (unsafe to use)</td></tr>
+<tr><td><code>borrow x as y in R { }</code></td><td>Explicit borrow with named region</td></tr>
+<tr><td><code>defer expr</code></td><td>Run <code>expr</code> at scope exit</td></tr>
+<tr><td><code>destroy(x)</code></td><td>Consume via destructor</td></tr>
+<tr><td><code>foreign("symbol")</code></td><td>Foreign function binding</td></tr>
+</tbody></table>
+<hr />
+<h2 id="appendix-a-standard-capabilities">Appendix A: Standard Capabilities</h2>
+<p>The <code>Std</code> capability (accessed via <code>!</code>) bundles these individual capabilities:</p>
+<table><thead><tr><th>Capability</th><th>Gates</th></tr></thead><tbody>
+<tr><td><code>File</code></td><td>Open, read, write, close files. Directory operations.</td></tr>
+<tr><td><code>Network</code></td><td>Sockets, HTTP, DNS resolution.</td></tr>
+<tr><td><code>Alloc</code></td><td>Heap allocation. Requires allocator binding at call site.</td></tr>
+<tr><td><code>Clock</code></td><td>System time, monotonic time, sleep.</td></tr>
+<tr><td><code>Random</code></td><td>Random number generation. Requires explicit seed for reproducibility.</td></tr>
+<tr><td><code>Env</code></td><td>Environment variables, command line arguments.</td></tr>
+<tr><td><code>Process</code></td><td>Spawn processes, exit codes, signals.</td></tr>
+<tr><td><code>Console</code></td><td>Stdin, stdout, stderr.</td></tr>
+</tbody></table>
+<p>Capabilities not in <code>Std</code>:</p>
+<table><thead><tr><th>Capability</th><th>Gates</th></tr></thead><tbody>
+<tr><td><code>Unsafe</code></td><td>Raw pointer operations, FFI calls, transmute, inline assembly. Never implicit.</td></tr>
+</tbody></table>
+<p>A function with no capability annotation is pure. A function with <code>!</code> has access to everything except <code>Unsafe</code>. A function with explicit <code>with(File, Alloc)</code> has exactly those capabilities.</p>
+<p>Capabilities are not hierarchical. <code>Std</code> is a shorthand for a set, not a super-capability. You cannot request "half of Std."</p>
+<hr />
+<h2 id="appendix-b-open-questions">Appendix B: Open Questions</h2>
+<p>These are unresolved design decisions:</p>
+<p><strong>Concurrency</strong></p>
+<p>No concurrency primitives exist. The language is currently single-threaded. Any future model must preserve:</p>
+<ul>
+<li>Linearity (no data races from aliasing)</li>
+<li>Determinism (reproducible execution)</li>
+<li>Effect tracking (concurrency as capability)</li>
+</ul>
+<p>Candidates: structured concurrency (like Trio/libdill), deterministic parallelism (like Haskell's <code>par</code>), actor model with linear message passing. Not decided.</p>
+<p><strong>Capability Polymorphism</strong></p>
+<p>Currently impossible:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn map&lt;T, U, C&gt;(list: List&lt;T&gt;, f: fn(T) with(C) -&gt; U) with(C) -&gt; List&lt;U&gt;
+</span></code></pre>
+<p>This forces duplicating combinators for each capability set. The theory exists (Koka, Eff, Frank), but adds complexity. Open question: is the duplication acceptable, or do we need polymorphism?</p>
+<p><strong>Effect Handlers</strong></p>
+<p>Capabilities track effects but don't handle them. Full algebraic effects would allow:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn with_mock_filesystem&lt;T&gt;(f: fn() with(File) -&gt; T) -&gt; T {
+</span><span class="z-text z-plain">    handle File in f() {
+</span><span class="z-text z-plain">        open(path) =&gt; resume(MockFile.new(path))
+</span><span class="z-text z-plain">        read(file) =&gt; resume(mock_data)
+</span><span class="z-text z-plain">    }
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>This enables testing, sandboxing, effect interception. Significant implementation complexity. Not committed.</p>
+<p><strong>Module System</strong></p>
+<p>Current design is minimal. Open questions:</p>
+<ul>
+<li>Parameterized modules (functors)?</li>
+<li>Module-level capability restrictions?</li>
+<li>Visibility modifiers beyond public/private?</li>
+<li>Separate compilation units?</li>
+</ul>
+<p><strong>FFI Type Mapping</strong></p>
+<p>The spec says "C-compatible types" without defining them. Need to specify:</p>
+<ul>
+<li>Integer mappings (is <code>Int</code> C's <code>int</code> or <code>intptr_t</code>?)</li>
+<li>Struct layout guarantees</li>
+<li>Calling conventions</li>
+<li>Nullable pointer representation</li>
+<li>String encoding at boundaries</li>
+</ul>
+<p><strong>Variance</strong></p>
+<p>Generic types have variance implications. <code>List&lt;T&gt;</code> is covariant in <code>T</code>. <code>fn(T) -&gt; U</code> is contravariant in <code>T</code>. The spec doesn't address this. For linear types, variance interacts with consumption. Needs formalization.</p>
+<p><strong>Macros</strong></p>
+<p>No macro system. Options:</p>
+<ul>
+<li>None (keep it simple)</li>
+<li>Hygienic macros (Scheme-style)</li>
+<li>Procedural macros (Rust-style)</li>
+<li>Compile-time evaluation (Zig-style comptime)</li>
+</ul>
+<p>Procedural macros would need capability restrictions. Not decided.</p>
+<hr />
+<h2 id="appendix-c-glossary">Appendix C: Glossary</h2>
+<p><strong>Affine type</strong>: A type whose values can be used at most once. Rust's ownership model is affine: you can drop a value without consuming it.</p>
+<p><strong>Capability</strong>: A token that grants permission to perform an effect. Functions declare required capabilities; callers must have them. Capabilities propagate: if <code>f</code> calls <code>g</code>, and <code>g</code> needs <code>File</code>, then <code>f</code> needs <code>File</code>.</p>
+<p><strong>Consumption</strong>: Using a linear value in a way that fulfills its "exactly once" obligation. Methods of consumption: pass to a function taking ownership, return, destructure via pattern match, call <code>destroy()</code>.</p>
+<p><strong>Copy type</strong>: A type exempt from linearity. Values can be duplicated freely. Must be explicitly marked. Cannot have destructors or linear fields.</p>
+<p><strong>Destruction</strong>: Consuming a linear value by invoking its destructor. <code>destroy(x)</code> calls the type's destructor and consumes <code>x</code>.</p>
+<p><strong>Effect</strong>: An observable interaction with the world outside pure computation: IO, allocation, mutation, non-determinism. Concrete tracks effects through capabilities.</p>
+<p><strong>Elaboration</strong>: The compiler phase that transforms surface syntax into kernel IR. Type checking, linearity checking, and capability checking happen here.</p>
+<p><strong>Kernel</strong>: The core calculus formalized in Lean. A small language with mechanically verified properties. The surface language elaborates into it.</p>
+<p><strong>Lexical region</strong>: A scope that bounds reference lifetimes. References created in a region cannot escape it. Unlike Rust's lifetime parameters, regions are always lexical and never appear in signatures.</p>
+<p><strong>Linear type</strong>: A type whose values must be used exactly once. Not zero (leak), not twice (double-use). Concrete's default.</p>
+<p><strong>Purity</strong>: Absence of effects. A pure function computes a result from its inputs without IO, allocation, or mutation. In Concrete, functions without capability annotations are pure.</p>
+<p><strong>Raw pointer</strong>: An <code>Address[T]</code> value. Carries no lifetime or linearity information. Safe to create and hold; unsafe to use.</p>
+<p><strong>Reference</strong>: A borrowed view of a value. <code>&amp;T</code> for immutable, <code>&amp;mut T</code> for mutable. The original value is inaccessible while borrowed.</p>
+<p><strong>Region</strong>: See lexical region.</p>
+<p><strong>Std</strong>: The standard capability set. Shorthand for <code>File</code>, <code>Network</code>, <code>Alloc</code>, <code>Clock</code>, <code>Random</code>, <code>Env</code>, <code>Process</code>, <code>Console</code>. Excludes <code>Unsafe</code>.</p>
+<p><strong>Unsafe</strong>: The capability that permits operations the type system cannot verify: FFI, raw pointer dereference, transmute.</p>
+<hr />
+<h2 id="appendix-d-comparison-table">Appendix D: Comparison Table</h2>
+<table><thead><tr><th>Feature</th><th>Concrete</th><th>Rust</th><th>Zig</th><th>Austral</th><th>Go</th></tr></thead><tbody>
+<tr><td>Memory safety</td><td>Linear types</td><td>Ownership + borrow checker</td><td>Runtime checks (optional)</td><td>Linear types</td><td>GC</td></tr>
+<tr><td>Linearity</td><td>Strict (exactly once)</td><td>Affine (at most once)</td><td>None</td><td>Strict</td><td>None</td></tr>
+<tr><td>GC</td><td>None</td><td>None</td><td>None</td><td>None</td><td>Yes</td></tr>
+<tr><td>Effect tracking</td><td>Capabilities</td><td>None</td><td>None</td><td>Capabilities</td><td>None</td></tr>
+<tr><td>Pure by default</td><td>Yes</td><td>No</td><td>No</td><td>Yes</td><td>No</td></tr>
+<tr><td>Explicit allocation</td><td>Capability + binding</td><td>Global allocator</td><td>Allocator parameter</td><td>No</td><td>GC</td></tr>
+<tr><td>Null</td><td>None (<code>Option&lt;T&gt;</code>)</td><td>None (<code>Option&lt;T&gt;</code>)</td><td>Optional (<code>?T</code>)</td><td>None (<code>Option[T]</code>)</td><td>Yes (<code>nil</code>)</td></tr>
+<tr><td>Exceptions</td><td>None</td><td>Panic (discouraged)</td><td>None</td><td>None</td><td>Panic</td></tr>
+<tr><td>Error handling</td><td><code>Result</code> + <code>?</code></td><td><code>Result</code> + <code>?</code></td><td>Error unions</td><td><code>Result</code></td><td>Multiple returns</td></tr>
+<tr><td>Lifetime annotations</td><td>None (lexical regions)</td><td>Yes</td><td>None</td><td>None</td><td>N/A (GC)</td></tr>
+<tr><td>Formal verification</td><td>Kernel in Lean</td><td>External tools</td><td>None</td><td>None</td><td>None</td></tr>
+<tr><td>Defer</td><td>Yes</td><td>No (RAII)</td><td>Yes</td><td>No</td><td>Yes</td></tr>
+<tr><td>Interior mutability</td><td>None</td><td><code>Cell</code>, <code>RefCell</code>, etc.</td><td>Pointers</td><td>None</td><td>Pointers</td></tr>
+<tr><td>Unsafe escape hatch</td><td><code>with(Unsafe)</code></td><td><code>unsafe</code> blocks</td><td>No safe/unsafe distinction</td><td><code>Unsafe_Module</code></td><td>No distinction</td></tr>
+<tr><td>Macros</td><td>None (undecided)</td><td>Procedural + declarative</td><td>Comptime</td><td>None</td><td>None</td></tr>
+<tr><td>Concurrency</td><td>None (undecided)</td><td><code>async</code>, threads, channels</td><td>Threads, async</td><td>None</td><td>Goroutines, channels</td></tr>
+<tr><td>Formatter</td><td>Ships with language</td><td>rustfmt (separate)</td><td>zig fmt</td><td>None</td><td>gofmt</td></tr>
+<tr><td>Grammar</td><td>LL(1)</td><td>Complex</td><td>Simple</td><td>Simple</td><td>LALR</td></tr>
+</tbody></table>
+<hr />
+<h2 id="appendix-e-error-messages">Appendix E: Error Messages</h2>
+<p>These are representative error messages. The actual compiler may differ.</p>
+<p><strong>Linearity violation: value not consumed</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0201]: linear value `f` is never consumed
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:4:9
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 4 |     let f = open(&quot;data.txt&quot;)
+</span><span class="z-text z-plain">   |         ^ this value has type `File` which is linear
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = help: linear values must be consumed exactly once
+</span><span class="z-text z-plain">   = help: add `defer destroy(f)` or pass `f` to a function that takes ownership
+</span></code></pre>
+<p><strong>Linearity violation: value consumed twice</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0202]: value `f` consumed twice
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:7:12
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 5 |     let content = read_all(f)
+</span><span class="z-text z-plain">   |                           - first consumption here
+</span><span class="z-text z-plain"> 6 |     
+</span><span class="z-text z-plain"> 7 |     destroy(f)
+</span><span class="z-text z-plain">   |            ^ second consumption here
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = help: after passing `f` to `read_all`, you no longer own it
+</span></code></pre>
+<p><strong>Borrow escape</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0301]: reference cannot escape its region
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:3:12
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 2 |     borrow data as r in R {
+</span><span class="z-text z-plain">   |                       --- region R starts here
+</span><span class="z-text z-plain"> 3 |         return r
+</span><span class="z-text z-plain">   |                ^ cannot return reference with region R
+</span><span class="z-text z-plain"> 4 |     }
+</span><span class="z-text z-plain">   |     - region R ends here
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = help: references are only valid within their borrow region
+</span></code></pre>
+<p><strong>Missing capability</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0401]: function requires capability `Network` which is not available
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:8:5
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 8 |     fetch(url)
+</span><span class="z-text z-plain">   |     ^^^^^^^^^^ requires `Network`
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = note: the current function has capabilities: {File, Alloc}
+</span><span class="z-text z-plain">   = help: add `Network` to the function&#39;s capability declaration:
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 2 | fn process(url: String) with(File, Alloc, Network) -&gt; Result&lt;Data, Error&gt;
+</span><span class="z-text z-plain">   |                                    +++++++++
+</span></code></pre>
+<p><strong>Capability leak through closure</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0402]: closure captures capability `File` but escapes its scope
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:5:18
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 5 |     let handler = fn() { read(&amp;config_file) }
+</span><span class="z-text z-plain">   |                   ^^^^ this closure requires `File`
+</span><span class="z-text z-plain"> 6 |     return handler
+</span><span class="z-text z-plain">   |            ------- closure escapes here
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = help: closures that escape cannot capture capabilities
+</span><span class="z-text z-plain">   = help: pass the file as a parameter instead
+</span></code></pre>
+<p><strong>Mutable borrow conflict</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0302]: cannot borrow `data` as immutable because it is already borrowed as mutable
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:4:17
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 3 |     borrow mut data as m in R {
+</span><span class="z-text z-plain">   |                       - mutable borrow occurs here
+</span><span class="z-text z-plain"> 4 |         let len = length(&amp;data)
+</span><span class="z-text z-plain">   |                          ^^^^^ immutable borrow attempted here
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = help: mutable borrows are exclusive; no other borrows allowed
+</span></code></pre>
+<p><strong>Unsafe operation without capability</strong></p>
+<pre class="z-code"><code><span class="z-text z-plain">error[E0501]: operation requires `Unsafe` capability
+</span><span class="z-text z-plain">  --&gt; src/main.concrete:6:5
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 6 |     ptr_read(addr)
+</span><span class="z-text z-plain">   |     ^^^^^^^^^^^^^^ unsafe operation
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain">   = note: reading from raw pointers may cause undefined behavior
+</span><span class="z-text z-plain">   = help: add `Unsafe` to the function&#39;s capabilities:
+</span><span class="z-text z-plain">   |
+</span><span class="z-text z-plain"> 2 | fn dangerous(addr: Address[Int]) with(Unsafe) -&gt; Int
+</span><span class="z-text z-plain">   |                                  ++++++++++++
+</span></code></pre>
+<hr />
+<h2 id="references">References</h2>
+<h3 id="languages">Languages</h3>
+<ul>
+<li><a href="https://lean-lang.org/">Lean 4</a> — theorem prover and programming language</li>
+<li><a href="https://austral-lang.org/">Austral</a> — linear types and capabilities for systems programming
+<ul>
+<li><a href="https://austral-lang.org/spec/spec.html">Specification</a></li>
+</ul>
+</li>
+<li><a href="https://www.rust-lang.org/">Rust</a> — ownership, borrowing, traits</li>
+<li><a href="https://ziglang.org/">Zig</a> — explicit allocators, defer, no hidden control flow</li>
+<li><a href="https://www.roc-lang.org/">Roc</a> — pure functional, <code>!</code> for effects</li>
+<li><a href="https://koka-lang.github.io/koka/doc/index.html">Koka</a> — algebraic effects and handlers</li>
+<li><a href="https://www.eff-lang.org/">Eff</a> — algebraic effects research language</li>
+<li><a href="https://github.com/frank-lang/frank">Frank</a> — effects as calling conventions</li>
+<li><a href="https://clean.cs.ru.nl/">Clean</a> — uniqueness types, pure by default</li>
+<li><a href="http://www.ats-lang.org/">ATS</a> — linear types with theorem proving</li>
+<li><a href="https://cyclone.thelanguage.org/">Cyclone</a> — region-based memory for C</li>
+<li><a href="https://www.adacore.com/about-spark">Ada/SPARK</a> — formal verification in systems programming</li>
+</ul>
+<h3 id="verified-systems">Verified Systems</h3>
+<ul>
+<li><a href="https://compcert.org/">CompCert</a> — verified C compiler</li>
+<li><a href="https://sel4.systems/">seL4</a> — verified microkernel</li>
+<li><a href="https://flint.cs.yale.edu/certikos/">CertiKOS</a> — verified concurrent OS kernel</li>
+<li><a href="https://iris-project.org/">Iris</a> — higher-order concurrent separation logic</li>
+</ul>
+<h3 id="papers">Papers</h3>
+<ul>
+<li><a href="https://homepages.inf.ed.ac.uk/wadler/papers/linearlogic/linearlogic.pdf">Linear Logic</a> — Wadler's introduction</li>
+<li><a href="https://www.cs.cmu.edu/~fp/courses/15816-s12/misc/substructural.pdf">Substructural Type Systems</a> — Walker's survey</li>
+<li><a href="https://granule-project.github.io/papers/esop22-paper.pdf">Linearity and Uniqueness: An Entente Cordiale</a> — linear vs unique vs affine</li>
+<li><a href="https://www.cs.umd.edu/~mwh/papers/cyclone-safety.pdf">Cyclone: A Safe Dialect of C</a> — region-based memory</li>
+<li><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/08/algeff-tr-2016-v2.pdf">Algebraic Effects for Functional Programming</a> — Leijen's tutorial</li>
+<li><a href="https://www.eff-lang.org/handlers-tutorial.pdf">An Introduction to Algebraic Effects and Handlers</a> — Matija Pretnar</li>
+<li><a href="https://www.microsoft.com/en-us/research/video/typed-continuations-and-the-origin-of-algebraic-effects/">Typed Continuations and the Origin of Algebraic Effects</a> — Daan Leijen</li>
+<li><a href="https://srl.cs.jhu.edu/pubs/SRL2003-02.pdf">Capability Myths Demolished</a> — what capabilities actually provide</li>
+<li><a href="https://www.cs.cmu.edu/~crary/819-f09/Landin66.pdf">The Next 700 Programming Languages</a> — Landin's classic</li>
+<li><a href="https://www.cs.yale.edu/flint/cs428/doc/HintsPL.pdf">Hints on Programming Language Design</a> — Tony Hoare</li>
+<li><a href="https://www.cs.virginia.edu/~evans/cs655/readings/steele.pdf">Growing a Language</a> — Guy Steele</li>
+<li><a href="https://web.cecs.pdx.edu/~mpj/pubs/polyrec.pdf">A Polymorphic Type System for Extensible Records and Variants</a> — row polymorphism</li>
+<li><a href="https://plv.mpi-sws.org/rustbelt/popl18/paper.pdf">RustBelt: Securing the Foundations of the Rust Programming Language</a> — formal verification of Rust</li>
+<li><a href="https://plv.mpi-sws.org/rustbelt/stacked-borrows/paper.pdf">Stacked Borrows: An Aliasing Model for Rust</a> — Ralf Jung on aliasing</li>
+<li><a href="https://patpannuto.com/pubs/levy15ownership.pdf">Ownership is Theft: Experiences Building an Embedded OS in Rust</a> — Tock OS</li>
+<li><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/07/history.pdf">A History of Haskell: Being Lazy with Class</a> — design decisions</li>
+<li><a href="https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf">Why Functional Programming Matters</a> — John Hughes</li>
+<li><a href="https://www.win.tue.nl/~wstomv/edu/2ip30/references/criteria_for_modularization.pdf">On the Criteria To Be Used in Decomposing Systems into Modules</a> — Parnas</li>
+<li><a href="https://clean.cs.ru.nl/download/doc/CleanLangRep.3.0.pdf">Clean Language Report</a> — uniqueness types specification</li>
+<li><a href="https://www.mbsd.cs.ru.nl/publications/papers/2010/deVries-Plasmeijer-uniqueness-simplified.pdf">Uniqueness Typing Simplified</a> — how uniqueness types work</li>
+<li><a href="https://www.amazon.science/publications/using-lightweight-formal-methods-to-validate-a-key-value-storage-node-in-amazon-s3">Using Lightweight Formal Methods to Validate a Key-Value Storage Node</a> — practical verification at AWS</li>
+</ul>
+<h3 id="blog-posts">Blog Posts</h3>
+<p><strong>Language Design Philosophy</strong></p>
+<ul>
+<li><a href="https://www.dreamsongs.com/RiseOfWorseIsBetter.html">Worse is Better</a> — Richard Gabriel on simplicity vs correctness</li>
+<li><a href="https://paulgraham.com/hundred.html">The Hundred-Year Language</a> — Paul Graham</li>
+<li><a href="https://blog.ploeh.dk/2015/04/13/less-is-more-language-features/">Less is more: language features</a> — Mark Seemann on constraints</li>
+<li><a href="https://curtclifton.net/papers/MosessonClifton06.pdf">Out of the Tar Pit</a> — Moseley and Marks on complexity</li>
+<li><a href="https://www.cs.virginia.edu/~evans/cs655/readings/smalltalk.html">Design Principles Behind Smalltalk</a> — Dan Ingalls</li>
+<li><a href="https://cdsmith.wordpress.com/2011/01/09/an-old-article-i-wrote/">What to Know Before Debating Type Systems</a> — Chris Smith</li>
+<li><a href="https://steve-yegge.blogspot.com/2006/03/execution-in-kingdom-of-nouns.html">Execution in the Kingdom of Nouns</a> — Steve Yegge</li>
+<li><a href="https://www.cs.virginia.edu/~cs655/readings/bwk-on-pascal.html">Why Pascal is Not My Favorite Language</a> — Kernighan</li>
+</ul>
+<p><strong>Austral and Linear Types</strong></p>
+<ul>
+<li><a href="https://borretti.me/article/introducing-austral">Introducing Austral</a> — Fernando Borretti's rationale</li>
+<li><a href="https://borretti.me/article/how-australs-linear-type-checker-works">How Austral's Linear Type Checker Works</a> — implementation decisions</li>
+<li><a href="https://borretti.me/article/linear-types-and-capabilities">Linear Types and Capabilities</a> — how they compose</li>
+<li><a href="https://borretti.me/article/type-systems-memory-safety">Type Systems for Memory Safety</a> — survey of approaches</li>
+<li><a href="https://borretti.me/article/case-for-compiler-complexity">The Case for Compiler Complexity</a> — why simple isn't always better</li>
+<li><a href="https://homepages.inf.ed.ac.uk/wadler/topics/linear-logic.html">Linear types can change the world!</a> — Wadler</li>
+<li><a href="https://www.tweag.io/blog/2017-03-13-linear-types/">Retrofitting Linear Types</a> — adding linear types to Haskell</li>
+</ul>
+<p><strong>Rust Design Decisions</strong></p>
+<ul>
+<li><a href="https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/">The Problem with Single-threaded Shared Mutability</a> — why Rust forbids it</li>
+<li><a href="https://limpet.net/mbrubeck/2019/02/07/rust-a-unique-perspective.html">Rust: A unique perspective</a> — ownership from first principles</li>
+<li><a href="https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html#non-lexical-lifetimes">Non-Lexical Lifetimes</a> — why Rust moved beyond lexical scopes</li>
+<li><a href="https://smallcultfollowing.com/babysteps/blog/2018/04/27/an-alias-based-formulation-of-the-borrow-checker/">Polonius: the future of the borrow checker</a> — Niko Matsakis</li>
+<li><a href="https://smallcultfollowing.com/babysteps/blog/2018/11/10/after-nll-moving-from-borrowed-data-and-the-sentinel-pattern/">After NLL: Moving from borrowed data</a> — borrow checker limitations</li>
+<li><a href="https://www.ralfj.de/blog/">Ralf Jung's Blog</a> — Stacked Borrows, unsafe, formal semantics</li>
+<li><a href="https://reberhardt.com/blog/2020/10/05/why-rust.html">Why Rust?</a> — Ryan Eberhardt</li>
+<li><a href="https://rust-unofficial.github.io/too-many-lists/">Learn Rust With Entirely Too Many Linked Lists</a> — ownership through pain</li>
+<li><a href="https://doc.rust-lang.org/nomicon/">The Rustonomicon</a> — dark arts of unsafe Rust</li>
+</ul>
+<p><strong>Graydon Hoare (Rust creator)</strong></p>
+<ul>
+<li><a href="https://graydon2.dreamwidth.org/307105.html">The Rust I Wanted Had No Future</a> — original vision</li>
+<li><a href="https://graydon2.dreamwidth.org/307291.html">Not Rust</a> — what Rust deliberately avoided</li>
+<li><a href="https://graydon2.dreamwidth.org/253769.html">What next for compiled languages?</a> — language evolution</li>
+<li><a href="https://graydon2.dreamwidth.org/249666.html">Rust prehistory</a> — design origins</li>
+</ul>
+<p><strong>Zig Design Decisions</strong></p>
+<ul>
+<li><a href="https://zig.news/kristoff/allocgate-finalizing-allocators-in-zig-3l99">Allocgate</a> — why Zig's allocator design changed</li>
+<li><a href="https://kristoff.it/blog/what-is-zigs-comptime/">What is Zig's Comptime</a> — compile-time execution design</li>
+<li><a href="https://zig.news/kristoff/zigs-io-and-you-2c28">Zig's I/O and You</a> — I/O design</li>
+<li><a href="https://www.scattered-thoughts.net/writing/a-reply-to-zigs-creator-on-undefined-behavior/">A Reply to Zig's Creator on Undefined Behavior</a> — Jamie Brandon</li>
+<li><a href="https://ziglang.org/learn/why_zig_over_c_cpp/">Why Zig When There's Already Rust?</a> — official comparison</li>
+<li><a href="https://zig.news/david_chisnall/zig-vs-c-35eo">Zig vs C++</a> — David Chisnall</li>
+</ul>
+<p><strong>Effects and Capabilities</strong></p>
+<ul>
+<li><a href="https://overreacted.io/algebraic-effects-for-the-rest-of-us/">Algebraic Effects for the Rest of Us</a> — Dan Abramov</li>
+<li><a href="https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/">What Color is Your Function?</a> — Bob Nystrom on effect tracking</li>
+<li><a href="https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/">Structured Concurrency</a> — Nathaniel Smith</li>
+<li><a href="https://www.eff-lang.org/learn/faq/">The Effect System FAQ</a> — Eff team</li>
+<li><a href="https://koka-lang.github.io/koka/doc/book.html">Koka: Programming with Row-polymorphic Effect Types</a> — official book</li>
+</ul>
+<p><strong>Roc and Purity</strong></p>
+<ul>
+<li><a href="https://www.roc-lang.org/design_goals.html">Roc Design Philosophy</a> — official goals</li>
+<li><a href="https://www.roc-lang.org/platforms">Why Roc Uses Platform/App Split</a> — effect isolation design</li>
+</ul>
+<p><strong>Go Design Decisions</strong></p>
+<ul>
+<li><a href="https://go.dev/talks/2012/splash.article">Go at Google: Language Design in the Service of Software Engineering</a> — Rob Pike</li>
+<li><a href="https://go.dev/talks/2015/simplicity-is-complicated.slide">Simplicity is Complicated</a> — Rob Pike</li>
+<li><a href="https://go.dev/blog/errors-are-values">Errors are values</a> — Rob Pike</li>
+<li><a href="https://go-proverbs.github.io/">Go Proverbs</a> — design philosophy</li>
+<li><a href="https://go.dev/blog/toward-go2">Toward Go 2</a> — Russ Cox on language evolution</li>
+</ul>
+<p><strong>Memory and Allocators</strong></p>
+<ul>
+<li><a href="https://www.rfleury.com/p/untangling-lifetimes-the-arena-allocator">Untangling Lifetimes: The Arena Allocator</a> — Ryan Fleury</li>
+<li><a href="https://www.foonathan.net/2022/08/malloc-overview/">What's a Memory Allocator Anyway?</a> — Jonathan Müller</li>
+<li><a href="https://www.foonathan.net/2022/08/malloc-interface/">malloc() and free() are a bad API</a> — Jonathan Müller</li>
+<li><a href="https://fitzgeraldnick.com/2019/11/01/always-bump-downwards.html">Always Bump Downwards</a> — Nick Fitzgerald</li>
+<li><a href="https://www.gingerbill.org/series/memory-allocation-strategies/">Memory Allocation Strategies</a> — Bill Hall's series</li>
+</ul>
+<p><strong>Error Handling Design</strong></p>
+<ul>
+<li><a href="https://joeduffyblog.com/2016/02/07/the-error-model/">The Error Model</a> — Joe Duffy on Midori's approach</li>
+<li><a href="https://sled.rs/errors">Error Handling in a Correctness-Critical Rust Project</a> — sled database</li>
+</ul>
+<p><strong>Formal Methods in Practice</strong></p>
+<ul>
+<li><a href="https://www.hillelwayne.com/post/theorem-prover-showdown/">Proofs About Programs</a> — Hillel Wayne</li>
+<li><a href="https://brooker.co.za/blog/2022/06/02/formal.html">Formal Methods Only Solve Half My Problems</a> — Marc Brooker at AWS</li>
+<li><a href="https://cacm.acm.org/magazines/2015/4/184701-how-amazon-web-services-uses-formal-methods/fulltext">How AWS Uses Formal Methods</a> — Communications of the ACM</li>
+<li><a href="https://www.hillelwayne.com/post/where-the-bugs-are/">Where the Bugs Are</a> — where verification helps</li>
+<li><a href="https://www.hillelwayne.com/post/using-tla-in-the-real-world/">Using TLA+ in the Real World</a> — Hillel Wayne</li>
+<li><a href="https://web.stanford.edu/~engler/ASPLOS24-dave.pdf">Verification at Scale</a> — how to verify real systems</li>
+<li><a href="https://blog.brownplt.org/2024/01/04/compile-your-proofs.html">You Should Compile Your Proofs</a> — on proof engineering</li>
+</ul>
+<p><strong>Lean 4</strong></p>
+<ul>
+<li><a href="https://lean-lang.org/functional_programming_in_lean/">Functional Programming in Lean</a> — official book</li>
+<li><a href="https://lean-lang.org/theorem_proving_in_lean4/">Theorem Proving in Lean 4</a> — official book</li>
+<li><a href="https://github.com/leanprover-community/lean4-metaprogramming-book">Metaprogramming in Lean 4</a> — macros and tactics</li>
+</ul>
+<p><strong>Type System Design</strong></p>
+<ul>
+<li><a href="https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/">Parse, Don't Validate</a> — Alexis King</li>
+<li><a href="https://lexi-lambda.github.io/blog/2020/11/01/names-are-not-type-safety/">Names Are Not Type Safety</a> — Alexis King</li>
+<li><a href="https://lexi-lambda.github.io/blog/2020/08/13/types-as-axioms-or-playing-with-fire/">Types as Axioms</a> — Alexis King</li>
+<li><a href="http://homepages.inf.ed.ac.uk/wadler/papers/expression/expression.txt">The Expression Problem</a> — Philip Wadler</li>
+</ul>
+<p><strong>Bob Harper</strong></p>
+<ul>
+<li><a href="https://existentialtype.wordpress.com/2011/03/19/what-if-anything-is-a-programming-paradigm/">What, if anything, is a programming paradigm?</a></li>
+<li><a href="https://existentialtype.wordpress.com/2011/03/19/dynamic-languages-are-static-languages/">Dynamic languages are static languages</a></li>
+<li><a href="https://existentialtype.wordpress.com/2011/04/16/modules-matter-most/">Modules matter most</a></li>
+</ul>
+<h3 id="talks">Talks</h3>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=0jI-AlWEwYI">Effects for Less</a> — Alexis King on effects (essential)</li>
+<li><a href="https://www.youtube.com/watch?v=Unq712gqu2U">The Road to Zig 1.0</a> — Andrew Kelley</li>
+<li><a href="https://www.youtube.com/watch?v=HgtRAbE1nBM">Is It Time to Rewrite the OS in Rust?</a> — Bryan Cantrill</li>
+<li><a href="https://www.youtube.com/watch?v=IOiZatlZtGU">Propositions as Types</a> — Philip Wadler</li>
+<li><a href="https://www.youtube.com/watch?v=nV3r1rB5_6E">Correctness by Construction</a> — Derek Dreyer on RustBelt</li>
+<li><a href="https://www.infoq.com/presentations/Simple-Made-Easy/">Simple Made Easy</a> — Rich Hickey</li>
+<li><a href="https://www.youtube.com/watch?v=GqmsQeSzMdw">Constraints Liberate, Liberties Constrain</a> — Runar Bjarnason</li>
+<li><a href="https://www.youtube.com/watch?v=_ahvzDzKdB0">Growing a Language</a> — Guy Steele (watch this)</li>
+<li><a href="https://www.youtube.com/watch?v=7GcrT0SBSnI">Why Algebraic Effects Matter</a> — Daan Leijen</li>
+<li><a href="https://www.youtube.com/watch?v=vzfy4EKwG_Y">Outperforming Imperative with Pure Functional Languages</a> — Richard Feldman</li>
+<li><a href="https://www.youtube.com/watch?v=cpQwtwVKAfU">Why Roc?</a> — Richard Feldman</li>
+<li><a href="https://www.youtube.com/watch?v=pW-SOdj4Kkk">Preventing the Collapse of Civilization</a> — Jonathan Blow on why new languages matter</li>
+<li><a href="https://www.youtube.com/watch?v=TH9VCN6UkyQ">Ideas about a new programming language for games</a> — Jonathan Blow on Jai</li>
+<li><a href="https://www.youtube.com/watch?v=t0mhvd3-60Y">Linear Types for Low-latency, High-throughput Systems</a> — Jean-Philippe Bernardy</li>
+<li><a href="https://www.youtube.com/watch?v=Sj3b8Sltx1s">seL4 and Formal Verification</a> — Gernot Heiser</li>
+</ul>
+<h3 id="books">Books</h3>
+<ul>
+<li><a href="https://www.cis.upenn.edu/~bcpierce/tapl/">Types and Programming Languages</a> — Pierce</li>
+<li><a href="https://www.cs.cmu.edu/~rwh/pfpl/">Practical Foundations for Programming Languages</a> — Harper</li>
+<li><a href="http://adam.chlipala.net/cpdt/">Certified Programming with Dependent Types</a> — Chlipala</li>
+<li><a href="https://softwarefoundations.cis.upenn.edu/">Software Foundations</a> — interactive Coq textbook</li>
+<li><a href="https://plfa.github.io/">Programming Language Foundations in Agda</a> — Wadler and Kokke</li>
+<li><a href="https://mitpress.mit.edu/9780262536431/the-little-typer/">The Little Typer</a> — Friedman and Christiansen</li>
+<li><a href="https://craftinginterpreters.com/">Crafting Interpreters</a> — Bob Nystrom</li>
+</ul>
+
+
+    <nav class="previous-next-episodes"><div class="button button--disabled text-align-end">(coming soon)&nbsp;❯</div></nav>
+  </article>
+
+</main>
+
+<footer class="full-width content-grid">
+  <div class="footer">
+    <div>
+      <h2>Contact me</h2>
+
+      <ul>
+        <li><a href="mailto:mail@fcarrone.com" title="Email">mail@fcarrone.com</a></li>
+        <li><a href="https://x.com/federicocarrone" title="Say hi on X" rel="me">X</a></li>
+        <li><a href="https://github.com/unbalancedparentheses" title="Say hi on Github">Github</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Recommendations</h2>
+
+      <ul>
+        <li><a href="https://ergodicgroup.com">ergodicgroup.com</a></li>
+        <li><a href="https://lambdaclass.com/">lambdaclass.com</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h2>More</h2>
+
+      <ul>
+        <li><a href="https://federicocarrone.com/rss.xml">RSS</a></li>
+        <li><a href="https://federicocarrone.com/atom.xml">Atom</a></li>
+        <li><a href="https://github.com/unbalancedparentheses/federicocarrone.com" title="Source code of this site">Source code</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
