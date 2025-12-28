@@ -487,6 +487,14 @@
 &lt;p&gt;&lt;strong&gt;Native&lt;&#x2F;strong&gt; via MLIR&#x2F;LLVM, &lt;strong&gt;C&lt;&#x2F;strong&gt; for portability, &lt;strong&gt;WebAssembly&lt;&#x2F;strong&gt; for browser and edge. Cross-compilation is first-class.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;tooling&quot;&gt;Tooling&lt;&#x2F;h3&gt;
 &lt;p&gt;Concrete ships with package manager, formatter, linter, test runner, and REPL. Part of the distribution, not external dependencies.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;profiling-and-tracing&quot;&gt;Profiling and Tracing&lt;&#x2F;h3&gt;
+&lt;p&gt;Profiling and tracing are first-class:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Built into the runtime, not bolted on&lt;&#x2F;li&gt;
+&lt;li&gt;Low overhead when disabled&lt;&#x2F;li&gt;
+&lt;li&gt;Structured output for tooling integration&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;Code is read more often than written, but executed more often than read. Performance visibility matters for systems programming.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;what-you-can-say-about-programs&quot;&gt;What You Can Say About Programs&lt;&#x2F;h2&gt;
 &lt;p&gt;If a program type-checks:&lt;&#x2F;p&gt;
 &lt;p&gt;&lt;strong&gt;&quot;This function is pure.&quot;&lt;&#x2F;strong&gt; No capabilities declared. No side effects, no IO, no allocation.&lt;&#x2F;p&gt;
