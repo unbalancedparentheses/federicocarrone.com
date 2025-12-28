@@ -49,7 +49,7 @@
       
   <div class="metadata">
     <time title="Published date" datetime="2025-12-26" property="datePublished">December 26, 2025</time>
-    <span title="Reading time" property="timeRequired" content="PT30M">30 minutes read</span>
+    <span title="Reading time" property="timeRequired" content="PT33M">33 minutes read</span>
     
       <span><a href="https://github.com/unbalancedparentheses/federicocarrone.com/edit/main/content/series&#x2F;concrete&#x2F;2025-12-26-the-concrete-programming-language-systems-programming-for-formal-reasoning&#x2F;index.md" title="Submit a patch for this page">Edit</a> this page</span>
       
@@ -249,10 +249,17 @@
 <li>Nested borrows of the same owned value forbidden</li>
 <li>Derived references can't outlive the original's region</li>
 </ol>
-<p>Closures cannot capture references if the closure escapes the borrow region.</p>
+<p>Closures cannot capture references if the closure escapes the borrow region. This ensures references never outlive their lexical scope.</p>
 <h2 id="capabilities">Capabilities</h2>
+<h3 id="what-capabilities-are">What Capabilities Are</h3>
+<p>A capability is a static permission annotation on a function. It declares which effects the function may perform. Capabilities are not runtime values—they cannot be created, passed, stored, or inspected at runtime. They exist only at the type level, checked by the compiler and erased before execution.</p>
+<p>Capabilities are predefined names. Users cannot define new capabilities or create composite capability types. Function signatures may combine predefined capabilities using <code>+</code> in the <code>with()</code> clause, but only among names exported by the platform's capability universe. There is no capability arithmetic, no capability inheritance, no way to forge a capability your caller didn't have.</p>
+<p>Capabilities that can be manufactured at runtime aren't capabilities—they're tokens.</p>
+<h3 id="purity">Purity</h3>
 <p>Concrete is <strong>pure by default</strong>, following Austral's approach to effect tracking. A function without capability annotations cannot perform IO, cannot allocate, cannot mutate external state. It computes a result from its inputs, nothing more.</p>
-<p>Purity means no side effects and no heap allocation. Stack allocation and compile-time constants are permitted. Non-termination is possible; purity does not imply totality.</p>
+<p>Purity in Concrete has a precise definition: a function is pure if and only if it declares no capabilities and does not require <code>Alloc</code>. Equivalently, purity means an empty capability set.</p>
+<p>Pure functions may use stack allocation and compile-time constants—these are not effects. Pure functions may diverge—termination is orthogonal to purity. A non-terminating function that performs no IO and touches no heap is still pure. This separates effect-freedom (what Concrete tracks) from totality (which Concrete does not guarantee).</p>
+<p>Purity enables equational reasoning: a pure function called twice with the same arguments yields the same result. Totality would enable stronger claims about program termination, but enforcing it would require restricting recursion, which conflicts with systems programming.</p>
 <p>When a function needs effects, it declares them:</p>
 <pre class="z-code"><code><span class="z-text z-plain">fn read_file(path: String) with(File) -&gt; String {
 </span><span class="z-text z-plain">    ...
@@ -301,6 +308,15 @@
 </span><span class="z-text z-plain">}
 </span></code></pre>
 <p>Allocation-free code is provably allocation-free.</p>
+<h3 id="allocator-binding-scope">Allocator Binding Scope</h3>
+<p>Allocator binding is lexically scoped. A binding applies within the static extent of the call being evaluated and any nested calls that require <code>with(Alloc)</code>.</p>
+<p>A nested binding may shadow an outer binding:</p>
+<pre class="z-code"><code><span class="z-text z-plain">fn outer() with(Alloc) {
+</span><span class="z-text z-plain">    inner()                         // uses outer binding
+</span><span class="z-text z-plain">    inner() with(Alloc = arena2)    // shadows within this call
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>Closures capture allocator bindings only if the closure is invoked within the lexical scope where the binding is in effect. If a closure escapes that scope, it cannot rely on an implicit allocator binding and must instead accept an explicit allocator parameter or be rejected by the type checker.</p>
 <h3 id="allocator-types">Allocator Types</h3>
 <pre class="z-code"><code><span class="z-text z-plain">// General-purpose heap allocator
 </span><span class="z-text z-plain">let gpa = GeneralPurposeAllocator.new()
@@ -315,6 +331,15 @@
 </span><span class="z-text z-plain">let fba = FixedBufferAllocator.new(&amp;buf)
 </span></code></pre>
 <p>All allocators implement a common <code>Allocator</code> trait.</p>
+<h3 id="allocator-interface">Allocator Interface</h3>
+<pre class="z-code"><code><span class="z-text z-plain">trait Allocator {
+</span><span class="z-text z-plain">    fn alloc&lt;T&gt;(&amp;mut self, count: Uint) -&gt; Result&lt;&amp;mut [T], AllocError&gt;
+</span><span class="z-text z-plain">    fn free&lt;T&gt;(&amp;mut self, ptr: &amp;mut [T])
+</span><span class="z-text z-plain">    fn realloc&lt;T&gt;(&amp;mut self, ptr: &amp;mut [T], new_count: Uint) -&gt; Result&lt;&amp;mut [T], AllocError&gt;
+</span><span class="z-text z-plain">}
+</span></code></pre>
+<p>The interface is minimal. <code>alloc</code> returns a mutable slice or fails. <code>free</code> releases memory. <code>realloc</code> resizes in place or relocates. All three take <code>&amp;mut self</code>—allocators are stateful resources, not ambient services.</p>
+<p>Custom allocators implement this trait. The standard library allocators (<code>GeneralPurposeAllocator</code>, <code>Arena</code>, <code>FixedBufferAllocator</code>) are implementations, not special cases.</p>
 <h2 id="error-handling">Error Handling</h2>
 <p>Errors are values, using <code>Result&lt;T, E&gt;</code> like Rust and the <code>?</code> operator for propagation:</p>
 <pre class="z-code"><code><span class="z-text z-plain">fn parse(input: String) -&gt; Result&lt;Config, ParseError&gt; {
@@ -338,12 +363,37 @@
 <p><strong>No implicit control flow.</strong> What you see is what executes. No implicit function calls from operator overloading, no compiler-inserted destructor calls. <code>defer</code> statements are explicit: you write them, you see them, even though their execution occurs at scope exit.</p>
 <p><strong>No implicit allocation.</strong> Allocation requires the <code>Alloc</code> capability. <code>grep with(Alloc)</code> finds every function that might touch the heap.</p>
 <p><strong>No interior mutability.</strong> All mutation flows through <code>&amp;mut</code> references. An immutable reference <code>&amp;T</code> guarantees immutability, no hidden mutation behind an immutable facade. This forbids patterns like shared caches and memoization behind shared references. If you need a cache, pass <code>&amp;mut</code>. If you need lazy initialization, initialize before borrowing. For advanced patterns that genuinely require interior mutability, the standard library provides <code>UnsafeCell&lt;T&gt;</code> gated by the <code>Unsafe</code> capability.</p>
-<p><strong>No reflection, no eval, no runtime metaprogramming.</strong> All code paths are determined at compile time.</p>
+<p><strong>No reflection, no eval, no runtime metaprogramming.</strong> All code paths are determined at compile time. There is no way to inspect types at runtime, call methods by name dynamically, or generate code during execution.</p>
+<p>If macros are added in a future version, they will be constrained to preserve the "can a machine reason about this?" principle:</p>
+<ul>
+<li><strong>Hygienic</strong> — no accidental variable capture</li>
+<li><strong>Phase-separated</strong> — macro expansion completes before type checking</li>
+<li><strong>Syntactic</strong> — macros transform syntax trees, not strings</li>
+<li><strong>Capability-tracked</strong> — procedural macros that execute arbitrary code at compile time will require capability annotations, extending effect tracking to the compile-time phase</li>
+</ul>
 <p><strong>No implicit global state.</strong> All global interactions (file system, network, clock, environment) are mediated through capabilities.</p>
 <p><strong>No variable shadowing.</strong> Each variable name is unique within its scope.</p>
 <p><strong>No null.</strong> Optional values use <code>Option&lt;T&gt;</code>.</p>
 <p><strong>No undefined behavior in safe code.</strong> Kernel semantics are fully defined and proven sound. The <code>Unsafe</code> capability explicitly reintroduces the possibility of undefined behavior for FFI and low-level operations.</p>
 <p><strong>No concurrency primitives.</strong> The language provides no threads, no async/await, no channels. Concurrency is a library concern. This may change, but any future concurrency model must preserve determinism and linearity, likely through structured or deterministic concurrency. This is a design constraint, not an open question.</p>
+<h3 id="anti-features-summary">Anti-Features Summary</h3>
+<table><thead><tr><th>Concrete does not have</th><th>Rationale</th></tr></thead><tbody>
+<tr><td>Garbage collection</td><td>Predictable latency, explicit resource management</td></tr>
+<tr><td>Hidden control flow</td><td>Auditability, debuggability</td></tr>
+<tr><td>Hidden allocation</td><td>Performance visibility, allocator control</td></tr>
+<tr><td>Interior mutability</td><td>Simple reasoning, verification tractability</td></tr>
+<tr><td>Reflection / eval</td><td>Static analysis, all paths known at compile time</td></tr>
+<tr><td>Global mutable state</td><td>Effect tracking, reproducibility</td></tr>
+<tr><td>Variable shadowing</td><td>Clarity, fewer subtle bugs</td></tr>
+<tr><td>Null</td><td>Type safety via <code>Option&lt;T&gt;</code></td></tr>
+<tr><td>Exceptions</td><td>Errors as values, explicit propagation</td></tr>
+<tr><td>Implicit conversions</td><td>No silent data loss or coercion</td></tr>
+<tr><td>Function overloading</td><td>Except through traits with explicit bounds</td></tr>
+<tr><td>Uninitialized variables</td><td>Memory safety</td></tr>
+<tr><td>Macros</td><td>Undecided; if added, will be hygienic and capability-aware</td></tr>
+<tr><td>Concurrency primitives</td><td>Undecided; must preserve linearity and determinism</td></tr>
+<tr><td>Undefined behavior (in safe code)</td><td>Kernel semantics fully defined</td></tr>
+</tbody></table>
 <h2 id="pattern-matching">Pattern Matching</h2>
 <p>Exhaustive pattern matching with linear type awareness:</p>
 <pre class="z-code"><code><span class="z-text z-plain">fn describe(opt: Option&lt;Int&gt;) -&gt; String {
@@ -425,7 +475,10 @@
 </span><span class="z-text z-plain">    ...
 </span><span class="z-text z-plain">}
 </span></code></pre>
-<p>Visibility is <code>public</code> or <code>private</code> (default). Capabilities are part of the signature and the public API contract.</p>
+<p>Visibility is <code>public</code> or <code>private</code> (default).</p>
+<h3 id="capabilities-as-public-contract">Capabilities as Public Contract</h3>
+<p>Capabilities are part of a function's signature and therefore part of the public API contract. Changing the required capability set of a public function is a breaking change. This applies in both directions: adding a capability requirement breaks callers who don't have it; removing one changes the function's guarantees.</p>
+<p>When reviewing dependency updates, diff the capability declarations. A library that adds <code>with(Network)</code> to a function that previously had none is a significant change, even if the types remain identical.</p>
 <pre class="z-code"><code><span class="z-text z-plain">import FileSystem
 </span><span class="z-text z-plain">import FileSystem.{open, read, write}
 </span><span class="z-text z-plain">import FileSystem as FS
