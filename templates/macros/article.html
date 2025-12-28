@@ -36,19 +36,23 @@
 {% endmacro %}
 
 {% macro table_of_content(page) %}
-  {#
-  {% if page.toc %}
-  <nav>
-    <details>
-      <summary><h2>Content</h2></summary>
-
-      <ul title="Jump to the following section in this page">
-      {% for h1 in page.toc -%}
-        <li><a href="#{{ h1.permalink | split(pat = "#") | last }}">{{ h1.title }}</a></li>
-      {% endfor %}
-      </ul>
-    </details>
+  {% if page.toc and page.toc | length > 2 %}
+  <nav class="toc" aria-label="Table of contents">
+    <h2>Table of contents</h2>
+    <ul>
+    {% for h1 in page.toc -%}
+      <li>
+        <a href="{{ h1.permalink | safe }}">{{ h1.title }}</a>
+        {% if h1.children %}
+        <ul>
+          {% for h2 in h1.children %}
+          <li><a href="{{ h2.permalink | safe }}">{{ h2.title }}</a></li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
   </nav>
   {% endif %}
-  #}
 {% endmacro %}
