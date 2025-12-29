@@ -202,14 +202,14 @@ li {
 }
 
 small {
-  font-size: .6em;
+  font-size: .75em;
 }
 
 code {
   /* Thanks https://modernfontstacks.com/! */
   font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
   font-weight: normal;
-  font-size: .85em;
+  font-size: .9em;
   hyphens: auto;
   padding: var(--space-very-small);
   background: #f3eee5;
@@ -220,7 +220,7 @@ pre {
 
   overflow-x: scroll;
   margin-block: var(--space);
-  line-height: 1.3em;
+  line-height: 1.5em;
   background: var(--color-dark-blue);
   border: var(--border-width) var(--border-color) solid;
 
@@ -317,7 +317,7 @@ table {
   border-collapse: collapse;
 
   th, td {
-    padding: var(--space-very-small) var(--space-small);
+    padding: var(--space-small) var(--space);
     border: var(--border-width) var(--border-color) solid;
   }
 }
