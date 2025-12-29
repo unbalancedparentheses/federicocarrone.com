@@ -4,6 +4,7 @@ pkgs.mkShell {
   buildInputs = with pkgs; [
     zola
     nodejs_20
+    lightningcss
   ];
 
   shellHook = ''
