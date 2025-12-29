@@ -160,7 +160,12 @@ h3, .h3 {
 p {
   --paragraph-margin: 1.5rem;
 
+  text-align: justify;
+  text-wrap: pretty;
   hyphens: auto;
+  hyphenate-limit-chars: 8 4 4;
+  orphans: 3;
+  widows: 3;
   margin-block: var(--paragraph-margin);
 
   &:first-child {
@@ -210,7 +215,7 @@ code {
   font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
   font-weight: normal;
   font-size: .9em;
-  hyphens: auto;
+  hyphens: none;
   padding: var(--space-very-small);
   background: #f3eee5;
 }
