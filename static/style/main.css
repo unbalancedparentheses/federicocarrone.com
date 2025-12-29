@@ -733,6 +733,32 @@ article {
   }
 }
 
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .content-grid {
+    --padding-inline: 1.5rem;
+  }
+
+  p {
+    text-align: left !important;
+    hyphens: none !important;
+  }
+
+  :root {
+    --text-size: 1rem;
+    --space-very-large: 2rem;
+    --space-large: 1.25rem;
+  }
+
+  .article-poster, .series-poster {
+    padding: 0.875rem;
+  }
+
+  figure figcaption {
+    max-width: 100%;
+  }
+}
+
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
