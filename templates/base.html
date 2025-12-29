@@ -1,11 +1,18 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <script>
+    (function() {
+      var theme = localStorage.getItem('theme');
+      if (theme === 'dark') document.documentElement.classList.add('dark');
+      else if (theme === 'light') document.documentElement.classList.add('light');
+    })();
+  </script>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
   <meta
   http-equiv="content-security-policy"
-  content="default-src 'self'; child-src 'self' https://www.youtube-nocookie.com; script-src 'self' https://cloud.umami.is; connect-src 'self' https://api-gateway.umami.dev"
+  content="default-src 'self'; child-src 'self' https://www.youtube-nocookie.com; script-src 'self' 'unsafe-inline' https://cloud.umami.is; connect-src 'self' https://api-gateway.umami.dev"
   >
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -14,6 +21,9 @@
 
   <link rel="stylesheet" href="{{ get_url(path = "/style/min/main.css", cachebust = true) }}" />
   <link rel="stylesheet" href="{{ get_url(path = "/style/min/syntax-theme.css", cachebust = true) }}" />
+
+  <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="{{ get_url(path = "rss.xml", trailing_slash = false) }}" />
+  <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="{{ get_url(path = "atom.xml", trailing_slash = false) }}" />
 
   <meta name="author" content="Federico Carrone" />
   {%- if page.description %}
@@ -49,6 +59,7 @@
     <li><a href="{{ get_url(path = '@/articles/_index.md' )}}">Articles</a></li>
     <li><a href="{{ get_url(path = '@/series/_index.md') }}">Series</a></li>
     <li><a href="/about">About</a></li>
+    <li><button id="theme-toggle" aria-label="Toggle dark mode">Theme</button></li>
   </ul>
 </nav>
 
@@ -89,6 +100,39 @@
     </div>
   </div>
 </footer>
+
+<script>
+  (function() {
+    var toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+
+    function getTheme() {
+      return localStorage.getItem('theme') || 'system';
+    }
+
+    function updateLabel() {
+      var theme = getTheme();
+      var label = theme === 'dark' ? 'Light' : theme === 'light' ? 'Auto' : 'Dark';
+      toggle.textContent = label;
+    }
+
+    updateLabel();
+
+    toggle.addEventListener('click', function() {
+      var current = getTheme();
+      var next = current === 'system' ? 'dark' : current === 'dark' ? 'light' : 'system';
+
+      document.documentElement.classList.remove('dark', 'light');
+      if (next === 'dark') document.documentElement.classList.add('dark');
+      else if (next === 'light') document.documentElement.classList.add('light');
+
+      if (next === 'system') localStorage.removeItem('theme');
+      else localStorage.setItem('theme', next);
+
+      updateLabel();
+    });
+  })();
+</script>
 
 </body>
 </html>

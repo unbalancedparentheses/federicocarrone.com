@@ -5,6 +5,7 @@ description = "Ethereum is emerging as a general purpose financial backend that 
 [taxonomies]
 keywords=["ethereum", "economy", "crypto"] 
 [extra]
+authors = ["Federico Carrone", "Roberto Catalan"]
 pinned = false
 +++
 
