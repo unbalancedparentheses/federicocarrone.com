@@ -5,6 +5,7 @@ description = "Many features of human experience that feel natural are historica
 [taxonomies]
 keywords=["consciousness", "coordination", "individuality"]
 [extra]
+author = "Federico Carrone"
 pinned = true
 +++
 

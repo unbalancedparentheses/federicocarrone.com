@@ -5,6 +5,7 @@ description = "Zero Knowledge Proofs (ZKPs) and other cryptographic and distribu
 [taxonomies]
 keywords=["cryptography", "coordination", "trust"] 
 [extra]
+author = "Federico Carrone"
 pinned = false
 +++
 

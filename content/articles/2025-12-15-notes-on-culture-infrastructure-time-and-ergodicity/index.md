@@ -6,6 +6,7 @@ description = "Ergodic Group is organized around the observation that certain sy
 [taxonomies]
 keywords=["ergodic"] 
 [extra]
+author = "Federico Carrone"
 pinned = true
 +++
 

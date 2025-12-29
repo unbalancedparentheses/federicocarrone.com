@@ -5,6 +5,7 @@ description = "We believe crypto has been incredibly successful at providing a t
 [taxonomies]
 keywords=["crypto"] 
 [extra]
+author = "Federico Carrone"
 pinned = false
 +++
 

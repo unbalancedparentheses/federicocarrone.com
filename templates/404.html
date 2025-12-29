@@ -1,3 +1,23 @@
-404
+{% extends "base.html" %}
 
-(try redirect to new URL maybe?)
+{% block title %}Page Not Found - federicocarrone.com{% endblock title %}
+{% block long_title %}Page Not Found{% endblock long_title %}
+
+{% block body %}
+<article>
+  <header>
+    <h1>Page Not Found</h1>
+  </header>
+
+  <p>The page you're looking for doesn't exist or has been moved.</p>
+
+  <p>Here are some places you might want to go:</p>
+
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/articles">Articles</a></li>
+    <li><a href="/series">Series</a></li>
+    <li><a href="/about">About</a></li>
+  </ul>
+</article>
+{% endblock body %}

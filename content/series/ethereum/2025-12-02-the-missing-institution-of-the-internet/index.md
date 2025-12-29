@@ -5,6 +5,7 @@ description = "Modern economic systems rest on two foundations: tools that expan
 [taxonomies]
 keywords=["ethereum", "economy", "crypto"] 
 [extra]
+authors = ["Federico Carrone", "Roberto Catalan"]
 pinned = true
 +++
 
