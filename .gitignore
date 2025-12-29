@@ -1,1 +1,13 @@
+# macOS
 .DS_Store
+
+# Build output
+public/
+docs/
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
