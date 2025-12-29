@@ -1,9 +1,9 @@
 +++
 title = "The Concrete Programming Language: Systems Programming for Formal Reasoning"
 date = "2025-12-26"
-description = ""
+description = "Concrete is a systems programming language designed around a single principle: every design choice must answer the question, can a machine reason about this? It aims to combine expressiveness with formal verification, performance with safety."
 [taxonomies]
-keywords=[] 
+keywords=["programming-languages", "formal-verification"] 
 [extra]
 author = "Federico Carrone"
 pinned = false

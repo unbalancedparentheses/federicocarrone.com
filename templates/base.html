@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="{{ get_url(path = "/style/min/main.css", cachebust = true) }}" />
   <link rel="stylesheet" href="{{ get_url(path = "/style/min/syntax-theme.css", cachebust = true) }}" />
 
+  <link rel="icon" href="{{ get_url(path = "/favicon.ico") }}" />
   <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="{{ get_url(path = "rss.xml", trailing_slash = false) }}" />
   <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="{{ get_url(path = "atom.xml", trailing_slash = false) }}" />
 
@@ -41,6 +42,7 @@
   {%- else %}
   <meta property="og:url" content="https://federicocarrone.com" />
   {%- endif %}
+  <meta property="og:image" content="{{ get_url(path = "/image/site-poster.jpg") }}" />
 
   <script defer src="https://cloud.umami.is/script.js" data-website-id="062ee306-b2e8-479b-80fd-1afeefa0bb29"></script>
 </head>
