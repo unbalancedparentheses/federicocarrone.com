@@ -51,7 +51,7 @@ p, h1, h2, h3, h4, h5, h6 {
   --border-width: 2px;
   --border-color: var(--color-dark-lighter);
 
-  --text-size: 1.05rem;
+  --text-size: 1.125rem;
   --text-line-height: 1.65;
 }
 
@@ -68,6 +68,10 @@ body {
   color: var(--color-dark);
   accent-color: var(--color-accent);
   background: var(--_background-color);
+
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
   scroll-behavior: smooth;    
 }
@@ -154,7 +158,7 @@ h3, .h3 {
 }
 
 p {
-  --paragraph-margin: var(--space);
+  --paragraph-margin: 1.5rem;
 
   hyphens: auto;
   margin-block: var(--paragraph-margin);
@@ -319,10 +323,13 @@ table {
 }
 
 blockquote {
-  font-style: italic;
+  font-style: normal;
   font-size: 1.05em;
-  padding-left: var(--space);
-  border-left: var(--border-width) var(--border-color) solid;
+  padding: var(--space);
+  padding-left: var(--space-large);
+  border-left: 4px var(--color-accent) solid;
+  background: var(--color-dark-blue);
+  border-radius: 0 var(--space-very-small) var(--space-very-small) 0;
 }
 
 q {
@@ -726,7 +733,7 @@ article {
   :root {
     --color-light: #1a1a1a;
     --color-lighter: #252525;
-    --color-light-darker: #999;
+    --color-light-darker: #aaa;
     --color-dark: #e0e0e0;
     --color-dark-lighter: #444;
     --color-dark-blue: #252525;
