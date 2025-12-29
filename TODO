@@ -1,6 +1,6 @@
-agregar autor a cada archivo
-ver si se puede tener en mas de un idioma
+DONE: agregar autor a cada archivo
+ver si se puede tener en mas de un idioma (Zola supports this via config.toml `default_language` and content structure)
 
-sacar carpeta docs
-que automaticamente github actions buildee zola, hay que cambiar algo de una url
+DONE: sacar carpeta docs
+DONE: que automaticamente github actions buildee zola, hay que cambiar algo de una url
 
