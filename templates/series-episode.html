@@ -1,4 +1,5 @@
 {% import "macros/article.html" as article %}
+{% import "macros/newsletter.html" as newsletter %}
 
 {% extends "base.html" %}
 
@@ -26,6 +27,8 @@
     </header>
 
     {{ page.content | safe }}
+
+    {{ newsletter::form() }}
 
     <nav class="previous-next-episodes">
       {%- if page.higher -%}

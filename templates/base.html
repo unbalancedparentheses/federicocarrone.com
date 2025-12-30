@@ -5,7 +5,7 @@
 
   <meta
   http-equiv="content-security-policy"
-  content="default-src 'self'; child-src 'self' https://www.youtube-nocookie.com; script-src 'self' https://cloud.umami.is; connect-src 'self' https://api-gateway.umami.dev"
+  content="default-src 'self'; child-src 'self' https://www.youtube-nocookie.com; script-src 'self' https://cloud.umami.is; connect-src 'self' https://api-gateway.umami.dev; form-action 'self' https://buttondown.com"
   >
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -53,6 +53,7 @@
     <li><a href="/">Home</a></li>
     <li><a href="{{ get_url(path = '@/articles/_index.md' )}}">Articles</a></li>
     <li><a href="{{ get_url(path = '@/series/_index.md') }}">Series</a></li>
+    <li><a href="/reading">Reading</a></li>
     <li><a href="/about">About</a></li>
   </ul>
 </nav>
