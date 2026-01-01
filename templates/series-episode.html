@@ -12,9 +12,50 @@
 {%- endblock long_title %}
 
 {% block body %}
-  <article class="series-episode" typeof="Article">
-    {% set series = get_section(path = page.ancestors | last) -%}
+  {% set series = get_section(path = page.ancestors | last) -%}
 
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/">Home</a></li>
+      <li><a href="/series/">Series</a></li>
+      <li><a href="{{ series.path | safe }}">{{ series.title }}</a></li>
+      <li aria-current="page">{{ page.title }}</li>
+    </ol>
+  </nav>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://federicocarrone.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Series",
+        "item": "https://federicocarrone.com/series/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "{{ series.title }}",
+        "item": "https://federicocarrone.com{{ series.path | safe }}"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "{{ page.title }}"
+      }
+    ]
+  }
+  </script>
+
+  <article class="series-episode" typeof="Article">
     <header>
       <h1 property="name">{{ page.title | markdown(inline = true) | safe }}</h1>
 

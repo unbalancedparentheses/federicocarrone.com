@@ -19,6 +19,9 @@
   <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="{{ get_url(path = "rss.xml", trailing_slash = false) }}" />
   <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="{{ get_url(path = "atom.xml", trailing_slash = false) }}" />
 
+  <link rel="preconnect" href="https://cloud.umami.is" crossorigin />
+  <link rel="dns-prefetch" href="https://cloud.umami.is" />
+
   <meta name="author" content="Federico Carrone" />
   {%- if page.description %}
   <meta name="description" content="{{ page.description }}" />
@@ -43,6 +46,18 @@
   <meta property="og:url" content="https://federicocarrone.com" />
   {%- endif %}
   <meta property="og:image" content="{{ get_url(path = "/image/site-poster.jpg") }}" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@federicocarrone" />
+  <meta name="twitter:creator" content="@federicocarrone" />
+
+  {%- if page.permalink %}
+  <link rel="canonical" href="{{ page.permalink | safe }}" />
+  {%- elif section.permalink %}
+  <link rel="canonical" href="{{ section.permalink | safe }}" />
+  {%- else %}
+  <link rel="canonical" href="https://federicocarrone.com/" />
+  {%- endif %}
 
   <script defer src="https://cloud.umami.is/script.js" data-website-id="062ee306-b2e8-479b-80fd-1afeefa0bb29"></script>
 </head>

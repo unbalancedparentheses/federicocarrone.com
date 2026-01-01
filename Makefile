@@ -1,12 +1,14 @@
 .PHONY: all build build-css watch
 
+NIX_RUN = nix develop --extra-experimental-features 'nix-command flakes' --command
+
 all: build-css build
 
 build:
-	zola build
+	$(NIX_RUN) zola build
 
 build-css:
-	lightningcss static/style/*.css --minify --output-dir static/style/min/
+	$(NIX_RUN) lightningcss static/style/*.css --minify --output-dir static/style/min/
 
 watch:
-	zola serve
+	$(NIX_RUN) zola serve
