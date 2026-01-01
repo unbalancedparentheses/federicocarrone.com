@@ -25,16 +25,120 @@ This guide covers type system concepts from the foundational ideas every program
 
 **Where to start**: If you know Java/TypeScript, learn Rust. It has the best type system that's still practical for everyday programming.
 
-## When to Use Dynamic Typing
+## Dynamic Type Systems
 
-This guide focuses on static type systems, but dynamic typing has legitimate uses:
+Dynamic typing is a valid type system category, not the absence of types. In dynamic languages, types exist and are checked, just at runtime rather than compile time.
+
+### How It Works
+
+Values carry type tags at runtime. Operations check these tags before executing:
+
+```python
+# Python: types checked at runtime
+def add(a, b):
+    return a + b
+
+add(1, 2)       # Works: both ints
+add("a", "b")   # Works: both strings
+add(1, "b")     # TypeError at runtime!
+```
+
+The type error still happens. It just happens when you run the code, not when you compile it. This trades earlier error detection for flexibility and development speed.
+
+### Why Choose Dynamic Typing
 
 - **Prototyping and exploration**: When you don't yet know what shape your data will take
-- **Scripts and glue code**: Short-lived code where development speed matters more than long-term maintenance
+- **Scripts and glue code**: Short-lived code where development speed matters more than maintenance
 - **REPLs and interactive development**: Immediate feedback without compilation
-- **Highly dynamic domains**: Serialization, ORMs, and metaprogramming where types fight the problem
+- **Highly dynamic domains**: Serialization, ORMs, and metaprogramming where static types fight the problem
+- **Duck typing**: If it quacks like a duck, use it as a duck. No need for explicit interface declarations
+
+### The Trade-off
+
+Dynamic typing isn't "no types." It's "types checked later." The benefits are real:
+
+| Aspect | Dynamic | Static |
+|--------|---------|--------|
+| Error detection | Runtime | Compile time |
+| Development speed | Often faster initially | Faster refactoring |
+| Flexibility | High | Constrained by types |
+| Tooling | Limited inference | Rich IDE support |
+| Documentation | Implicit | Types as docs |
 
 The question isn't "static vs dynamic" but "how much static?" Python with type hints, TypeScript with strict mode, Rust with full ownership tracking: these represent different points on a spectrum. Pick the point that matches your problem.
+
+### Languages
+
+Python, Ruby, JavaScript, Lisp, Clojure, Erlang, Elixir. Most have optional type systems now (Python's type hints, TypeScript for JavaScript).
+
+## Gradual Typing
+
+Gradual typing blends static and dynamic checking within the same language. You can add types incrementally, and the system inserts runtime checks at the boundaries between typed and untyped code.
+
+### How It Works
+
+In a gradually typed system, you can leave parts of your code untyped (using `any` or equivalent) while fully typing other parts. The type checker verifies the typed portions statically. At runtime, checks are inserted where typed code interacts with untyped code.
+
+```typescript
+// TypeScript: gradual typing in action
+function greet(name: string): string {
+    return `Hello, ${name}`;
+}
+
+// Fully typed: checked statically
+greet("Ada");  // OK at compile time
+
+// Escape hatch: 'any' bypasses static checking
+function processUnknown(data: any): void {
+    // No compile-time checking on 'data'
+    console.log(data.someProperty);  // Could fail at runtime
+}
+
+// The boundary: where typed meets untyped
+function fromExternal(json: any): User {
+    // Runtime validation needed here
+    return json as User;  // Risky! No guarantee json matches User
+}
+```
+
+### The Key Insight
+
+The **gradual guarantee** is the formal property that makes this work: adding type annotations should not change program behavior (unless there's a type error). You can migrate from untyped to typed code one function at a time without breaking anything.
+
+This enables incremental adoption:
+1. Start with a dynamically typed codebase
+2. Add types to critical paths first
+3. Gradually expand type coverage
+4. Runtime checks catch boundary violations
+
+### Blame Tracking
+
+When a type error occurs at a boundary, who's at fault? **Blame tracking** attributes errors to the untyped side of the boundary. If typed code calls untyped code and gets a wrong type back, blame falls on the untyped code.
+
+```python
+# Python with type hints
+def typed_function(x: int) -> int:
+    return x + 1
+
+def untyped_function(y):
+    return "not an int"  # Bug here
+
+# At runtime, the error is blamed on untyped_function
+result: int = untyped_function(5)  # Runtime TypeError
+```
+
+### The Trade-off
+
+| Aspect | Benefit | Cost |
+|--------|---------|------|
+| Migration | Incremental adoption | Partial guarantees |
+| Flexibility | Mix paradigms | Runtime check overhead |
+| Tooling | Some IDE support | Less precise than full static |
+| Guarantees | Better than nothing | Weaker than full static |
+
+### Languages
+
+TypeScript, Python (with mypy/pyright), PHP (with Hack), Racket (Typed Racket), Dart (before null safety), C# (with nullable reference types).
 
 ## How to Read This Guide
 
@@ -43,8 +147,8 @@ The concepts are organized into tiers by complexity and practical relevance:
 | Tier | What's Here | You Should Know If... |
 |------|-------------|----------------------|
 | 1: Foundational | Generics, ADTs, pattern matching | You write code |
-| 2: Mainstream Advanced | Traits, GADTs, existentials | You design libraries |
-| 3: Serious Complexity | HKT, linear types, effects | You want deep FP or systems programming |
+| 2: Mainstream Advanced | Traits, GADTs, flow typing, existentials | You design libraries |
+| 3: Serious Complexity | HKT, linear/ownership types, effects | You want deep FP or systems programming |
 | 4: Research Level | Dependent types, session types | You work on PLs or verification |
 | 5: Cutting Edge | HoTT, QTT, graded modalities | You do research |
 
@@ -54,7 +158,7 @@ You don't need to read linearly. Jump to what interests you. But concepts build 
 
 How type systems relate to each other in terms of expressiveness versus annotation burden:
 
-```
+```text
                     EXPRESSIVENESS
                     Low ──────────────────► High
                     │
@@ -153,6 +257,20 @@ let strings = map(numbers, |n| n.to_string());
 
 The trade-off: some advanced features ([GADTs](#generalized-algebraic-data-types-gadts), [higher-rank types](#rank-n-polymorphism)) break inference and require annotations. But for everyday code, you get static typing's safety without its traditional verbosity. Available in ML, OCaml, Haskell, Rust, F#, Elm, and Scala.
 
+### Beyond HM: Other Inference Strategies
+
+Hindley-Milner is the gold standard for inference in purely functional languages, but other strategies exist:
+
+| Strategy | How It Works | Used In |
+|----------|--------------|---------|
+| **Bidirectional** | Types flow both up (inference) and down (checking) | Rust, Scala, Agda |
+| **Constraint-based** | Collect constraints, solve with SMT/unification | Gradual typing, refinement types |
+| **Local** | Infer within expressions, require declarations at boundaries | Java (var), C++ (auto) |
+
+**Bidirectional typing** is particularly important for modern languages. Instead of pure inference (bottom-up) or pure checking (top-down), types flow both ways. When you write `let x: Vec<i32> = vec![1, 2, 3]`, the expected type `Vec<i32>` flows *down* to help infer the element type. When you write `let x = vec![1, 2, 3]`, the literal types flow *up* to infer `Vec<i32>`.
+
+This scales better than pure HM to richer type systems. GADTs, higher-rank types, and dependent types all work well with bidirectional typing because explicit annotations guide inference where needed.
+
 ---
 
 ## Parametric Polymorphism (Generics)
@@ -224,12 +342,60 @@ Think of it as a contract. An `Animal` promises certain capabilities: it has a n
 
 This is the Liskov Substitution Principle encoded in the type system: if `Dog <: Animal`, then any property that holds for `Animal` should hold for `Dog`. You can substitute Dogs for Animals without breaking correctness.
 
-There are two flavors:
+### Nominal vs Structural: Two Philosophies
 
-| Style | How It Works | Languages |
-|-------|--------------|-----------|
-| Nominal | Must explicitly declare `Dog extends Animal` | Java, C#, Kotlin |
-| Structural | If Dog has all of Animal's fields/methods, it fits | TypeScript, Go |
+This is a fundamental classification of type systems, not just a detail of subtyping:
+
+| Aspect | Nominal | Structural |
+|--------|---------|------------|
+| Type equality | Based on declared name | Based on shape/structure |
+| Subtyping | Explicit declaration required | Implicit if structure matches |
+| Philosophy | "What it's called" | "What it can do" |
+| Abstraction | Strong boundaries | Flexible composition |
+| Refactoring | Rename breaks compatibility | Structure changes break compatibility |
+
+**Nominal typing** requires explicit declarations. Even if two types have identical fields, they're different types unless related by declaration:
+
+```java
+// Java: nominal typing
+class Meters { double value; }
+class Feet { double value; }
+
+// These are DIFFERENT types despite identical structure
+Meters m = new Meters();
+Feet f = m;  // ERROR: incompatible types
+```
+
+**Structural typing** cares only about shape. If it has the right fields and methods, it fits:
+
+```typescript
+// TypeScript: structural typing
+interface Point { x: number; y: number; }
+
+// Any object with x and y is a Point
+const p: Point = { x: 1, y: 2 };           // OK
+const q: Point = { x: 1, y: 2, z: 3 };     // OK (extra field allowed)
+
+class Coordinate { x: number; y: number; }
+const r: Point = new Coordinate();          // OK (same structure)
+```
+
+**Go's approach** is interesting: nominal for defined types, but interfaces are structural. A type implements an interface if it has the right methods, no declaration needed.
+
+```go
+// Go: structural interfaces
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+
+// MyFile implements Reader without declaring it
+type MyFile struct { ... }
+func (f MyFile) Read(p []byte) (int, error) { ... }
+
+// Works: MyFile has the right method
+func process(r Reader) { ... }
+process(MyFile{})  // OK
+```
 
 ### What It Adds
 
@@ -608,6 +774,102 @@ Associated types are less flexible than type parameters when you need the same t
 
 ---
 
+## Flow-Sensitive Typing
+
+### The Problem
+
+You check if a value is null before using it. You know it's not null inside the `if` block. But does the type system know?
+
+```java
+// Java: the type system doesn't track the check
+Object x = maybeNull();
+if (x != null) {
+    // You KNOW x isn't null here
+    // But the type is still Object, not NonNull<Object>
+    x.toString();  // Still need to handle potential null?
+}
+```
+
+### The Insight
+
+**Flow-sensitive typing** (also called **occurrence typing** or **type narrowing**) refines types based on control flow. After a type check, the type system narrows the variable's type in branches where the check succeeded.
+
+The key insight is that type information can *change* as you move through code. The type of `x` isn't fixed at its declaration. It evolves based on what the program has learned. After `if (x !== null)`, the type of `x` in the `then` branch is narrower than at the start.
+
+This bridges static and dynamic typing philosophies. Dynamic languages always know the runtime type. Static languages traditionally fix types at declaration. Flow-sensitive typing lets static types benefit from runtime checks without losing static guarantees.
+
+### The Code
+
+```typescript
+// TypeScript: flow-sensitive typing
+function process(value: string | number | null) {
+    // Here: value is string | number | null
+
+    if (value === null) {
+        return;  // value is null in this branch
+    }
+    // Here: value is string | number (null eliminated)
+
+    if (typeof value === "string") {
+        // Here: value is string
+        console.log(value.toUpperCase());  // OK: string method
+    } else {
+        // Here: value is number
+        console.log(value.toFixed(2));     // OK: number method
+    }
+}
+
+// Works with user-defined type guards too
+interface Cat { meow(): void; }
+interface Dog { bark(): void; }
+
+function isCat(pet: Cat | Dog): pet is Cat {
+    return (pet as Cat).meow !== undefined;
+}
+
+function speak(pet: Cat | Dog) {
+    if (isCat(pet)) {
+        pet.meow();  // TypeScript knows pet is Cat here
+    } else {
+        pet.bark();  // TypeScript knows pet is Dog here
+    }
+}
+```
+
+```kotlin
+// Kotlin: smart casts
+fun process(x: Any) {
+    if (x is String) {
+        // x is automatically cast to String here
+        println(x.length)  // No explicit cast needed
+    }
+
+    // Works with null checks too
+    val name: String? = getName()
+    if (name != null) {
+        // name is String here, not String?
+        println(name.length)
+    }
+}
+```
+
+### What It Adds
+
+- **Eliminates redundant casts**: The compiler tracks what you've already checked
+- **Catches impossible branches**: If a branch can never execute, the compiler warns
+- **Natural null handling**: Null checks automatically narrow types
+- **Type guards**: User-defined functions can narrow types
+
+### The Trade-off
+
+Flow-sensitive typing complicates the type system. The type of a variable depends on *where* you are in the code, not just its declaration. This makes type checking more complex and can lead to surprising behavior when variables are reassigned or captured in closures.
+
+### Languages
+
+TypeScript, Kotlin, Ceylon, Flow (JavaScript), Rust (with pattern matching), Swift, and increasingly other modern languages.
+
+---
+
 ## Generalized Algebraic Data Types (GADTs)
 
 ### The Problem
@@ -827,7 +1089,7 @@ Can't we abstract over the *container itself*?
 
 Types have **kinds**, just as values have types. This is the key conceptual leap:
 
-```
+```text
 Int         : Type                    -- a plain type
 Vec         : Type -> Type            -- takes a type, returns a type
 Result      : Type -> Type -> Type    -- takes two types, returns a type
@@ -980,6 +1242,35 @@ fn main() {
 ```
 
 The borrow checker takes practice. Some patterns (graphs, doubly-linked lists) fight against it. But once you internalize ownership thinking, most code just works.
+
+### The Broader Family: Ownership, Regions, and Capabilities
+
+Linear/affine types are part of a broader family of resource-tracking type systems:
+
+| System | What It Tracks | Example |
+|--------|----------------|---------|
+| **Linear/Affine** | Usage count (exactly/at most once) | Move semantics |
+| **Ownership** | Who owns a value | Rust's ownership model |
+| **Region/Lifetime** | How long a reference is valid | Rust lifetimes (`'a`) |
+| **Capability** | What permissions a value grants | Object-capability languages |
+
+**Ownership types** make the owner explicit in the type. Rust combines ownership with affine types: the owner is responsible for cleanup, and ownership can transfer exactly once. This is more than tracking usage; it's tracking *responsibility*.
+
+**Region types** (or **lifetime types**) track the *scope* where a reference is valid. Rust's lifetime annotations (`&'a T`) are region types: they prove references don't outlive the data they point to.
+
+```rust
+// Rust: lifetimes are region types
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() { x } else { y }
+}
+
+// The 'a says: the returned reference is valid as long as
+// BOTH input references are valid. The compiler checks this.
+```
+
+**Capability types** encode *permissions*, not just structure. A `ReadCapability<File>` lets you read, while `WriteCapability<File>` lets you write. The type system ensures you can only perform operations you have capabilities for. This is object-capability security expressed in types.
+
+These ideas originated in research (region inference in MLKit, capability calculus, Cyclone's safe C) but reached mainstream through Rust. Languages like Vale and Austral explore different points in this design space.
 
 ---
 
@@ -1165,7 +1456,7 @@ Types can depend on values. `Vector<3, Int>` (a vector of 3 integers) is a diffe
 
 Function types can express relationships between inputs and outputs:
 
-```
+```text
 append : Vector<n, a> -> Vector<m, a> -> Vector<n + m, a>
 ```
 
@@ -1254,7 +1545,7 @@ Key concept: **duality**. The client's view is the *dual* of the server's view: 
 
 ### The Code
 
-```
+```text
 // Session types: Types encode protocols
 
 // Notation:
@@ -1455,7 +1746,7 @@ Rust's borrow checker embodies these ideas. Mutable borrows are exclusive owners
 
 ### The Code
 
-```
+```text
 // Separation logic specifications (pseudocode)
 
 // Points-to assertion: x points to value v
@@ -1508,7 +1799,7 @@ Dependent type systems need to know all functions terminate. Otherwise type chec
 
 But this rejects valid programs:
 
-```
+```text
 merge : Stream → Stream → Stream
 merge (x:xs) (y:ys) = x : y : merge xs ys
 ```
@@ -1581,7 +1872,7 @@ These concepts are at the research frontier. They haven't reached mainstream lan
 
 ### Graded Modal Types (Brief Example)
 
-```
+```haskell
 -- Granule: grades unify linearity and effects
 
 id : forall {a : Type} . a [1] -> a   -- use exactly once
