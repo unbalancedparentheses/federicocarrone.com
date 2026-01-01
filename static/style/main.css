@@ -509,7 +509,7 @@ main {
 
   > ul {
     display: grid;
-    grid-template-columns: repeat(5, auto);
+    grid-template-columns: repeat(6, auto);
     padding: 0;
     height: var(--space-very-large);
     align-items: center;
@@ -964,4 +964,174 @@ article {
     white-space: pre-wrap;
     border: 1px solid #ccc;
   }
+}
+
+/* Cyberpunk theme */
+[data-theme="cyberpunk"] {
+  --color-light: #0a0a0f;
+  --color-lighter: #12121a;
+  --color-light-darker: #888;
+  --color-dark: #e0e0e0;
+  --color-dark-lighter: #2a2a3a;
+  --color-dark-blue: #15151f;
+  --color-accent: #0ff;
+  --color-accent-darker: #0aa;
+  --color-accent2: #ff00ff;
+
+  --neon-glow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor;
+  --neon-glow-subtle: 0 0 5px currentColor, 0 0 10px currentColor;
+}
+
+[data-theme="cyberpunk"] body {
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(255, 0, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
+    var(--color-light);
+}
+
+[data-theme="cyberpunk"] #menu {
+  background: linear-gradient(90deg, #1a0a1a 0%, #0a1a1a 100%);
+  border-bottom: 1px solid var(--color-accent2);
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+[data-theme="cyberpunk"] #menu a[aria-current="page"] {
+  color: #0ff;
+  text-shadow: var(--neon-glow-subtle);
+}
+
+[data-theme="cyberpunk"] a {
+  transition: text-shadow 0.2s;
+
+  &:hover, &:focus {
+    text-shadow: var(--neon-glow-subtle);
+  }
+}
+
+[data-theme="cyberpunk"] h1,
+[data-theme="cyberpunk"] h2,
+[data-theme="cyberpunk"] h3 {
+  color: #ff00ff;
+  text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+}
+
+[data-theme="cyberpunk"] article > header h1 {
+  color: #0ff;
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.5), 0 0 40px rgba(0, 255, 255, 0.3);
+}
+
+[data-theme="cyberpunk"] .button {
+  background: transparent;
+  border: 1px solid #0ff;
+  color: #0ff;
+  text-shadow: var(--neon-glow-subtle);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.1);
+  transition: all 0.2s;
+
+  &:hover, &:focus {
+    background: rgba(0, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), inset 0 0 20px rgba(0, 255, 255, 0.2);
+  }
+}
+
+[data-theme="cyberpunk"] #reading-progress {
+  background: linear-gradient(90deg, #ff00ff, #0ff);
+  box-shadow: 0 0 10px #0ff, 0 0 20px #ff00ff;
+}
+
+[data-theme="cyberpunk"] pre {
+  border-color: #2a2a3a;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+}
+
+[data-theme="cyberpunk"] code {
+  color: #0ff;
+}
+
+[data-theme="cyberpunk"] blockquote {
+  border-left-color: #ff00ff;
+  background: rgba(255, 0, 255, 0.05);
+}
+
+[data-theme="cyberpunk"] .label {
+  background: #ff00ff;
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+}
+
+[data-theme="cyberpunk"] .reading-time {
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  color: #0ff;
+}
+
+[data-theme="cyberpunk"] .breadcrumbs a:hover {
+  color: #0ff;
+  text-shadow: var(--neon-glow-subtle);
+}
+
+[data-theme="cyberpunk"] footer {
+  border-top-color: #ff00ff;
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 0, 255, 0.05) 100%);
+}
+
+[data-theme="cyberpunk"] .article-poster,
+[data-theme="cyberpunk"] .series-poster {
+  border-color: #2a2a3a;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    border-color: #0ff;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  }
+}
+
+[data-theme="cyberpunk"] .toc {
+  border-color: #2a2a3a;
+  background: rgba(0, 255, 255, 0.02);
+}
+
+[data-theme="cyberpunk"] .newsletter {
+  border-color: #ff00ff;
+  background: linear-gradient(180deg, rgba(255, 0, 255, 0.02) 0%, rgba(0, 255, 255, 0.02) 100%);
+}
+
+[data-theme="cyberpunk"] .newsletter-form input[type="email"] {
+  background: var(--color-lighter);
+  border-color: #0ff;
+  color: var(--color-dark);
+
+  &:focus {
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  }
+}
+
+[data-theme="cyberpunk"] .newsletter-form button {
+  background: transparent;
+  border-color: #ff00ff;
+  color: #ff00ff;
+  text-shadow: var(--neon-glow-subtle);
+
+  &:hover {
+    background: rgba(255, 0, 255, 0.1);
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
+  }
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2em;
+  padding: var(--space-very-small);
+  color: inherit;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+[data-theme="cyberpunk"] .theme-toggle {
+  text-shadow: var(--neon-glow-subtle);
 }

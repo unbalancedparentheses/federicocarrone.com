@@ -14,6 +14,7 @@
 
   <link rel="stylesheet" href="{{ get_url(path = "/style/min/main.css", cachebust = true) }}" />
   <link rel="stylesheet" href="{{ get_url(path = "/style/min/syntax-theme.css", cachebust = true) }}" />
+  <script src="{{ get_url(path = "/js/theme-toggle.js", cachebust = true) }}"></script>
 
   <link rel="icon" href="{{ get_url(path = "/favicon.ico") }}" />
   <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="{{ get_url(path = "rss.xml", trailing_slash = false) }}" />
@@ -75,6 +76,7 @@
     <li><a href="{{ get_url(path = '@/series/_index.md') }}"{% if current_path is starting_with("/series") %} aria-current="page"{% endif %}>Series</a></li>
     <li><a href="/reading"{% if current_path is starting_with("/reading") %} aria-current="page"{% endif %}>Reading</a></li>
     <li><a href="/about"{% if current_path is starting_with("/about") %} aria-current="page"{% endif %}>About</a></li>
+    <li><button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">🌃</button></li>
   </ul>
 </nav>
 
