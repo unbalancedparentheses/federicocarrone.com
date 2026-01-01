@@ -1274,31 +1274,35 @@ The cost is severe: type inference becomes undecidable for Rank-2 and above. You
 Rust can't express Rank-N types directly. OCaml can:
 
 ```ocaml
-(* OCaml: Rank-2 polymorphism *)
+(* OCaml: Rank-2 polymorphism via record types *)
 
 (* Rank-1: caller chooses 'a *)
 let id : 'a -> 'a = fun x -> x
 
-(* Rank-2: the FUNCTION ARGUMENT must be polymorphic *)
-(* The type says: "give me a function that works for ANY type" *)
-let apply_to_both : (forall 'a. 'a -> 'a) -> (int * string) -> (int * string) =
-  fun f (x, y) -> (f x, f y)
+(* Rank-2 requires a record with polymorphic field *)
+type poly_fn = { f : 'a. 'a -> 'a }
+
+let apply_to_both (p : poly_fn) (x, y) = (p.f x, p.f y)
 
 (* This works: id is polymorphic *)
-let result = apply_to_both id (42, "hello")
+let result = apply_to_both { f = id } (42, "hello")
+(* result = (42, "hello") *)
 
 (* This FAILS: (+1) only works on int, not any type *)
-(* let bad = apply_to_both (fun x -> x + 1) (42, "hello") *)
-(* Error: expected 'a -> 'a, got int -> int *)
+(* let bad = apply_to_both { f = fun x -> x + 1 } (42, "hello") *)
+(* Error: This field value has type int -> int
+   which is less general than 'a. 'a -> 'a *)
 ```
 
-```ocaml
-(* Why it matters: the ST monad trick *)
-(* runST : (forall s. ST s a) -> a *)
+```haskell
+-- Haskell: cleaner Rank-2 syntax with RankNTypes extension
+{-# LANGUAGE RankNTypes #-}
 
-(* The 's' type variable is chosen by runST, not the caller.
-   This makes it impossible to return an STRef outside runST,
-   because the 's' won't match anything outside. *)
+-- runST : (forall s. ST s a) -> a
+
+-- The 's' type variable is chosen by runST, not the caller.
+-- This makes it impossible to return an STRef outside runST,
+-- because the 's' won't match anything outside.
 ```
 
 Rank-N types are rare outside Haskell. Most languages don't support them, and you can usually work around their absence.
@@ -1370,9 +1374,9 @@ given Functor[Option] with
 def double[F[_]: Functor](fa: F[Int]): F[Int] =
   summon[Functor[F]].map(fa)(_ * 2)
 
-double(List(1, 2, 3))     // List(2, 4, 6)
-double(Some(5))           // Some(10)
-double(None)              // None
+double(List(1, 2, 3))              // List(2, 4, 6)
+double(Option(5))                  // Some(10)
+double(Option.empty[Int])          // None
 
 // Monad builds on Functor
 trait Monad[M[_]] extends Functor[M]:
