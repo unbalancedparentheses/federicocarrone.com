@@ -101,7 +101,7 @@ function fromExternal(json: any): User {
 }
 ```
 
-### The Key Insight
+### The Insight
 
 The **gradual guarantee** is the formal property that makes this work: adding type annotations should not change program behavior (unless there's a type error). You can migrate from untyped to typed code one function at a time without breaking anything.
 
@@ -445,8 +445,6 @@ fn mystery<T>(x: T) -> T {
     x
 }
 ```
-
-Unlike C++ templates, you can't specialize behavior for specific types. But that constraint gives you the parametricity guarantees.
 
 ---
 
@@ -916,7 +914,7 @@ if (x != null) {
 
 **Flow-sensitive typing** (also called **occurrence typing** or **type narrowing**) refines types based on control flow. After a type check, the type system narrows the variable's type in branches where the check succeeded.
 
-The key insight is that type information can *change* as you move through code. The type of `x` isn't fixed at its declaration. It evolves based on what the program has learned. After `if (x !== null)`, the type of `x` in the `then` branch is narrower than at the start.
+Type information *changes* as you move through code. The type of `x` isn't fixed at its declaration. It evolves based on what the program has learned. After `if (x !== null)`, the type of `x` in the `then` branch is narrower than at the start.
 
 This bridges static and dynamic typing philosophies. Dynamic languages always know the runtime type. Static languages traditionally fix types at declaration. Flow-sensitive typing lets static types benefit from runtime checks without losing static guarantees.
 
@@ -1009,11 +1007,7 @@ You have a value that could be one of several types. Or a value that must satisf
 
 **Intersection types** (`A & B`) represent "this AND that." A value of type `A & B` has all properties of both `A` and `B`. It satisfies both interfaces simultaneously.
 
-These are fundamental type-theoretic constructs that correspond to logical operations:
-- Union = logical OR (disjunction)
-- Intersection = logical AND (conjunction)
-
-The duality is precise. Unions expand the set of possible values (more things are `A | B` than just `A`). Intersections narrow it (fewer things are `A & B` than just `A`).
+These correspond to logical OR (union) and AND (intersection).
 
 ### The Code
 
@@ -1404,9 +1398,7 @@ Garbage collectors handle memory but not files, sockets, or locks. Manual manage
 
 ### The Insight
 
-Most type systems only track *what* a value is. Linear types also track *how many times* it's used. This is a fundamental extension of what types can express.
-
-Track *how many times* a value is used. This is the **substructural** family of type systems, named because they restrict the structural rules of logic (weakening, contraction, exchange):
+Most type systems only track *what* a value is. Linear types also track *how many times* it's used. This is the **substructural** family, named because they restrict the structural rules of logic (weakening, contraction, exchange):
 
 | Type | Rule | Structural Rule Restricted | Use Case |
 |------|------|---------------------------|----------|
@@ -1420,7 +1412,7 @@ Track *how many times* a value is used. This is the **substructural** family of 
 
 Rust uses **affine types**: values are used at most once (moved), but you can drop them without using them. True **linear types** require using values exactly once. You can't forget to handle something.
 
-The key insight is that "use" includes transferring ownership. When you pass a `String` to a function that takes it by value, you've "used" the String. It's gone from your scope. You can't use it again. This is the "borrow checker" experience: the compiler tracks ownership and prevents use-after-move.
+"Use" includes transferring ownership. When you pass a `String` to a function that takes it by value, you've "used" the String. It's gone from your scope. You can't use it again. The borrow checker tracks ownership and prevents use-after-move.
 
 Borrowing (`&T` and `&mut T`) is how Rust escapes the "use once" restriction when you need it. A borrow doesn't consume the value; it temporarily lends access. The original owner keeps ownership and can use the value after the borrow ends. The borrow checker ensures borrows don't outlive the owner.
 
@@ -2367,7 +2359,7 @@ Functions that work on records with "at least these fields," preserving other fi
 
 Regular generics abstract over types. Row polymorphism abstracts over *record structure*. A function `getName` needs records with a `name` field. It shouldn't care about other fields. Row polymorphism lets you write this: "give me any record with at least a `name: String` field, and I'll return the name."
 
-The crucial feature is that extra fields pass through unchanged. If you have `{ name: "Ada", age: 36, title: "Countess" }` and call `getName`, you get "Ada" back. The function ignores `age` and `title`, but doesn't require you to strip them first. This is more flexible than structural subtyping (which TypeScript uses) because row polymorphism is parametric: it works uniformly for any extra fields.
+Extra fields pass through unchanged. If you have `{ name: "Ada", age: 36, title: "Countess" }` and call `getName`, you get "Ada" back. The function ignores `age` and `title`, but doesn't require you to strip them first. More flexible than structural subtyping because it's parametric: works uniformly for any extra fields.
 
 This is common in functional languages with records (PureScript, Elm, OCaml) and solves the problem of writing functions that operate on "records with certain fields" without committing to a specific record type.
 
