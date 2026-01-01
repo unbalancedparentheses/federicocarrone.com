@@ -95,6 +95,20 @@ summary:focus-visible {
   outline-offset: 2px;
 }
 
+/* Reading progress bar */
+#reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  z-index: 1000;
+  pointer-events: none;
+}
+
 h1, h2, h3, h4, h5, h6 {
   line-height: 1.25em;
 
@@ -675,6 +689,17 @@ article {
 
   :has(+ &) {
     margin-inline-end: var(--space-large);
+  }
+}
+
+.reading-time {
+  padding: var(--space-very-small) var(--space-small);
+  background: var(--color-dark-blue);
+  border-radius: var(--space-very-small);
+  font-variant-numeric: tabular-nums;
+
+  &::before {
+    content: "⏱ ";
   }
 }
 

@@ -49,9 +49,6 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://federicocarrone.com/images/twitter-card.png" />
   <meta name="twitter:site" content="@federicocarrone" />
-
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:site" content="@federicocarrone" />
   <meta name="twitter:creator" content="@federicocarrone" />
 
   {%- if page.permalink %}
@@ -64,8 +61,11 @@
 
   <script defer src="https://cloud.umami.is/script.js" data-website-id="062ee306-b2e8-479b-80fd-1afeefa0bb29"></script>
   <script defer src="{{ get_url(path = "/js/code-copy.js", cachebust = true) }}"></script>
+  <script defer src="{{ get_url(path = "/js/reading-progress.js", cachebust = true) }}"></script>
 </head>
 <body class="content-grid">
+
+<div id="reading-progress" class="full-width" aria-hidden="true"></div>
 
 {%- set current_path = current_path | default(value="/") -%}
 <nav id="menu" class="full-width content-grid" aria-label="Main navigation">
