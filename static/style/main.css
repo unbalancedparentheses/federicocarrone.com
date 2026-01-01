@@ -1048,7 +1048,7 @@ article {
   box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
 }
 
-[data-theme="cyberpunk"] code {
+[data-theme="cyberpunk"] :not(pre) > code {
   color: #0ff;
 }
 
@@ -1221,7 +1221,7 @@ article {
   box-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
 }
 
-[data-theme="amber"] code { color: #ff9500; }
+[data-theme="amber"] :not(pre) > code { color: #ff9500; }
 [data-theme="amber"] blockquote { border-left-color: #ff6600; background: rgba(255, 149, 0, 0.05); }
 [data-theme="amber"] .label { background: #ff6600; }
 [data-theme="amber"] footer { border-top-color: #ff9500; }
@@ -1289,7 +1289,7 @@ article {
   background: linear-gradient(90deg, #2dd4bf, #e05577);
 }
 
-[data-theme="ghost"] code { color: #5eeedd; }
+[data-theme="ghost"] :not(pre) > code { color: #5eeedd; }
 [data-theme="ghost"] blockquote { border-left-color: #e05577; background: rgba(224, 85, 119, 0.05); }
 [data-theme="ghost"] .label { background: #e05577; }
 [data-theme="ghost"] footer { border-top-color: rgba(45, 212, 191, 0.3); }
