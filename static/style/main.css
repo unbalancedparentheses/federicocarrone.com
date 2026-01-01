@@ -1020,151 +1020,150 @@ article {
 
 /* ============================================
    CYPHERPUNK THEME
-   Violet + cyan, synthwave vibes, beautiful & readable
+   Dark + soft teal + coral, readable & beautiful
    ============================================ */
 [data-theme="ghost"] {
-  --color-light: #0c0a10;
-  --color-lighter: #13111a;
-  --color-light-darker: #777;
-  --color-dark: #e0dce8;
-  --color-dark-lighter: #1e1a28;
-  --color-dark-blue: #110f18;
-  --color-accent: #c084fc;
-  --color-accent-darker: #a855f7;
-  --color-accent2: #22d3ee;
+  --color-light: #0a1214;
+  --color-lighter: #0f1a1d;
+  --color-light-darker: #6b7c80;
+  --color-dark: #d4e4e8;
+  --color-dark-lighter: #162225;
+  --color-dark-blue: #0d1618;
+  --color-accent: #2dd4bf;
+  --color-accent-darker: #14b8a6;
+  --color-accent2: #fb7185;
 }
 
 [data-theme="ghost"] body {
   background:
-    radial-gradient(ellipse at 20% 0%, rgba(192, 132, 252, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 100%, rgba(34, 211, 238, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 30% 0%, rgba(45, 212, 191, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 100%, rgba(251, 113, 133, 0.03) 0%, transparent 50%),
     var(--color-light);
 }
 
 [data-theme="ghost"] #menu {
-  background: rgba(12, 10, 16, 0.95);
-  border-bottom: 1px solid rgba(192, 132, 252, 0.3);
+  background: rgba(10, 18, 20, 0.95);
+  border-bottom: 1px solid rgba(45, 212, 191, 0.25);
   backdrop-filter: blur(10px);
 }
 
 [data-theme="ghost"] #menu a[aria-current="page"] {
-  color: #c084fc;
+  color: #2dd4bf;
 }
 
 [data-theme="ghost"] a {
-  color: #c084fc;
+  color: #2dd4bf;
   transition: all 0.15s;
 }
 
 [data-theme="ghost"] a:hover {
-  color: #d8b4fe;
-  text-shadow: 0 0 12px rgba(192, 132, 252, 0.5);
+  color: #5eead4;
+  text-shadow: 0 0 10px rgba(45, 212, 191, 0.4);
 }
 
 [data-theme="ghost"] h1,
 [data-theme="ghost"] h2,
 [data-theme="ghost"] h3 {
-  color: #c084fc;
+  color: #2dd4bf;
 }
 
 [data-theme="ghost"] article > header h1 {
-  color: #d8b4fe;
-  text-shadow: 0 0 30px rgba(192, 132, 252, 0.4);
+  color: #5eead4;
+  text-shadow: 0 0 25px rgba(45, 212, 191, 0.3);
 }
 
 [data-theme="ghost"] .button {
   background: transparent;
-  border: 1px solid #c084fc;
-  color: #c084fc;
+  border: 1px solid #2dd4bf;
+  color: #2dd4bf;
   transition: all 0.2s;
 }
 
 [data-theme="ghost"] .button:hover {
-  background: rgba(192, 132, 252, 0.1);
-  box-shadow: 0 0 20px rgba(192, 132, 252, 0.3);
+  background: rgba(45, 212, 191, 0.1);
+  box-shadow: 0 0 15px rgba(45, 212, 191, 0.25);
 }
 
 [data-theme="ghost"] #reading-progress {
-  background: linear-gradient(90deg, #a855f7, #22d3ee);
-  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+  background: linear-gradient(90deg, #2dd4bf, #fb7185);
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.4);
 }
 
 [data-theme="ghost"] pre {
-  border: 1px solid rgba(192, 132, 252, 0.15);
-  box-shadow: 0 0 30px rgba(192, 132, 252, 0.03);
+  border: 1px solid rgba(45, 212, 191, 0.12);
 }
 
 [data-theme="ghost"] :not(pre) > code {
-  color: #22d3ee;
-  background: rgba(34, 211, 238, 0.1);
+  color: #fb7185;
+  background: rgba(251, 113, 133, 0.1);
 }
 
 [data-theme="ghost"] blockquote {
-  border-left-color: #22d3ee;
-  background: rgba(34, 211, 238, 0.03);
+  border-left-color: #fb7185;
+  background: rgba(251, 113, 133, 0.04);
 }
 
 [data-theme="ghost"] .label {
-  background: #a855f7;
+  background: #fb7185;
 }
 
 [data-theme="ghost"] .reading-time {
-  background: rgba(192, 132, 252, 0.1);
-  border: 1px solid rgba(192, 132, 252, 0.25);
-  color: #c084fc;
+  background: rgba(45, 212, 191, 0.1);
+  border: 1px solid rgba(45, 212, 191, 0.2);
+  color: #2dd4bf;
 }
 
 [data-theme="ghost"] footer {
-  border-top-color: rgba(192, 132, 252, 0.25);
+  border-top-color: rgba(45, 212, 191, 0.2);
 }
 
 [data-theme="ghost"] .article-poster,
 [data-theme="ghost"] .series-poster {
-  border-color: #1e1a28;
+  border-color: #162225;
   transition: all 0.2s;
 }
 
 [data-theme="ghost"] .article-poster:hover,
 [data-theme="ghost"] .series-poster:hover {
-  border-color: #c084fc;
-  box-shadow: 0 0 25px rgba(192, 132, 252, 0.12);
+  border-color: #2dd4bf;
+  box-shadow: 0 0 20px rgba(45, 212, 191, 0.1);
 }
 
 [data-theme="ghost"] .toc {
-  border-left-color: #c084fc;
+  border-left-color: #2dd4bf;
 }
 
 [data-theme="ghost"] .newsletter {
-  border-color: #22d3ee;
-  background: linear-gradient(180deg, rgba(192, 132, 252, 0.02) 0%, rgba(34, 211, 238, 0.02) 100%);
+  border-color: #fb7185;
+  background: linear-gradient(180deg, rgba(45, 212, 191, 0.02) 0%, rgba(251, 113, 133, 0.02) 100%);
 }
 
 [data-theme="ghost"] .newsletter-form input[type="email"] {
   background: var(--color-lighter);
-  border-color: #c084fc;
+  border-color: #2dd4bf;
   color: var(--color-dark);
 }
 
 [data-theme="ghost"] .newsletter-form input[type="email"]:focus {
-  box-shadow: 0 0 15px rgba(192, 132, 252, 0.3);
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.25);
 }
 
 [data-theme="ghost"] .newsletter-form button {
   background: transparent;
-  border-color: #22d3ee;
-  color: #22d3ee;
+  border-color: #fb7185;
+  color: #fb7185;
 }
 
 [data-theme="ghost"] .newsletter-form button:hover {
-  background: rgba(34, 211, 238, 0.1);
-  box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+  background: rgba(251, 113, 133, 0.1);
+  box-shadow: 0 0 12px rgba(251, 113, 133, 0.25);
 }
 
 [data-theme="ghost"] .theme-toggle:hover {
-  text-shadow: 0 0 12px rgba(192, 132, 252, 0.8);
+  text-shadow: 0 0 10px rgba(45, 212, 191, 0.6);
 }
 
 [data-theme="ghost"] ::selection {
-  background: rgba(192, 132, 252, 0.35);
+  background: rgba(45, 212, 191, 0.3);
   color: #fff;
 }
