@@ -154,9 +154,131 @@ The concepts are organized into tiers by complexity and practical relevance:
 
 You don't need to read linearly. Jump to what interests you. But concepts build on each other: if GADTs confuse you, make sure you understand [ADTs](#algebraic-data-types) first.
 
-## The Map
+## Orthogonal Dimensions
 
-How type systems relate to each other in terms of expressiveness versus annotation burden:
+Type systems are not a linear progression. They combine **orthogonal axes** independently. A language chooses a point on each axis.
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        TYPE SYSTEM TAXONOMY                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1. CHECKING          Static ←───────────────────────────→ Dynamic          │
+│                              ↑                                              │
+│                           Gradual                                           │
+│                                                                             │
+│  2. EQUALITY          Nominal ←─────────────────────────→ Structural        │
+│                                                                             │
+│  3. POLYMORPHISM      None → Parametric → Bounded → Higher-Kinded           │
+│                         ↓                                                   │
+│                      Ad-hoc (overloading, traits, typeclasses)              │
+│                                                                             │
+│  4. INFERENCE         Explicit → Local → Bidirectional → Full (HM)          │
+│                                                                             │
+│  5. PREDICATES        Simple → Refinement → Dependent                       │
+│                                                                             │
+│  6. RESOURCES         Unrestricted → Relevant → Affine → Linear → Ordered   │
+│                                                                             │
+│  7. EFFECTS           Implicit → Monadic → Algebraic                        │
+│                                                                             │
+│  8. FLOW              Insensitive ←───────────────────→ Flow-Sensitive      │
+│                                                                             │
+│  9. COMMUNICATION     Untyped → Typed Messages → Actors → Session Types     │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+EXAMPLE LANGUAGE POSITIONS:
+
+  Rust        = Static + Nominal + Parametric + Bidirectional + Affine + Sensitive
+  TypeScript  = Gradual + Structural + Parametric + Constraint + Sensitive
+  Haskell     = Static + Nominal + Higher-Kinded + HM + Monadic
+  Python      = Dynamic + Nominal + Ad-hoc + Explicit
+  Go          = Static + Structural + Parametric + Local + Typed Channels
+```
+
+Each axis is independent. You can have static + structural (TypeScript), static + nominal (Java), or gradual + nominal (Python+mypy). The combinations create the design space.
+
+### 1. Time of Checking
+
+| Approach | When Types Checked | Examples |
+|----------|-------------------|----------|
+| **Static** | Compile time | Rust, Haskell, Java |
+| **Dynamic** | Runtime | Python, Ruby, JavaScript |
+| **Gradual** | Both, with boundaries | TypeScript, Python+mypy |
+
+### 2. Type Equality
+
+| Approach | Types Equal When... | Examples |
+|----------|---------------------|----------|
+| **Nominal** | Same declared name | Java, Rust, C# |
+| **Structural** | Same shape/fields | TypeScript, Go interfaces |
+
+### 3. Polymorphism
+
+| Kind | What It Abstracts | Examples |
+|------|-------------------|----------|
+| **Parametric** | Type variables (`T`) | Generics in all typed languages |
+| **Ad-hoc** | Different impls per type | Overloading, typeclasses, traits |
+| **Subtype** | Substitutability | OOP inheritance, structural subtyping |
+| **Bounded** | Constrained type variables | `T: Ord`, `T extends Comparable` |
+
+### 4. Type Inference
+
+| Strategy | How Types Inferred | Examples |
+|----------|-------------------|----------|
+| **Hindley-Milner** | Global, principal types | ML, Haskell, OCaml |
+| **Bidirectional** | Up and down the AST | Rust, Scala, Agda |
+| **Local** | Within expressions only | Java `var`, C++ `auto` |
+| **Constraint-based** | Solve constraint systems | TypeScript, gradual systems |
+
+### 5. Predicate Refinement
+
+| Level | What Types Express | Examples |
+|-------|-------------------|----------|
+| **Simple** | Base types only | Most languages |
+| **Refinement** | Types + predicates (`{x: Int \| x > 0}`) | Liquid Haskell, F* |
+| **Dependent** | Types compute from values | Idris, Agda, Lean |
+
+### 6. Substructural / Resource Tracking
+
+| Discipline | Usage Rule | Examples |
+|------------|-----------|----------|
+| **Unrestricted** | Any number of times | Most languages |
+| **Affine** | At most once | Rust ownership |
+| **Linear** | Exactly once | Linear Haskell, Rust borrows |
+| **Relevant** | At least once | Research systems |
+| **Ordered** | Once, in order | Stack disciplines |
+
+### 7. Effect Tracking
+
+| Approach | What's Tracked | Examples |
+|----------|---------------|----------|
+| **None** | Effects implicit | Java, Python, Go |
+| **Monadic** | Effects in type wrappers | Haskell IO |
+| **Algebraic** | First-class effect handlers | Koka, OCaml 5 |
+
+### 8. Flow Sensitivity
+
+| Approach | Type Changes With... | Examples |
+|----------|---------------------|----------|
+| **Insensitive** | Fixed at declaration | Java, C |
+| **Sensitive** | Control flow | TypeScript, Kotlin, Rust |
+
+### 9. Concurrency / Communication
+
+| Approach | What's Typed | Examples |
+|----------|-------------|----------|
+| **Untyped** | No protocol checking | Most languages |
+| **Marker traits** | Send/Sync capabilities | Rust |
+| **Session types** | Protocol state machines | Research, Links |
+
+---
+
+**Real languages combine these axes.** Rust is static + nominal + parametric + bidirectional + affine + flow-sensitive + marker traits. TypeScript is gradual + structural + parametric + constraint-based + flow-sensitive. There's no single "best" combination; each serves different goals.
+
+## The Expressiveness Map
+
+How type systems relate in terms of expressiveness versus annotation burden:
 
 ```text
                     EXPRESSIVENESS
@@ -1280,14 +1402,17 @@ Garbage collectors handle memory but not files, sockets, or locks. Manual manage
 
 Most type systems only track *what* a value is. Linear types also track *how many times* it's used. This is a fundamental extension of what types can express.
 
-Track *how many times* a value is used:
+Track *how many times* a value is used. This is the **substructural** family of type systems, named because they restrict the structural rules of logic (weakening, contraction, exchange):
 
-| Type | Rule | Use Case |
-|------|------|----------|
-| Unrestricted | Any number of times | Normal values |
-| Affine | At most once | Rust ownership, can drop unused |
-| Linear | Exactly once | Must handle, can't forget |
-| Relevant | At least once | Must use, can duplicate |
+| Type | Rule | Structural Rule Restricted | Use Case |
+|------|------|---------------------------|----------|
+| Unrestricted | Any number of times | None | Normal values |
+| Affine | At most once | Contraction (no duplication) | Rust ownership, can drop unused |
+| Linear | Exactly once | Contraction + Weakening | Must handle, can't forget |
+| Relevant | At least once | Weakening (no discarding) | Must use, can duplicate |
+| Ordered | Exactly once, in order | Contraction + Weakening + Exchange | Stack disciplines |
+
+**Ordered types** are the most restrictive: values must be used exactly once and in LIFO order. They model stack-based resources where you can't reorder operations.
 
 Rust uses **affine types**: values are used at most once (moved), but you can drop them without using them. True **linear types** require using values exactly once. You can't forget to handle something.
 
@@ -1643,13 +1768,26 @@ Dependent types are in Idris 2, Agda, Coq, Lean 4, and F*. For most application 
 
 ---
 
-## Session Types
+## Communication and Protocol Typing
 
-### The Problem
+Concurrency introduces problems that go beyond sequential code. Functions have types, but what about *interactions*? Type systems for communication ensure that distributed components agree on protocols, preventing deadlocks and message mismatches at compile time.
+
+### Why Concurrency Needs Types Beyond Functions
+
+In sequential code, a function type `A -> B` tells you everything: give an `A`, get a `B`. But concurrent systems have:
+
+- **Ordering constraints**: Must send request before receiving response
+- **Protocol states**: What you can do depends on what happened before
+- **Multiple parties**: Client, server, and maybe others must agree
+- **Failure modes**: Deadlock, livelock, message type mismatch
+
+Regular function types can't express "after you send X, you must receive Y before sending Z." Protocol violations compile fine but fail at runtime.
+
+### Session Types
+
+**Session types** encode communication protocols in channel types. The channel's type *changes* as you use it, tracking protocol state.
 
 Distributed systems communicate over channels. Client sends `Request`, server responds with `Response`. But what if the client sends two requests without waiting? Or expects a response that never comes? Protocol violations cause deadlocks or silent failures, discovered only in production.
-
-### The Insight
 
 Encode the communication protocol in the type of the channel. After you send a `Request`, the channel's type *changes* to expect a `Response`. The type system ensures both sides follow the protocol.
 
@@ -1716,6 +1854,71 @@ global protocol Purchase(Buyer, Seller, Shipper) {
 ```
 
 Session types are mostly in research: Links, Scribble, and various academic implementations. Few production systems use them directly, but the ideas influence API design.
+
+### Actor Message Typing
+
+**Actor systems** (Erlang, Akka, Orleans) use message passing instead of shared memory. Each actor has a mailbox and processes messages sequentially. But what messages can an actor receive?
+
+Without typing, any message can be sent to any actor. Typos in message names, wrong payload types, or protocol violations surface only at runtime.
+
+**Typed actors** constrain what messages an actor can receive:
+
+```scala
+// Akka Typed: Actor's message type is explicit
+object Counter {
+  sealed trait Command
+  case class Increment(replyTo: ActorRef[Int]) extends Command
+  case class GetValue(replyTo: ActorRef[Int]) extends Command
+}
+
+// The actor can ONLY receive Counter.Command messages
+def counter(value: Int): Behavior[Counter.Command] =
+  Behaviors.receive { (context, message) =>
+    message match {
+      case Increment(replyTo) =>
+        replyTo ! (value + 1)
+        counter(value + 1)
+      case GetValue(replyTo) =>
+        replyTo ! value
+        Behaviors.same
+    }
+  }
+
+// Sending wrong message type = compile error
+// counterRef ! "hello"  // ERROR: String is not Counter.Command
+```
+
+```erlang
+%% Erlang: Dialyzer can check message types via specs
+-spec loop(state()) -> no_return().
+loop(State) ->
+    receive
+        {increment, From} ->
+            From ! {ok, State + 1},
+            loop(State + 1);
+        {get, From} ->
+            From ! {ok, State},
+            loop(State)
+    end.
+```
+
+### Comparing Approaches
+
+| Approach | What's Typed | Guarantees | Examples |
+|----------|-------------|------------|----------|
+| **Untyped channels** | Nothing | None | Raw sockets, most languages |
+| **Typed messages** | Message payload types | No wrong payloads | Go channels, Rust mpsc |
+| **Actor behavior types** | What actor accepts | No invalid messages | Akka Typed, Pony |
+| **Session types** | Protocol state machine | No protocol violations | Links, research |
+| **Multiparty session** | N-party protocols | Global protocol safety | Scribble, research |
+
+### Practical Adoption
+
+Rust's `Send` and `Sync` traits are a lightweight form of concurrency typing: they mark which types can safely cross thread boundaries. This isn't protocol typing, but it prevents data races at compile time.
+
+Go's typed channels (`chan int`, `chan Message`) ensure payload types match but don't track protocol state.
+
+Full session types remain mostly academic, but the ideas are seeping into practice. TypeScript's discriminated unions with exhaustive matching approximate protocol states. Rust's typestate pattern uses the type system to enforce valid sequences of operations.
 
 ---
 
