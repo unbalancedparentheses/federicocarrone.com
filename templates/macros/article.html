@@ -13,8 +13,8 @@
     <time title="Published date" datetime="{{ page.date }}" property="datePublished">
       {{- page.date | date(format = "%B %d, %Y") -}}
     </time>
-    <span title="Reading time" property="timeRequired" content="PT{{ page.reading_time }}M">
-      {{- page.reading_time ~ " minutes read" -}}
+    <span class="reading-time" title="Reading time" property="timeRequired" content="PT{{ page.reading_time }}M">
+      {{- page.reading_time ~ " min read" -}}
     </span>
     {% if page.taxonomies.keywords %}
     <span title="Keywords" property="keywords" content="{{ page.taxonomies.keywords | join(sep = ", ") }}">
