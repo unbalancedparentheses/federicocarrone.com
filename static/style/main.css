@@ -259,6 +259,12 @@ pre {
   &.language-json { --text: "JSON" }
   &.language-html { --text: "HTML" }
   &.language-toml { --text: "TOML" }
+  &.language-haskell { --text: "Haskell" }
+  &.language-scala { --text: "Scala" }
+  &.language-typescript, &.language-ts { --text: "TypeScript" }
+  &.language-ocaml { --text: "OCaml" }
+  &.language-python, &.language-py { --text: "Python" }
+  &.language-purescript { --text: "PureScript" }
 }
 
 .copy-button {
