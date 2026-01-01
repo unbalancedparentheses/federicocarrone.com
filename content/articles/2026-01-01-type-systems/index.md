@@ -1545,7 +1545,7 @@ Some systems also provide **effect handlers**: intercept an effect and provide c
 
 ### The Code
 
-```haskell
+```koka
 // Koka: Effects are part of the type
 
 // Pure function: no effects
@@ -1569,7 +1569,7 @@ fun map(xs: list<a>, f: (a) -> e b): e list<b>
 // If f has io effect, map has io effect
 ```
 
-```haskell
+```koka
 // Effect handlers: provide custom interpretations of effects
 effect ask<a>
   ctl ask(): a
@@ -1627,7 +1627,7 @@ Division by zero becomes a *type error*, caught before running. Buffer overflows
 
 ### The Code
 
-```haskell
+```fstar
 // F*: Refinement types with dependent types
 
 // Natural numbers: ints >= 0
@@ -1652,7 +1652,7 @@ let result = divide 10 5
 // Error: can't prove y > 0
 ```
 
-```haskell
+```fstar
 // Vectors with length in the type (simple dependent types)
 val head : #a:Type -> l:list a{length l > 0} -> a
 let head #a l = List.hd l
@@ -1716,7 +1716,7 @@ The payoff: matrix multiplication that's dimensionally checked at compile time. 
 
 ### The Code
 
-```haskell
+```idris
 -- Idris 2: Dependent types
 
 -- Vector indexed by its length
@@ -1749,7 +1749,7 @@ matMul : Num a => Matrix n m a -> Matrix m p a -> Matrix n p a
 -- Error: expected Matrix 3 p, got Matrix 5 2
 ```
 
-```haskell
+```idris
 -- Type-safe printf!
 -- The format string determines the function's type
 
@@ -1928,7 +1928,7 @@ Full session types remain mostly academic, but the ideas are seeping into practi
 
 Linear types track usage (use exactly once). Dependent types need to inspect values at the type level. But inspecting a value for typing shouldn't count as "using" it at runtime!
 
-```haskell
+```idris
 -- We want the length n to be:
 -- - Available at compile time (for type checking)
 -- - Erased at runtime (zero cost)
@@ -1952,7 +1952,7 @@ This also cleanly handles linear resources. A file handle has quantity 1: use it
 
 ### The Code
 
-```haskell
+```idris
 -- Idris 2 uses QTT natively
 
 -- The 'n' has quantity 0: erased at runtime!
@@ -1999,7 +1999,7 @@ This geometric intuition makes equality computational. Univalence becomes a theo
 
 ### The Code
 
-```haskell
+```agda
 -- Cubical Agda
 
 {-# OPTIONS --cubical #-}
@@ -2137,7 +2137,7 @@ For coinductive data (infinite structures like streams), you need **productivity
 
 ### The Code
 
-```haskell
+```agda
 {-# OPTIONS --sized-types #-}
 
 open import Size
@@ -2257,7 +2257,7 @@ These concepts are at the research frontier. They haven't reached mainstream lan
 
 ### Graded Modal Types (Brief Example)
 
-```haskell
+```granule
 -- Granule: grades unify linearity and effects
 
 id : forall {a : Type} . a [1] -> a   -- use exactly once
@@ -2608,6 +2608,136 @@ Features often compose poorly:
 - **Dependent types + effects**: need special care (effects in types)
 - **Linear types + higher-order functions**: subtle ownership tracking
 - **GADTs + type families**: can make inference unpredictable
+
+---
+
+## Practical Evidence: Do Types Actually Help?
+
+Anecdotes claim types catch bugs. But what does the evidence say?
+
+### Empirical Studies
+
+| Study | Finding |
+|-------|---------|
+| **Hanenberg et al. (2014)** | Static types improved development time for larger tasks but not small ones |
+| **Mayer et al. (2012)** | Type annotations aided code comprehension, especially for unfamiliar code |
+| **Gao et al. (2017)** | ~15% of JavaScript bugs in studied projects would have been caught by TypeScript/Flow |
+| **Ray et al. (2014)** | Languages with stronger type systems correlated with fewer bug-fix commits (GitHub study of 729 projects) |
+| **Microsoft (2019)** | 70% of security vulnerabilities in their C/C++ code were memory safety issues (addressable by Rust-style types) |
+
+The evidence is **mixed but generally positive**:
+
+- Types help most for **larger codebases** and **unfamiliar code**
+- Types help less for **small scripts** where overhead exceeds benefit
+- **Memory safety types** (Rust) show clearest wins for security-critical code
+- **Gradual adoption** (TypeScript) shows measurable bug reduction even with partial coverage
+
+### Tooling Impact
+
+Type systems enable tooling that untyped languages can't match:
+
+| Capability | Enabled By | Example |
+|------------|-----------|---------|
+| **Accurate autocomplete** | Type information | IDE knows methods on a variable |
+| **Safe refactoring** | Type checking | Rename symbol across codebase |
+| **Go to definition** | Type resolution | Jump to actual implementation |
+| **Inline documentation** | Type signatures | See parameter/return types |
+| **Dead code detection** | Exhaustiveness | Unreachable branches flagged |
+| **Compile-time errors** | Type checking | Catch mistakes before running |
+
+Languages like TypeScript transformed JavaScript development primarily through **tooling**, not runtime safety. The types exist largely to power the IDE experience.
+
+### Developer Experience Trade-offs
+
+| Aspect | Stronger Types | Weaker Types |
+|--------|----------------|--------------|
+| **Initial velocity** | Slower (annotations, fighting checker) | Faster (just write code) |
+| **Refactoring confidence** | High (compiler catches breakage) | Low (hope tests cover it) |
+| **Onboarding** | Easier (types document intent) | Harder (read implementation) |
+| **Compile times** | Longer (type checking is work) | Shorter or none |
+| **Error messages** | Sometimes cryptic | N/A |
+
+The sweet spot varies by project. A weekend script doesn't need Rust's borrow checker. A database engine does.
+
+---
+
+## Verification in Practice
+
+Dependent types and proof assistants blur the line between programming and mathematics. How are they actually used?
+
+### Real Verified Systems
+
+| System | What It Proves | Language/Tool |
+|--------|---------------|---------------|
+| **CompCert** | C compiler preserves program semantics | Coq |
+| **seL4** | Microkernel has no bugs (full functional correctness) | Isabelle/HOL |
+| **HACL*** | Cryptographic library is correct and side-channel resistant | F* |
+| **Everest** | Verified HTTPS stack (TLS 1.3) | F*, Dafny, Vale |
+| **CertiKOS** | Concurrent OS kernel isolation | Coq |
+| **Iris** | Concurrent separation logic framework | Coq |
+| **Lean's mathlib** | 100,000+ mathematical theorems | Lean 4 |
+
+These are **production systems**, not toys. CompCert is used in aerospace. seL4 runs in military helicopters. HACL* is in Firefox and Linux.
+
+### The Verification Workflow
+
+Writing verified code differs from normal programming:
+
+```text
+1. SPECIFICATION
+   Write a formal spec of what the code should do
+   (This is often harder than writing the code)
+
+2. IMPLEMENTATION
+   Write the code that implements the spec
+
+3. PROOF
+   Prove the implementation satisfies the spec
+   (Interactive: you guide the prover)
+   (Automated: SMT solver finds proof or fails)
+
+4. EXTRACTION
+   Generate executable code from the verified artifact
+   (Coq → OCaml/Haskell, F* → C/WASM)
+```
+
+### Proof Burden
+
+The ratio of proof code to implementation code is sobering:
+
+| Project | Implementation | Proof | Ratio |
+|---------|---------------|-------|-------|
+| seL4 | ~10K lines C | ~200K lines proof | 20:1 |
+| CompCert | ~20K lines C | ~100K lines Coq | 5:1 |
+| Typical F* | varies | 2-10x implementation | 2-10:1 |
+
+This is why verification is reserved for **critical infrastructure**, not business logic. But the ratio is improving as tools mature.
+
+### Lightweight Verification
+
+Full proofs are expensive. Lighter-weight approaches offer partial guarantees:
+
+| Approach | What You Get | Cost |
+|----------|-------------|------|
+| **Refinement types** (Liquid Haskell) | Prove properties via SMT | Low annotations |
+| **Property-based testing** (QuickCheck) | Find counterexamples | Write properties |
+| **Fuzzing** | Find crashes/bugs | CPU time |
+| **Model checking** | Explore state space | Build model |
+| **Design by contract** | Runtime checks from specs | Write contracts |
+
+Refinement types are the sweet spot for many applications: you get meaningful guarantees (array bounds, non-null, positive) without full proofs. Liquid Haskell and F* make this practical.
+
+### When to Verify
+
+| Verify When... | Skip Verification When... |
+|----------------|---------------------------|
+| Security-critical (crypto, auth) | Prototype/MVP |
+| Safety-critical (medical, aerospace) | Business logic |
+| High-assurance infrastructure | UI code |
+| Correctness matters more than ship date | Deadline-driven |
+| Bugs are catastrophically expensive | Bugs are cheap to fix |
+
+Most code doesn't need formal verification. But for the code that does, types that can express and check proofs are invaluable.
 
 ---
 
