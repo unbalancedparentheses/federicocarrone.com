@@ -2398,21 +2398,41 @@ greet { name: "Lovelace", title: "Countess", birth: 1815 }
 
 Rather than ranking languages linearly, this section maps popular languages across the taxonomy axes. Real languages are bundles of trade-offs.
 
-## Comparison Table
+## Comparison Tables
 
-| Language | Checking | Discipline | Polymorphism | Inference | Linearity | Effects | Flow | Soundness |
-|----------|----------|------------|--------------|-----------|-----------|---------|------|-----------|
-| **Rust** | Static | Nominal | Parametric + traits | Bidirectional | Affine + lifetimes | Via types | Limited | Sound |
-| **Haskell** | Static | Nominal | Parametric + typeclasses | HM extended | Optional linear | Monads | Limited | Mostly sound |
-| **OCaml** | Static | Nominal + structural modules | Parametric + modules | HM | None (GC) | Algebraic | Limited | Sound |
-| **Scala** | Static | Nominal | Parametric + implicits | Bidirectional | None | Library | Limited | Edges unsound |
-| **TypeScript** | Gradual | Structural | Parametric + unions | Constraint | None | None | Strong | Intentionally unsound |
-| **Python** | Dynamic/gradual | Nominal + protocols | Runtime ad-hoc | Minimal | None | None | Some | Unsound |
-| **Java** | Static | Nominal | Parametric (erased) | Local | None (GC) | None | Very limited | Mostly sound |
-| **C#** | Static | Nominal | Parametric | Local + constraint | None (GC) | None | Nullable flow | Sound |
-| **Go** | Static | Structural interfaces | Parametric + interfaces | Local | None (GC) | None | Minimal | Sound |
-| **C++** | Static | Nominal | Templates + overloading | Minimal | Manual/move | None | None | Easy to break |
-| **Lean/Coq** | Static | Dependent | Full dependent | Bidirectional | None | Pure | N/A | Sound (types = proofs) |
+### Core Type System
+
+| Language | Checking | Discipline | Polymorphism |
+|----------|----------|------------|--------------|
+| **Rust** | Static | Nominal | Parametric + traits |
+| **Haskell** | Static | Nominal | Parametric + typeclasses |
+| **OCaml** | Static | Nominal + structural | Parametric + modules |
+| **Scala** | Static | Nominal | Parametric + implicits |
+| **TypeScript** | Gradual | Structural | Parametric + unions |
+| **Python** | Dynamic | Nominal + protocols | Runtime ad-hoc |
+| **Java** | Static | Nominal | Parametric (erased) |
+| **C#** | Static | Nominal | Parametric |
+| **Go** | Static | Structural | Parametric + interfaces |
+| **C++** | Static | Nominal | Templates |
+| **Lean/Coq** | Static | Dependent | Full dependent |
+
+### Advanced Features
+
+| Language | Inference | Linearity | Effects | Soundness |
+|----------|-----------|-----------|---------|-----------|
+| **Rust** | Bidirectional | Affine + lifetimes | Via types | Sound |
+| **Haskell** | HM extended | Optional linear | Monads | Mostly sound |
+| **OCaml** | HM | None | Algebraic | Sound |
+| **Scala** | Bidirectional | None | Library | Edges unsound |
+| **TypeScript** | Constraint | None | None | Unsound* |
+| **Python** | Minimal | None | None | Unsound |
+| **Java** | Local | None | None | Mostly sound |
+| **C#** | Local | None | None | Sound |
+| **Go** | Local | None | None | Sound |
+| **C++** | Minimal | Manual/move | None | Easy to break |
+| **Lean/Coq** | Bidirectional | None | Pure | Sound |
+
+*TypeScript is intentionally unsound for pragmatic reasons.
 
 ## Language Profiles
 
