@@ -48,7 +48,7 @@
 
     button.textContent = currentTheme.icon;
     button.setAttribute('aria-label', 'Theme: ' + currentTheme.label + '. Click for ' + nextTheme.label);
-    button.setAttribute('title', currentTheme.label + ' → ' + nextTheme.label);
+    button.setAttribute('title', currentTheme.label);
   }
 
   function cycleTheme() {
