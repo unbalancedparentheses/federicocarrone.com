@@ -870,6 +870,122 @@ TypeScript, Kotlin, Ceylon, Flow (JavaScript), Rust (with pattern matching), Swi
 
 ---
 
+## Intersection and Union Types
+
+### The Problem
+
+You have a value that could be one of several types. Or a value that must satisfy multiple interfaces simultaneously. Regular generics and subtyping don't express these relationships cleanly.
+
+```typescript
+// How do you type a function that accepts string OR number?
+// How do you require an object to be BOTH Serializable AND Comparable?
+```
+
+### The Insight
+
+**Union types** (`A | B`) represent "this OR that." A value of type `A | B` is either an `A` or a `B`. You must handle both possibilities before using type-specific operations.
+
+**Intersection types** (`A & B`) represent "this AND that." A value of type `A & B` has all properties of both `A` and `B`. It satisfies both interfaces simultaneously.
+
+These are fundamental type-theoretic constructs that correspond to logical operations:
+- Union = logical OR (disjunction)
+- Intersection = logical AND (conjunction)
+
+The duality is elegant. Unions expand the set of possible values (more things are `A | B` than just `A`). Intersections narrow it (fewer things are `A & B` than just `A`).
+
+### The Code
+
+```typescript
+// TypeScript: Union types
+type StringOrNumber = string | number;
+
+function process(value: StringOrNumber) {
+    // Must narrow before using type-specific operations
+    if (typeof value === "string") {
+        console.log(value.toUpperCase());  // OK: string method
+    } else {
+        console.log(value.toFixed(2));     // OK: number method
+    }
+}
+
+// Discriminated unions: tagged sum types
+type Result<T, E> =
+    | { kind: "ok"; value: T }
+    | { kind: "error"; error: E };
+
+function handle<T, E>(result: Result<T, E>) {
+    switch (result.kind) {
+        case "ok": return result.value;      // TypeScript knows value exists
+        case "error": throw result.error;    // TypeScript knows error exists
+    }
+}
+```
+
+```typescript
+// TypeScript: Intersection types
+interface Named { name: string; }
+interface Aged { age: number; }
+
+type Person = Named & Aged;  // Must have both name AND age
+
+const person: Person = {
+    name: "Ada",
+    age: 36
+};
+
+// Intersection for mixin-style composition
+interface Loggable { log(): void; }
+interface Serializable { serialize(): string; }
+
+type LoggableAndSerializable = Loggable & Serializable;
+
+function process(obj: LoggableAndSerializable) {
+    obj.log();           // OK: has Loggable
+    obj.serialize();     // OK: has Serializable
+}
+```
+
+```scala
+// Scala 3: Union and intersection types
+def process(value: String | Int): String = value match
+  case s: String => s.toUpperCase
+  case i: Int => i.toString
+
+// Intersection: must satisfy both traits
+trait Runnable { def run(): Unit }
+trait Stoppable { def stop(): Unit }
+
+def manage(service: Runnable & Stoppable): Unit =
+  service.run()
+  service.stop()
+```
+
+### What It Adds
+
+- **Precise typing for heterogeneous data**: JSON, configs, APIs with variant responses
+- **Mixin composition**: Combine interfaces without inheritance hierarchies
+- **Discriminated unions**: Type-safe pattern matching on tagged variants
+- **Subtyping relationships**: `A` is subtype of `A | B`; `A & B` is subtype of `A`
+
+### Intersection Types in Type Theory
+
+In formal type theory, intersection types have deeper significance. The **intersection type discipline** can type more programs than simple types: some programs untypable in System F become typable with intersections. This is because intersections allow giving a term multiple types simultaneously.
+
+```text
+// The identity function can have type:
+λx.x : Int → Int           // for integers
+λx.x : String → String     // for strings
+λx.x : (Int → Int) ∧ (String → String)  // BOTH at once with intersection
+```
+
+This enables **principal typings** for some systems and is used in program analysis and partial evaluation.
+
+### Languages
+
+TypeScript (extensive), Scala 3, Flow, Ceylon, Pike, CDuce, and research languages. Java has limited intersection types in generics (`<T extends A & B>`). Haskell achieves similar effects through typeclasses.
+
+---
+
 ## Generalized Algebraic Data Types (GADTs)
 
 ### The Problem
@@ -1853,6 +1969,72 @@ Agda supports sized types. They're useful when the termination checker is too st
 
 ---
 
+## Pure Type Systems
+
+### The Problem
+
+There are many typed lambda calculi: simply typed, System F, System Fω, the Calculus of Constructions, Martin-Löf type theory. Each has its own rules for what can depend on what. Is there a unified framework?
+
+### The Insight
+
+**Pure Type Systems** (PTS) provide a single parameterized framework that encompasses most typed lambda calculi. A PTS is defined by three sets:
+
+- **Sorts** (S): The "types of types." Typically `*` (the type of ordinary types) and `□` (the type of `*` itself)
+- **Axioms** (A): Which sorts have which sorts as their type (e.g., `* : □`)
+- **Rules** (R): Triples `(s₁, s₂, s₃)` specifying that functions from `s₁` to `s₂` live in `s₃`
+
+By varying these parameters, you recover different type systems:
+
+| System | Rules | What It Expresses |
+|--------|-------|-------------------|
+| Simply Typed λ-calculus | `(*, *, *)` | Terms depending on terms |
+| System F | `(*, *, *)`, `(□, *, *)` | Types depending on types (polymorphism) |
+| System Fω | `(*, *, *)`, `(□, *, *)`, `(□, □, □)` | Higher-kinded types |
+| λP (LF) | `(*, *, *)`, `(*, □, □)` | Types depending on terms (dependent types) |
+| Calculus of Constructions | All four combinations | Full dependent types + polymorphism |
+
+The **Lambda Cube** visualizes this: three axes representing term-to-term, type-to-type, and term-to-type abstraction. Each corner is a different type system.
+
+```text
+                    λC (CoC)
+                   /|
+                  / |
+                 /  |
+               λPω  λP2
+               /|   /|
+              / |  / |
+             /  | /  |
+           λω   λP   System F
+            |   |   /
+            |   |  /
+            |   | /
+            λ→ (Simply Typed)
+```
+
+### Why It Matters
+
+PTS provides:
+
+- **Unified theory**: Understand all these systems as instances of one framework
+- **Metatheoretic results**: Prove properties (normalization, type preservation) once, apply everywhere
+- **Design guidance**: When designing a type system, you're choosing a point in this space
+- **Implementation reuse**: Type checkers can be parameterized by PTS specification
+
+The Calculus of Constructions (top corner) is the basis for Coq. Martin-Löf Type Theory (related but distinct) underlies Agda. Understanding PTS clarifies what dependent types *are*: the ability to form types that depend on terms, placed on equal footing with other forms of abstraction.
+
+### Connection to Practice
+
+When you write `Vector<n, T>` in a dependently typed language, you're using term-to-type dependency: the type `Vector` depends on the term `n`. This is the λP axis of the Lambda Cube. When you write `forall T. T -> T`, you're using type-to-term polymorphism: the System F corner.
+
+Modern dependently typed languages live near the CoC corner, with various additions (universes, inductive types, effects) that go beyond the pure PTS framework but are still understood through it.
+
+### Further Reading
+
+- "Lambda Calculi with Types" by Henk Barendregt (the definitive reference)
+- "Type Theory and Formal Proof" by Rob Nederpelt and Herman Geuvers
+
+---
+
 # Tier 5: Cutting Edge Research
 
 These concepts are at the research frontier. They haven't reached mainstream languages yet, but they influence future designs. Brief coverage for completeness:
@@ -2002,6 +2184,178 @@ greet { name: "Lovelace", title: "Countess", birth: 1815 }
 -- "Countess Lovelace"
 -- The 'birth' field passes through, ignored but preserved
 ```
+
+---
+
+# Languages Compared
+
+Rather than ranking languages linearly, this section maps popular languages across the taxonomy axes. Real languages are bundles of trade-offs.
+
+## Comparison Table
+
+| Language | Checking | Discipline | Polymorphism | Inference | Linearity | Effects | Flow | Soundness |
+|----------|----------|------------|--------------|-----------|-----------|---------|------|-----------|
+| **Rust** | Static | Nominal | Parametric + traits | Bidirectional | Affine + lifetimes | Via types | Limited | Sound |
+| **Haskell** | Static | Nominal | Parametric + typeclasses | HM extended | Optional linear | Monads | Limited | Mostly sound |
+| **OCaml** | Static | Nominal + structural modules | Parametric + modules | HM | None (GC) | Algebraic | Limited | Sound |
+| **Scala** | Static | Nominal | Parametric + implicits | Bidirectional | None | Library | Limited | Edges unsound |
+| **TypeScript** | Gradual | Structural | Parametric + unions | Constraint | None | None | Strong | Intentionally unsound |
+| **Python** | Dynamic/gradual | Nominal + protocols | Runtime ad-hoc | Minimal | None | None | Some | Unsound |
+| **Java** | Static | Nominal | Parametric (erased) | Local | None (GC) | None | Very limited | Mostly sound |
+| **C#** | Static | Nominal | Parametric | Local + constraint | None (GC) | None | Nullable flow | Sound |
+| **Go** | Static | Structural interfaces | Parametric + interfaces | Local | None (GC) | None | Minimal | Sound |
+| **C++** | Static | Nominal | Templates + overloading | Minimal | Manual/move | None | None | Easy to break |
+| **Lean/Coq** | Static | Dependent | Full dependent | Bidirectional | None | Pure | N/A | Sound (types = proofs) |
+
+## Language Profiles
+
+### Rust
+
+**Core identity**: Ownership and affine typing for systems safety.
+
+Rust's type system is built around *resource management*. Affine types (values used at most once) combine with the borrow checker to eliminate use-after-free, data races, and resource leaks at compile time. Lifetimes are region types that prove references don't outlive their referents.
+
+Trade-offs: No garbage collector means some patterns (cyclic structures) require workarounds. The learning curve is steep. But for systems code, the safety guarantees are unmatched outside research languages.
+
+**Best for**: Systems programming, performance-critical applications, anywhere memory safety matters.
+
+---
+
+### Haskell
+
+**Core identity**: Parametric polymorphism plus effect encoding.
+
+Haskell pioneered typeclasses (ad-hoc polymorphism without inheritance) and proved that effect tracking via monads works at scale. The type system is extremely expressive: higher-kinded types, GADTs, type families, and with extensions, approaches dependent types.
+
+Trade-offs: Complexity accumulates. Extensions interact in surprising ways. Lazy evaluation complicates reasoning about performance. The learning curve is legendary.
+
+**Best for**: Compilers, financial systems, anywhere correctness matters more than onboarding speed.
+
+---
+
+### OCaml
+
+**Core identity**: Pragmatic functional programming with sound foundations.
+
+OCaml keeps Hindley-Milner inference simple while adding powerful modules with structural typing. The module system enables abstraction and separate compilation. Recently added algebraic effects bring first-class effect handling.
+
+Trade-offs: Less expressive than Haskell, fewer libraries than mainstream languages. But the simplicity is intentional: the type system stays predictable.
+
+**Best for**: Compilers (including Rust's original), theorem provers, DSL implementation.
+
+---
+
+### Scala
+
+**Core identity**: Maximum expressiveness on the JVM.
+
+Scala pushes the boundaries of what's expressible in a statically typed language: path-dependent types, implicits for type-level computation, union and intersection types. Scala 3 cleans up the syntax while adding match types and explicit term inference.
+
+Trade-offs: The expressiveness creates complexity. Compile times suffer. Some corners are unsound. The type system can be "too powerful" for teams that don't need it.
+
+**Best for**: Complex domain modeling, big data (Spark), anywhere you need JVM compatibility with advanced types.
+
+---
+
+### TypeScript
+
+**Core identity**: Structural gradual typing with strong flow sensitivity.
+
+TypeScript chose structural typing to model JavaScript's duck typing, and gradual typing to enable incremental adoption. Its flow-sensitive type narrowing is among the best: the type of a variable changes based on control flow. Union types and discriminated unions bring algebraic data types to JavaScript.
+
+Trade-offs: Intentionally unsound in several places (bivariant function parameters, type assertions). The goal is usability and tooling, not proofs. `any` is always an escape hatch.
+
+**Best for**: Large JavaScript codebases, teams migrating from untyped to typed, frontend development.
+
+---
+
+### Python
+
+**Core identity**: Runtime flexibility with optional static hints.
+
+Python's type system is bolted on: the runtime ignores type hints entirely. Tools like mypy and pyright check them statically. This enables gradual adoption but means types are advisory, not enforced.
+
+Trade-offs: No runtime guarantees. Type coverage varies across the ecosystem. But the flexibility is intentional: Python prioritizes "getting things done" over proving correctness.
+
+**Best for**: Scripting, data science, rapid prototyping, anywhere development speed trumps runtime safety.
+
+---
+
+### Java
+
+**Core identity**: Nominal enterprise typing with conservative evolution.
+
+Java's generics use type erasure for backward compatibility, limiting what's expressible. The type system is nominal: explicit declarations define relationships. Evolution is slow and deliberate.
+
+Trade-offs: Verbose. Limited inference. No value types (until Valhalla). But stability and backward compatibility matter for enterprise software. Code written in 2004 still compiles.
+
+**Best for**: Enterprise systems, Android development, anywhere long-term stability matters.
+
+---
+
+### C#
+
+**Core identity**: Pragmatic nominal typing with steady evolution.
+
+C# evolves faster than Java, adding features like nullable reference types (flow-sensitive null tracking), pattern matching, and records. The type system is nominal but increasingly expressive.
+
+Trade-offs: Windows-centric history (though .NET Core is cross-platform). Less expressive than Scala or Haskell. But the evolution is pragmatic: features that work in enterprise settings.
+
+**Best for**: Windows development, game development (Unity), enterprise .NET systems.
+
+---
+
+### Go
+
+**Core identity**: Structural minimalism.
+
+Go deliberately limits the type system. Interfaces are structural (implement by having the methods), generics were added reluctantly. The philosophy: simple tools for simple problems.
+
+Trade-offs: Lack of expressiveness means repetitive code. No sum types means error handling via multiple returns. But the simplicity aids onboarding and tooling.
+
+**Best for**: Cloud infrastructure, CLI tools, services where simplicity aids maintenance.
+
+---
+
+### C++
+
+**Core identity**: Unchecked power.
+
+C++ templates are Turing-complete, enabling extreme metaprogramming. Move semantics approximate affine types but aren't enforced. The type system can express almost anything but guarantees almost nothing.
+
+Trade-offs: Easy to write undefined behavior. Compile errors are notorious. But when you need zero-overhead abstraction with full control, nothing else competes.
+
+**Best for**: Game engines, embedded systems, performance-critical code where control matters more than safety.
+
+---
+
+### Lean and Coq
+
+**Core identity**: Types are proofs.
+
+These are proof assistants first, programming languages second. Full dependent types mean types can express any mathematical proposition, and programs are proofs of those propositions. Type checking is theorem proving.
+
+Trade-offs: Writing proofs is hard. Libraries are limited. But for verified software (CompCert, seL4), they're the gold standard.
+
+**Best for**: Formal verification, mathematics formalization, critical systems requiring proofs.
+
+---
+
+## One-Sentence Summaries
+
+| Language | Core Type System Identity |
+|----------|---------------------------|
+| Rust | Ownership and affine typing for memory safety |
+| Haskell | Parametric polymorphism plus monadic effects |
+| OCaml | Sound HM inference with structural modules |
+| Scala | Maximum expressiveness on the JVM |
+| TypeScript | Structural gradual typing with flow sensitivity |
+| Python | Runtime flexibility with optional static hints |
+| Java | Conservative nominal enterprise typing |
+| C# | Pragmatic nominal typing with steady evolution |
+| Go | Structural minimalism by design |
+| C++ | Unchecked power via templates |
+| Lean/Coq | Dependent types where programs are proofs |
 
 ---
 
