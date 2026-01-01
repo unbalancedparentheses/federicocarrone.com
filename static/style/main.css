@@ -1135,3 +1135,147 @@ article {
 [data-theme="cyberpunk"] .theme-toggle {
   text-shadow: var(--neon-glow-subtle);
 }
+
+/* ============================================
+   BLADE RUNNER AMBER THEME
+   ============================================ */
+[data-theme="amber"] {
+  --color-light: #0d0a07;
+  --color-lighter: #1a1510;
+  --color-light-darker: #998866;
+  --color-dark: #e8dcc8;
+  --color-dark-lighter: #3d3020;
+  --color-dark-blue: #1a1510;
+  --color-accent: #ff9500;
+  --color-accent-darker: #cc7700;
+  --color-accent2: #ff6600;
+
+  --neon-glow: 0 0 10px currentColor, 0 0 20px currentColor;
+  --neon-glow-subtle: 0 0 5px currentColor;
+}
+
+[data-theme="amber"] body {
+  background:
+    radial-gradient(ellipse at 30% 70%, rgba(255, 149, 0, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 30%, rgba(255, 102, 0, 0.04) 0%, transparent 50%),
+    var(--color-light);
+}
+
+[data-theme="amber"] #menu {
+  background: linear-gradient(90deg, #1a1000 0%, #0d0a07 100%);
+  border-bottom: 1px solid var(--color-accent);
+  box-shadow: 0 0 20px rgba(255, 149, 0, 0.2);
+}
+
+[data-theme="amber"] #menu a[aria-current="page"] {
+  color: #ff9500;
+  text-shadow: var(--neon-glow-subtle);
+}
+
+[data-theme="amber"] a:hover,
+[data-theme="amber"] a:focus {
+  text-shadow: var(--neon-glow-subtle);
+}
+
+[data-theme="amber"] h1,
+[data-theme="amber"] h2,
+[data-theme="amber"] h3 {
+  color: #ff9500;
+  text-shadow: 0 0 10px rgba(255, 149, 0, 0.4);
+}
+
+[data-theme="amber"] article > header h1 {
+  color: #ffaa30;
+  text-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
+}
+
+[data-theme="amber"] .button {
+  background: transparent;
+  border: 1px solid #ff9500;
+  color: #ff9500;
+  box-shadow: 0 0 10px rgba(255, 149, 0, 0.2);
+}
+
+[data-theme="amber"] .button:hover {
+  background: rgba(255, 149, 0, 0.1);
+  box-shadow: 0 0 20px rgba(255, 149, 0, 0.4);
+}
+
+[data-theme="amber"] #reading-progress {
+  background: linear-gradient(90deg, #ff6600, #ff9500);
+  box-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
+}
+
+[data-theme="amber"] code { color: #ff9500; }
+[data-theme="amber"] blockquote { border-left-color: #ff6600; background: rgba(255, 149, 0, 0.05); }
+[data-theme="amber"] .label { background: #ff6600; }
+[data-theme="amber"] footer { border-top-color: #ff9500; }
+
+/* ============================================
+   GHOST IN THE SHELL TEAL THEME
+   ============================================ */
+[data-theme="ghost"] {
+  --color-light: #0a1014;
+  --color-lighter: #101820;
+  --color-light-darker: #6699aa;
+  --color-dark: #c0d8e0;
+  --color-dark-lighter: #1a2830;
+  --color-dark-blue: #101820;
+  --color-accent: #2dd4bf;
+  --color-accent-darker: #20a090;
+  --color-accent2: #e05577;
+
+  --neon-glow: 0 0 10px rgba(45, 212, 191, 0.4);
+  --neon-glow-subtle: 0 0 5px rgba(45, 212, 191, 0.3);
+}
+
+[data-theme="ghost"] body {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(45, 212, 191, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(224, 85, 119, 0.03) 0%, transparent 50%),
+    var(--color-light);
+}
+
+[data-theme="ghost"] #menu {
+  background: rgba(16, 24, 32, 0.95);
+  border-bottom: 1px solid rgba(45, 212, 191, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="ghost"] #menu a[aria-current="page"] {
+  color: #2dd4bf;
+}
+
+[data-theme="ghost"] a { color: #2dd4bf; }
+[data-theme="ghost"] a:hover { color: #5eeedd; }
+
+[data-theme="ghost"] h1,
+[data-theme="ghost"] h2,
+[data-theme="ghost"] h3 {
+  color: #2dd4bf;
+}
+
+[data-theme="ghost"] article > header h1 {
+  color: #5eeedd;
+  text-shadow: 0 0 20px rgba(45, 212, 191, 0.3);
+}
+
+[data-theme="ghost"] .button {
+  background: transparent;
+  border: 1px solid #2dd4bf;
+  color: #2dd4bf;
+}
+
+[data-theme="ghost"] .button:hover {
+  background: rgba(45, 212, 191, 0.1);
+}
+
+[data-theme="ghost"] #reading-progress {
+  background: linear-gradient(90deg, #2dd4bf, #e05577);
+}
+
+[data-theme="ghost"] code { color: #5eeedd; }
+[data-theme="ghost"] blockquote { border-left-color: #e05577; background: rgba(224, 85, 119, 0.05); }
+[data-theme="ghost"] .label { background: #e05577; }
+[data-theme="ghost"] footer { border-top-color: rgba(45, 212, 191, 0.3); }
+[data-theme="ghost"] .reading-time { background: rgba(45, 212, 191, 0.1); border-color: rgba(45, 212, 191, 0.3); color: #2dd4bf; }
