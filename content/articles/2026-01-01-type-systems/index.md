@@ -151,16 +151,7 @@ let strings = map(numbers, |n| n.to_string());
 // Compiler infers: T = i32, U = String
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Low (invisible to user) |
-| Daily usage | Every line of code benefits |
-| Trade-off | Some features break inference ([GADTs](#generalized-algebraic-data-types-gadts), [higher-rank types](#rank-n-polymorphism)) |
-| Languages | ML, OCaml, Haskell, Rust, F#, Elm, Scala |
-
-The key insight: you get static typing's safety without its traditional verbosity.
+The trade-off: some advanced features ([GADTs](#generalized-algebraic-data-types-gadts), [higher-rank types](#rank-n-polymorphism)) break inference and require annotations. But for everyday code, you get static typing's safety without its traditional verbosity. Available in ML, OCaml, Haskell, Rust, F#, Elm, and Scala.
 
 ---
 
@@ -215,14 +206,7 @@ fn mystery<T>(x: T) -> T {
 }
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Low-Medium |
-| Daily usage | Constant |
-| Trade-off | Less powerful than templates (can't specialize by type) |
-| Languages | Every modern statically-typed language |
+Unlike C++ templates, you can't specialize behavior for specific types. But that constraint gives you the parametricity guarantees.
 
 ---
 
@@ -289,16 +273,7 @@ greet(dog);  // OK! Dog has everything Animal needs
 // Extra fields (breed, fetch) are fine
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Low |
-| Daily usage | Constant in OOP |
-| Trade-off | Complicates type inference; variance becomes tricky |
-| Languages | Java, C#, TypeScript, Kotlin, Scala, Python |
-
-Note: Rust doesn't have traditional subtyping. It uses traits and lifetime subtyping instead, which we'll cover in [Traits](#traits-typeclasses).
+The downside: subtyping complicates type inference and introduces variance questions (see [Variance](#variance)). Rust sidesteps this by using traits instead of subtyping for polymorphism.
 
 ---
 
@@ -391,14 +366,7 @@ enum Result<T, E> {
 // These are ADTs! Sum types with generic parameters.
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Medium (requires shifting mindset from OOP) |
-| Daily usage | Should be constant |
-| Trade-off | Different thinking from class hierarchies |
-| Languages | Rust, Haskell, OCaml, F#, Scala, Swift, Kotlin |
+If you come from OOP, ADTs require rethinking how you model data. Instead of class hierarchies with methods, you define data structures and functions that pattern match on them. Available in Rust, Haskell, OCaml, F#, Scala, Swift, and Kotlin.
 
 ---
 
@@ -412,7 +380,7 @@ Given an algebraic data type, you need to branch on its variants and extract dat
 
 Pattern matching is the natural counterpart to [ADTs](#algebraic-data-types). If constructors *build* sum types, pattern matching *deconstructs* them. They're two sides of the same coin.
 
-The compiler knows every possible variant of your sum type. When you write a `match`, it checks that you've covered them all. Forget a case? Compile error. Add a new variant to your enum? Every `match` in your codebase that doesn't handle it becomes a compile error. This is **exhaustiveness checking**, and it's a game-changer for refactoring.
+The compiler knows every possible variant of your sum type. When you write a `match`, it checks that you've covered them all. Forget a case? Compile error. Add a new variant to your enum? Every `match` in your codebase that doesn't handle it becomes a compile error. This is **exhaustiveness checking**.
 
 The comparison to `if-else` or `switch` is instructive. In most languages, `switch` doesn't warn you about missing cases. Pattern matching does. And unlike the visitor pattern (OOP's answer to this problem), pattern matching is concise and doesn't require boilerplate classes.
 
@@ -467,14 +435,7 @@ fn first_two<T: Clone>(items: &[T]) -> Option<(T, T)> {
 }
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Low |
-| Daily usage | Constant when using ADTs |
-| Trade-off | None, strictly better than alternatives |
-| Languages | Rust, Haskell, OCaml, Scala, Swift, C# 8+, Python 3.10+ |
+Pattern matching is now in C# 8+, Python 3.10+, and most functional languages. Once you use it, you won't go back.
 
 ---
 
@@ -572,14 +533,7 @@ trait Greet {
 }
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Medium |
-| Daily usage | Frequent |
-| Trade-off | Orphan rules restrict where you can impl traits |
-| Languages | Rust, Haskell, Scala, Swift (protocols), Kotlin |
+Rust's orphan rules restrict where you can implement traits to prevent conflicting implementations. This is sometimes frustrating but maintains coherence.
 
 ---
 
@@ -650,14 +604,7 @@ trait BadIterator<Item> {
 // are different traits! A type could implement both!
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Medium |
-| Daily usage | Moderate (mostly when defining traits) |
-| Trade-off | Less flexible than type parameters for some cases |
-| Languages | Rust, Swift, Haskell (type families) |
+Associated types are less flexible than type parameters when you need the same type to implement a trait multiple ways. But for most cases, they make APIs cleaner.
 
 ---
 
@@ -677,7 +624,7 @@ Let each constructor specify its own, more precise return type. `Add` constructs
 
 With regular ADTs, all constructors return the same type. `Some(x)` and `None` both return `Option<T>` for the same `T`. But with GADTs, different constructors can return *different* type instantiations. `LitInt(5)` returns `Expr<Int>`. `LitBool(true)` returns `Expr<Bool>`. The "generalized" means this flexibility.
 
-The magic happens when you pattern match. If you match on an `Expr<Int>` and see a `LitInt`, the compiler knows the type parameter is `Int`. It can use this knowledge to type-check the branch correctly. You can return an `Int` directly, not a wrapped type. This information flow from patterns to type checking is what makes type-safe evaluators possible.
+Pattern matching reveals the payoff. If you match on an `Expr<Int>` and see a `LitInt`, the compiler knows the type parameter is `Int`. It can use this knowledge to type-check the branch correctly. You can return an `Int` directly, not a wrapped type. This information flow from patterns to type checking is what makes type-safe evaluators possible.
 
 The cost: type inference breaks. The compiler can't always figure out what type an expression should have, because it depends on which constructor was used. You need explicit type annotations at GADT match sites.
 
@@ -717,14 +664,7 @@ val expr: Expr[Int] = Expr.Add(Expr.LitInt(1), Expr.LitInt(2))
 val result: Int = eval(expr)  // Type-safe: result is Int, not Object
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Hard |
-| Daily usage | Occasional (DSLs, compilers, interpreters) |
-| Trade-off | Breaks type inference; requires explicit annotations |
-| Languages | Haskell, OCaml, Scala 3, (limited in TypeScript) |
+GADTs are available in Haskell, OCaml, and Scala 3. TypeScript has limited support through type guards.
 
 ---
 
@@ -792,14 +732,7 @@ fn complex_iter() -> impl Iterator<Item = i32> {
 }
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Medium-Hard |
-| Daily usage | Moderate |
-| Trade-off | Runtime cost (vtable lookup), can't recover concrete type |
-| Languages | Rust (`dyn`), Haskell, Java (`?` wildcards), OCaml |
+The cost: `dyn Trait` has runtime overhead (vtable lookup) and you can't recover the concrete type. Use generics when you know the type statically.
 
 ---
 
@@ -868,14 +801,7 @@ let result = apply_to_both id (42, "hello")
    because the 's' won't match anything outside. *)
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Hard |
-| Daily usage | Rare |
-| Trade-off | Type inference fails completely; must annotate everything |
-| Languages | Haskell, OCaml, Scala (limited) |
+Rank-N types are rare outside Haskell. Most languages don't support them, and you can usually work around their absence.
 
 ---
 
@@ -958,22 +884,7 @@ trait Monad[M[_]] extends Functor[M]:
     flatMap(fa)(a => pure(f(a)))
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Hard |
-| Daily usage | Frequent in FP codebases |
-| Trade-off | Complex error messages, inference limitations |
-| Languages | Haskell, Scala, PureScript; Rust has GATs as partial workaround |
-
-### When NOT to Use
-
-Skip HKT when:
-- Your language doesn't support it (Go, Rust without GATs). Don't fight the language.
-- Simple code duplication is clearer. Three similar functions are fine if they're short.
-- Your team doesn't know FP abstractions. The cognitive overhead isn't worth it.
-- You're writing application code, not library code. HKT shines in generic libraries.
+HKT is standard in Haskell, Scala, and PureScript. Rust avoids full HKT but added GATs (Generic Associated Types) as a partial workaround. If your language doesn't support HKT, don't fight it. Three similar functions are fine if they're short.
 
 ---
 
@@ -1008,7 +919,7 @@ Borrowing (`&T` and `&mut T`) is how Rust escapes the "use once" restriction whe
 
 ### What It Adds
 
-- **Memory safety without GC**: Rust's killer feature
+- **Memory safety without GC**: no runtime overhead, no pauses
 - **Resource safety**: can't forget to close files
 - **Prevent use-after-free**: type system rejects it
 - **No data races**: ownership prevents shared mutable state
@@ -1068,14 +979,7 @@ fn main() {
 }
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Medium (borrow checker takes practice) |
-| Daily usage | Constant in Rust |
-| Trade-off | Fighting the borrow checker, some patterns harder |
-| Languages | Rust (affine), Linear Haskell, Austral (linear), Clean, Idris 2 |
+The borrow checker takes practice. Some patterns (graphs, doubly-linked lists) fight against it. But once you internalize ownership thinking, most code just works.
 
 ---
 
@@ -1153,22 +1057,7 @@ fun main(): io ()
   println(result.show)
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Hard |
-| Daily usage | Would be constant if in mainstream languages |
-| Trade-off | Verbose types, learning curve |
-| Languages | Koka, Eff, Frank, Unison; Haskell uses monads as a workaround |
-
-### When NOT to Use
-
-Skip effect systems when:
-- Your language doesn't have them. Retrofitting effects onto existing code is painful.
-- Performance is critical and you can't afford the abstraction cost.
-- Your codebase is mostly effectful anyway. If everything has IO, tracking it adds noise.
-- Simple discipline works. "Pure functions in the core, effects at the edges" doesn't need a type system.
+Effect systems are in Koka, Eff, Frank, and Unison. Haskell uses monads as a workaround. Most mainstream languages don't have them, so you can use discipline instead: pure functions in the core, effects at the edges.
 
 ---
 
@@ -1249,14 +1138,7 @@ val nth : #a:Type -> l:list a -> i:nat{i < length l} -> a
 // The refinement i < length l guarantees bounds safety
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Hard |
-| Daily usage | Moderate (growing in safety-critical code) |
-| Trade-off | SMT solver can fail or timeout on complex predicates |
-| Languages | F*, Dafny, Liquid Haskell, Ada/SPARK |
+The SMT solver can fail or timeout on complex predicates. When it works, it's like magic. When it doesn't, you're debugging why the solver can't prove something you know is true. F*, Dafny, Liquid Haskell, and Ada/SPARK all use this approach.
 
 ---
 
@@ -1291,18 +1173,13 @@ The return type *computes* from the input types. If you append a 3-element vecto
 
 This is the Curry-Howard correspondence in full force. Types are propositions. Programs are proofs. `Vector<n, a>` is a proposition: "there exists a vector of n elements of type a." Constructing such a vector proves the proposition. A function type `Vector<n, a> -> Vector<n, a>` is an implication: "if you give me a proof of n-vector, I'll give you back a proof of n-vector."
 
-### What It Adds
-
-- **Express almost any property in the type**: dimensions, lengths, protocols, invariants
-- **Types compute**: `Matrix<n, m> × Matrix<m, p> → Matrix<n, p>`
-- **Proofs are programs**: the Curry-Howard correspondence extends fully
-- **Eliminate runtime checks**: impossible states are impossible types
+The payoff: matrix multiplication that's dimensionally checked at compile time. `Matrix<n, m> × Matrix<m, p> → Matrix<n, p>`. If dimensions don't match, the code doesn't compile.
 
 ### Why It's Hard
 
 - **Type checking requires evaluation**: undecidable in general
 - **Termination checking required**: non-terminating functions break type checking
-- **Steep learning curve**: proving is harder than programming
+- **Proving is different from programming**: you need to think about why code is correct, not just that it works
 - **Verbose proofs**: sometimes more proof code than actual code
 
 ### The Code
@@ -1355,23 +1232,7 @@ printf : (fmt : String) -> PrintfType fmt
 -- Wrong number/type of arguments = compile error
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Very Hard |
-| Daily usage | Proof assistants, verified software |
-| Trade-off | Long compile times, complex error messages, proof burden |
-| Languages | Idris 2, Agda, Coq, Lean 4, F* |
-
-### When NOT to Use
-
-Skip dependent types when:
-- You're writing typical application code. The proof burden outweighs the benefits.
-- Your team doesn't have PL/formal methods expertise. The learning curve is steep.
-- Simpler types suffice. [Refinement types](#refinement-types) or even [phantom types](#phantom-types) might be enough.
-- Rapid iteration matters. Dependent types slow down development significantly.
-- Your domain doesn't have clear invariants to encode. Not every program benefits from proofs.
+Dependent types are in Idris 2, Agda, Coq, Lean 4, and F*. For most application code, they're overkill. [Refinement types](#refinement-types) or [phantom types](#phantom-types) often suffice.
 
 ---
 
@@ -1389,14 +1250,7 @@ This is linear types applied to communication. A channel isn't just "a thing you
 
 The channel type evolves as you use it. Start with `!Request.?Response.End`. After sending a request, you have `?Response.End`. After receiving the response, you have `End`. Each operation transforms the type. Using the wrong operation is a type error.
 
-Key concept: **duality**. The client's view is the *dual* of the server's view: sends become receives and vice versa. If the client has `!Request.?Response.End`, the server has `?Request.!Response.End`. The types are symmetric. This ensures both sides agree on the protocol, verified at compile time.
-
-### What It Adds
-
-- **Protocol compliance by construction**: can't send when you should receive
-- **Deadlock freedom**: well-typed programs don't deadlock
-- **Both ends verified**: protocol checked from each participant's view
-- **Session fidelity**: the protocol is followed exactly
+Key concept: **duality**. The client's view is the *dual* of the server's view: sends become receives and vice versa. If the client has `!Request.?Response.End`, the server has `?Request.!Response.End`. The types are symmetric. This ensures both sides agree on the protocol, verified at compile time. Well-typed programs can't deadlock.
 
 ### The Code
 
@@ -1454,14 +1308,7 @@ global protocol Purchase(Buyer, Seller, Shipper) {
 }
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Very Hard |
-| Daily usage | Research, specialized protocol verification |
-| Trade-off | Complex theory, limited language support |
-| Languages | Links, Scribble, various research implementations |
+Session types are mostly in research: Links, Scribble, and various academic implementations. Few production systems use them directly, but the ideas influence API design.
 
 ---
 
@@ -1491,13 +1338,7 @@ The key problem this solves: in dependent types, type-checking might *use* a val
 
 With QTT, you write `(0 n : Nat)` to say "n exists for type-checking but has zero runtime representation." The `0` quantity means "used zero times at runtime." The type checker uses it. The compiled code doesn't include it.
 
-This also cleanly handles linear resources. A file handle has quantity 1: use it exactly once. A normal integer has quantity ω: use it as many times as you want. The quantities form a semiring (they can be added and multiplied), which makes them compose correctly when you combine functions.
-
-### What It Adds
-
-- **Zero-cost type-level information**: 0-usage types exist only at compile time
-- **Controlled resource usage**: 1-usage for linear resources
-- **Clean semantics**: semiring laws govern usage
+This also cleanly handles linear resources. A file handle has quantity 1: use it exactly once. A normal integer has quantity ω: use it as many times as you want. The quantities form a semiring, which makes them compose correctly when you combine functions.
 
 ### The Code
 
@@ -1528,14 +1369,7 @@ id _ x = x
 -- x is used exactly once at runtime
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Very Hard |
-| Daily usage | Research, Idris 2 users |
-| Trade-off | Novel system, still evolving |
-| Languages | Idris 2, Granule |
+Idris 2 uses QTT. Granule is a research language exploring graded types more generally.
 
 ---
 
@@ -1547,14 +1381,11 @@ Homotopy Type Theory (HoTT) introduced revolutionary ideas: types as spaces, equ
 
 ### The Insight
 
-Make equality *computational*. A path (proof of equality) is literally a function from the interval [0,1] to the type, where endpoints map to the equal values. Univalence becomes a theorem, not an axiom. Everything computes.
+Make equality *computational*. In standard type theory, you can prove two things are equal, but you can't always *compute* with that equality. Univalence (equivalent types are equal) was an axiom: you could assert it, but it didn't reduce to anything. Asking "is this proof of equality the same as that one?" might not give an answer.
 
-### What It Adds
+Cubical type theory fixes this by taking homotopy seriously. A proof of equality `a = b` is literally a path from `a` to `b`. Formally, it's a function from the interval type `I` (representing [0,1]) to the type, where the function maps 0 to `a` and 1 to `b`. You can walk along the path. You can reverse it (symmetry). You can concatenate paths (transitivity).
 
-- **Computational univalence**: equivalent types can substitute
-- **Higher inductive types**: quotients, circles, spheres as types
-- **Functional extensionality**: functions equal if they agree on all inputs
-- **A foundation for mathematics that computes**
+This geometric intuition makes equality computational. Univalence becomes a theorem: given an equivalence between types, you can construct a path between them. And crucially, transporting values along this path actually *applies* the equivalence. Everything reduces. Everything computes. You also get functional extensionality (functions equal if they agree on all inputs) and higher inductive types (quotients, circles, spheres as types) for free.
 
 ### The Code
 
@@ -1591,14 +1422,7 @@ ua : ∀ {A B : Type} → A ≃ B → A ≡ B
 -- actually applies the equivalence!
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Extreme |
-| Daily usage | Research only |
-| Trade-off | Steep learning curve, specialized |
-| Languages | Cubical Agda, redtt, cooltt, Arend |
+Cubical Agda, redtt, cooltt, and Arend implement cubical type theory. Unless you're doing research in type theory or formalizing mathematics, you won't need this.
 
 ---
 
@@ -1621,14 +1445,13 @@ void swap(int *x, int *y) {
 
 Reason about **ownership of heap regions**. The key operator is **separating conjunction** (`*`): `P * Q` means "P holds for some heap region, Q holds for a *separate* region." If you prove you own separate regions, they can't alias.
 
-Rust's borrow checker is inspired by these ideas, but separation logic goes further: you can prove properties about arbitrary heap-manipulating programs.
+Classical logic has conjunction (∧): "P and Q are both true." Separation logic adds a new conjunction (*): "P holds for part of memory, Q holds for a *different* part of memory, and these parts don't overlap." This is the missing piece for reasoning about pointers.
 
-### What It Adds
+When you write `{x ↦ 5 * y ↦ 10}`, you're asserting: x points to 5, y points to 10, *and x and y are different locations*. The separating conjunction makes non-aliasing explicit. Without it, modifying `*x` might affect `*y`. With it, you know they're independent.
 
-- **Alias freedom by construction**: separate ownership = can't alias
-- **Frame rule**: local reasoning, unchanged heap is unchanged
-- **Verified low-level code**: prove pointer operations correct
-- **Concurrent separation logic**: reason about shared-memory concurrency
+The **frame rule** makes proofs modular. If you prove `{P} code {Q}` (running code in state P yields state Q), then `{P * R} code {Q * R}` for any R. Whatever R describes is *framed out*, untouched by code. You can reason about each piece of memory independently.
+
+Rust's borrow checker embodies these ideas. Mutable borrows are exclusive ownership of a memory region. The guarantee that you can't have two `&mut` to the same location is the separating conjunction at work. Concurrent separation logic extends this to reason about shared-memory concurrency.
 
 ### The Code
 
@@ -1673,14 +1496,7 @@ fn swap(x: &mut i32, y: &mut i32) {
 // swap(&mut n, &mut n);  // Error: can't borrow n mutably twice
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Very Hard |
-| Daily usage | Implicit in Rust; explicit in verification tools |
-| Trade-off | Complex proofs, specialized tools needed |
-| Tools | Iris (Coq), Viper, VeriFast, RustBelt |
+You get separation logic ideas implicitly through Rust's borrow checker. For explicit proofs, tools like Iris (Coq), Viper, and VeriFast let you verify pointer-manipulating code.
 
 ---
 
@@ -1703,12 +1519,11 @@ Neither `xs` nor `ys` is structurally smaller than both original arguments!
 
 Track *sizes* abstractly in types. A `Stream<i>` has "size" `i`. Operations might not be syntactically smaller but are *semantically* smaller in size. The type checker tracks sizes symbolically.
 
-### What It Adds
+The problem is termination checking. Dependent type checkers must ensure all functions terminate, otherwise type-checking could loop forever. Simple structural recursion ("the argument gets smaller") works for many cases but rejects valid programs.
 
-- **Accept more terminating programs**: semantic decrease, not only syntactic
-- **Safe codata**: infinite structures handled correctly
-- **Size polymorphism**: abstract over sizes
-- **Productivity checking**: corecursive functions produce output
+Consider merging two streams. At each step, you take one element from each stream. Neither stream is "structurally smaller" than both inputs. But semantically, you're making progress: you're consuming both streams. Sized types capture this. Each stream has an abstract size. After taking an element, the remaining stream has a smaller size. The type checker sees sizes decreasing and accepts the function.
+
+For coinductive data (infinite structures like streams), you need **productivity checking**: you must produce output in finite time. Sized types handle this too. The output stream's size depends on the input sizes in a way that guarantees you always make progress.
 
 ### The Code
 
@@ -1743,14 +1558,7 @@ zipWith f (x ∷ xs) (y ∷ ys) =
 -- because it can't see that streams are being consumed productively
 ```
 
-### Difficulty and Trade-offs
-
-| Aspect | Rating |
-|--------|--------|
-| Learning difficulty | Hard |
-| Daily usage | Occasional (coinduction, termination proofs) |
-| Trade-off | Adds annotation burden, inference limited |
-| Languages | Agda, some research extensions |
+Agda supports sized types. They're useful when the termination checker is too strict, particularly for coinductive definitions.
 
 ---
 
@@ -1796,6 +1604,12 @@ A few concepts that don't fit the tier structure but are practically important:
 
 When `Dog <: Animal`, what's the relationship between `Container<Dog>` and `Container<Animal>`? It depends on how the container uses its type parameter.
 
+This question matters for every generic type. You might expect `Container<Dog>` to be a subtype of `Container<Animal>` always. But that's wrong in general, and understanding why is key to writing correct generic code.
+
+The intuition: if you can only *get* values out of a container (produce), then `Container<Dog>` can substitute for `Container<Animal>`. You asked for animals, I give you dogs, dogs are animals, everyone's happy. But if you can *put* values into a container (consume), it's the reverse. A container that accepts any animal can accept dogs. But a container that only accepts dogs can't substitute for one that accepts any animal, because someone might try to put a cat in it.
+
+Mutable containers are the problem case. You can both get and put. Neither subtyping direction is safe. `Container<Dog>` must be invariant: no subtyping relationship with `Container<Animal>`.
+
 ```typescript
 // TypeScript: variance annotations
 
@@ -1828,7 +1642,11 @@ interface MutableBox<T> {
 
 Type parameters that appear in the type but not in the data. Used for compile-time distinctions.
 
-**Real-world cost**: The Mars Climate Orbiter (1999) was lost because one team used metric units while another used imperial. The $327 million spacecraft burned up in the Martian atmosphere. Phantom types can encode units in the type system, making such mismatches compile-time errors instead of mission-ending disasters.
+At first, this sounds pointless. Why have a type parameter that doesn't affect the data? The answer: to carry information at the type level that the compiler checks, even though the runtime doesn't need it.
+
+Consider a `UserId` and a `ProductId`. Both are just integers at runtime. But mixing them up is a bug. With phantom types, `Id<User>` and `Id<Product>` are different types, even though both hold a single integer. The phantom parameter (`User` or `Product`) exists only for the type checker. Zero runtime cost. Full compile-time safety.
+
+**Real-world cost**: The Mars Climate Orbiter (1999) was lost because one team used metric units while another used imperial. The $327 million spacecraft burned up in the Martian atmosphere. Phantom types can encode units in the type system, making such mismatches compile-time errors instead of mission-ending disasters. `Distance<Meters>` and `Distance<Feet>` can't be mixed.
 
 ```rust
 use std::marker::PhantomData;
@@ -1866,6 +1684,12 @@ add(meters, Distance::new(50.0));  // OK: both Meters
 ## Row Polymorphism
 
 Functions that work on records with "at least these fields," preserving other fields.
+
+Regular generics abstract over types. Row polymorphism abstracts over *record structure*. A function `getName` needs records with a `name` field. It shouldn't care about other fields. Row polymorphism lets you write this: "give me any record with at least a `name: String` field, and I'll return the name."
+
+The crucial feature is that extra fields pass through unchanged. If you have `{ name: "Ada", age: 36, title: "Countess" }` and call `getName`, you get "Ada" back. The function ignores `age` and `title`, but doesn't require you to strip them first. This is more flexible than structural subtyping (which TypeScript uses) because row polymorphism is parametric: it works uniformly for any extra fields.
+
+This is common in functional languages with records (PureScript, Elm, OCaml) and solves the problem of writing functions that operate on "records with certain fields" without committing to a specific record type.
 
 ```purescript
 -- PureScript: Row polymorphism
