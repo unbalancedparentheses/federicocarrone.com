@@ -992,157 +992,6 @@ article {
   }
 }
 
-/* Cyberpunk theme */
-[data-theme="cyberpunk"] {
-  --color-light: #0a0a0f;
-  --color-lighter: #12121a;
-  --color-light-darker: #888;
-  --color-dark: #e0e0e0;
-  --color-dark-lighter: #2a2a3a;
-  --color-dark-blue: #15151f;
-  --color-accent: #0ff;
-  --color-accent-darker: #0aa;
-  --color-accent2: #ff00ff;
-
-  --neon-glow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor;
-  --neon-glow-subtle: 0 0 5px currentColor, 0 0 10px currentColor;
-}
-
-[data-theme="cyberpunk"] body {
-  background:
-    radial-gradient(ellipse at 20% 80%, rgba(255, 0, 255, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(0, 255, 255, 0.08) 0%, transparent 50%),
-    var(--color-light);
-}
-
-[data-theme="cyberpunk"] #menu {
-  background: linear-gradient(90deg, #1a0a1a 0%, #0a1a1a 100%);
-  border-bottom: 1px solid var(--color-accent2);
-  box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
-}
-
-[data-theme="cyberpunk"] #menu a[aria-current="page"] {
-  color: #0ff;
-  text-shadow: var(--neon-glow-subtle);
-}
-
-[data-theme="cyberpunk"] a {
-  transition: text-shadow 0.2s;
-
-  &:hover, &:focus {
-    text-shadow: var(--neon-glow-subtle);
-  }
-}
-
-[data-theme="cyberpunk"] h1,
-[data-theme="cyberpunk"] h2,
-[data-theme="cyberpunk"] h3 {
-  color: #ff00ff;
-  text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
-}
-
-[data-theme="cyberpunk"] article > header h1 {
-  color: #0ff;
-  text-shadow: 0 0 20px rgba(0, 255, 255, 0.5), 0 0 40px rgba(0, 255, 255, 0.3);
-}
-
-[data-theme="cyberpunk"] .button {
-  background: transparent;
-  border: 1px solid #0ff;
-  color: #0ff;
-  text-shadow: var(--neon-glow-subtle);
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.1);
-  transition: all 0.2s;
-
-  &:hover, &:focus {
-    background: rgba(0, 255, 255, 0.1);
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), inset 0 0 20px rgba(0, 255, 255, 0.2);
-  }
-}
-
-[data-theme="cyberpunk"] #reading-progress {
-  background: linear-gradient(90deg, #ff00ff, #0ff);
-  box-shadow: 0 0 10px #0ff, 0 0 20px #ff00ff;
-}
-
-[data-theme="cyberpunk"] pre {
-  border-color: #2a2a3a;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
-}
-
-[data-theme="cyberpunk"] :not(pre) > code {
-  color: #0ff;
-}
-
-[data-theme="cyberpunk"] blockquote {
-  border-left-color: #ff00ff;
-  background: rgba(255, 0, 255, 0.05);
-}
-
-[data-theme="cyberpunk"] .label {
-  background: #ff00ff;
-  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
-}
-
-[data-theme="cyberpunk"] .reading-time {
-  background: rgba(0, 255, 255, 0.1);
-  border: 1px solid rgba(0, 255, 255, 0.3);
-  color: #0ff;
-}
-
-[data-theme="cyberpunk"] .breadcrumbs a:hover {
-  color: #0ff;
-  text-shadow: var(--neon-glow-subtle);
-}
-
-[data-theme="cyberpunk"] footer {
-  border-top-color: #ff00ff;
-  background: linear-gradient(180deg, transparent 0%, rgba(255, 0, 255, 0.05) 100%);
-}
-
-[data-theme="cyberpunk"] .article-poster,
-[data-theme="cyberpunk"] .series-poster {
-  border-color: #2a2a3a;
-  transition: border-color 0.2s, box-shadow 0.2s;
-
-  &:hover {
-    border-color: #0ff;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-  }
-}
-
-[data-theme="cyberpunk"] .toc {
-  border-left-color: #0ff;
-  box-shadow: -2px 0 10px rgba(0, 255, 255, 0.2);
-}
-
-[data-theme="cyberpunk"] .newsletter {
-  border-color: #ff00ff;
-  background: linear-gradient(180deg, rgba(255, 0, 255, 0.02) 0%, rgba(0, 255, 255, 0.02) 100%);
-}
-
-[data-theme="cyberpunk"] .newsletter-form input[type="email"] {
-  background: var(--color-lighter);
-  border-color: #0ff;
-  color: var(--color-dark);
-
-  &:focus {
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-  }
-}
-
-[data-theme="cyberpunk"] .newsletter-form button {
-  background: transparent;
-  border-color: #ff00ff;
-  color: #ff00ff;
-  text-shadow: var(--neon-glow-subtle);
-
-  &:hover {
-    background: rgba(255, 0, 255, 0.1);
-    box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
-  }
-}
-
 /* Theme toggle button */
 .theme-toggle-wrapper {
   display: none;
@@ -1169,150 +1018,159 @@ article {
   }
 }
 
-[data-theme="cyberpunk"] .theme-toggle {
-  text-shadow: var(--neon-glow-subtle);
-}
-
 /* ============================================
-   BLADE RUNNER AMBER THEME
-   ============================================ */
-[data-theme="amber"] {
-  --color-light: #0d0a07;
-  --color-lighter: #1a1510;
-  --color-light-darker: #998866;
-  --color-dark: #e8dcc8;
-  --color-dark-lighter: #3d3020;
-  --color-dark-blue: #1a1510;
-  --color-accent: #ff9500;
-  --color-accent-darker: #cc7700;
-  --color-accent2: #ff6600;
-
-  --neon-glow: 0 0 10px currentColor, 0 0 20px currentColor;
-  --neon-glow-subtle: 0 0 5px currentColor;
-}
-
-[data-theme="amber"] body {
-  background:
-    radial-gradient(ellipse at 30% 70%, rgba(255, 149, 0, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 30%, rgba(255, 102, 0, 0.04) 0%, transparent 50%),
-    var(--color-light);
-}
-
-[data-theme="amber"] #menu {
-  background: linear-gradient(90deg, #1a1000 0%, #0d0a07 100%);
-  border-bottom: 1px solid var(--color-accent);
-  box-shadow: 0 0 20px rgba(255, 149, 0, 0.2);
-}
-
-[data-theme="amber"] #menu a[aria-current="page"] {
-  color: #ff9500;
-  text-shadow: var(--neon-glow-subtle);
-}
-
-[data-theme="amber"] a:hover,
-[data-theme="amber"] a:focus {
-  text-shadow: var(--neon-glow-subtle);
-}
-
-[data-theme="amber"] h1,
-[data-theme="amber"] h2,
-[data-theme="amber"] h3 {
-  color: #ff9500;
-  text-shadow: 0 0 10px rgba(255, 149, 0, 0.4);
-}
-
-[data-theme="amber"] article > header h1 {
-  color: #ffaa30;
-  text-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
-}
-
-[data-theme="amber"] .button {
-  background: transparent;
-  border: 1px solid #ff9500;
-  color: #ff9500;
-  box-shadow: 0 0 10px rgba(255, 149, 0, 0.2);
-}
-
-[data-theme="amber"] .button:hover {
-  background: rgba(255, 149, 0, 0.1);
-  box-shadow: 0 0 20px rgba(255, 149, 0, 0.4);
-}
-
-[data-theme="amber"] #reading-progress {
-  background: linear-gradient(90deg, #ff6600, #ff9500);
-  box-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
-}
-
-[data-theme="amber"] :not(pre) > code { color: #ff9500; }
-[data-theme="amber"] blockquote { border-left-color: #ff6600; background: rgba(255, 149, 0, 0.05); }
-[data-theme="amber"] .label { background: #ff6600; }
-[data-theme="amber"] footer { border-top-color: #ff9500; }
-
-/* ============================================
-   GHOST IN THE SHELL TEAL THEME
+   CYPHERPUNK THEME
+   Matrix green + hot pink, terminal vibes, readable
    ============================================ */
 [data-theme="ghost"] {
-  --color-light: #0a1014;
-  --color-lighter: #101820;
-  --color-light-darker: #6699aa;
-  --color-dark: #c0d8e0;
-  --color-dark-lighter: #1a2830;
-  --color-dark-blue: #101820;
-  --color-accent: #2dd4bf;
-  --color-accent-darker: #20a090;
-  --color-accent2: #e05577;
-
-  --neon-glow: 0 0 10px rgba(45, 212, 191, 0.4);
-  --neon-glow-subtle: 0 0 5px rgba(45, 212, 191, 0.3);
+  --color-light: #0a0a0a;
+  --color-lighter: #111111;
+  --color-light-darker: #666;
+  --color-dark: #d0d0d0;
+  --color-dark-lighter: #1a1a1a;
+  --color-dark-blue: #0f0f0f;
+  --color-accent: #00ff41;
+  --color-accent-darker: #00cc33;
+  --color-accent2: #ff2a6d;
 }
 
 [data-theme="ghost"] body {
   background:
-    radial-gradient(ellipse at 30% 20%, rgba(45, 212, 191, 0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 80%, rgba(224, 85, 119, 0.03) 0%, transparent 50%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 65, 0.015) 2px,
+      rgba(0, 255, 65, 0.015) 4px
+    ),
+    radial-gradient(ellipse at 50% 0%, rgba(0, 255, 65, 0.08) 0%, transparent 50%),
     var(--color-light);
 }
 
 [data-theme="ghost"] #menu {
-  background: rgba(16, 24, 32, 0.95);
-  border-bottom: 1px solid rgba(45, 212, 191, 0.3);
+  background: rgba(10, 10, 10, 0.95);
+  border-bottom: 1px solid rgba(0, 255, 65, 0.4);
   backdrop-filter: blur(10px);
 }
 
 [data-theme="ghost"] #menu a[aria-current="page"] {
-  color: #2dd4bf;
+  color: #00ff41;
 }
 
-[data-theme="ghost"] a { color: #2dd4bf; }
-[data-theme="ghost"] a:hover { color: #5eeedd; }
+[data-theme="ghost"] a {
+  color: #00ff41;
+  transition: all 0.15s;
+}
+
+[data-theme="ghost"] a:hover {
+  color: #33ff66;
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+}
 
 [data-theme="ghost"] h1,
 [data-theme="ghost"] h2,
 [data-theme="ghost"] h3 {
-  color: #2dd4bf;
+  color: #00ff41;
 }
 
 [data-theme="ghost"] article > header h1 {
-  color: #5eeedd;
-  text-shadow: 0 0 20px rgba(45, 212, 191, 0.3);
+  color: #00ff41;
+  text-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
 }
 
 [data-theme="ghost"] .button {
   background: transparent;
-  border: 1px solid #2dd4bf;
-  color: #2dd4bf;
+  border: 1px solid #00ff41;
+  color: #00ff41;
+  transition: all 0.2s;
 }
 
 [data-theme="ghost"] .button:hover {
-  background: rgba(45, 212, 191, 0.1);
+  background: rgba(0, 255, 65, 0.1);
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
 }
 
 [data-theme="ghost"] #reading-progress {
-  background: linear-gradient(90deg, #2dd4bf, #e05577);
+  background: linear-gradient(90deg, #00ff41, #ff2a6d);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
 }
 
-[data-theme="ghost"] :not(pre) > code { color: #5eeedd; }
-[data-theme="ghost"] blockquote { border-left-color: #e05577; background: rgba(224, 85, 119, 0.05); }
-[data-theme="ghost"] .label { background: #e05577; }
-[data-theme="ghost"] footer { border-top-color: rgba(45, 212, 191, 0.3); }
-[data-theme="ghost"] .reading-time { background: rgba(45, 212, 191, 0.1); border-color: rgba(45, 212, 191, 0.3); color: #2dd4bf; }
+[data-theme="ghost"] pre {
+  border: 1px solid rgba(0, 255, 65, 0.2);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.05);
+}
+
+[data-theme="ghost"] :not(pre) > code {
+  color: #33ff66;
+  background: rgba(0, 255, 65, 0.1);
+}
+
+[data-theme="ghost"] blockquote {
+  border-left-color: #ff2a6d;
+  background: rgba(255, 42, 109, 0.05);
+}
+
+[data-theme="ghost"] .label {
+  background: #ff2a6d;
+}
+
+[data-theme="ghost"] .reading-time {
+  background: rgba(0, 255, 65, 0.1);
+  border: 1px solid rgba(0, 255, 65, 0.3);
+  color: #00ff41;
+}
+
+[data-theme="ghost"] footer {
+  border-top-color: rgba(0, 255, 65, 0.3);
+}
+
+[data-theme="ghost"] .article-poster,
+[data-theme="ghost"] .series-poster {
+  border-color: #1a1a1a;
+  transition: all 0.2s;
+}
+
+[data-theme="ghost"] .article-poster:hover,
+[data-theme="ghost"] .series-poster:hover {
+  border-color: #00ff41;
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+}
+
+[data-theme="ghost"] .toc {
+  border-left-color: #00ff41;
+}
+
+[data-theme="ghost"] .newsletter {
+  border-color: #ff2a6d;
+  background: linear-gradient(180deg, rgba(255, 42, 109, 0.02) 0%, rgba(0, 255, 65, 0.02) 100%);
+}
+
+[data-theme="ghost"] .newsletter-form input[type="email"] {
+  background: var(--color-lighter);
+  border-color: #00ff41;
+  color: var(--color-dark);
+}
+
+[data-theme="ghost"] .newsletter-form input[type="email"]:focus {
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+}
+
+[data-theme="ghost"] .newsletter-form button {
+  background: transparent;
+  border-color: #ff2a6d;
+  color: #ff2a6d;
+}
+
+[data-theme="ghost"] .newsletter-form button:hover {
+  background: rgba(255, 42, 109, 0.1);
+  box-shadow: 0 0 15px rgba(255, 42, 109, 0.3);
+}
+
+[data-theme="ghost"] .theme-toggle:hover {
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+}
+
+[data-theme="ghost"] ::selection {
+  background: rgba(0, 255, 65, 0.3);
+  color: #fff;
+}

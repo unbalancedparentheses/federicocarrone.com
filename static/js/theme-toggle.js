@@ -2,9 +2,7 @@
   var STORAGE_KEY = 'theme';
   var THEMES = [
     { id: 'default', label: 'Default', icon: '☀️' },
-    { id: 'cyberpunk', label: 'Neon Noir', icon: '🌃' },
-    { id: 'amber', label: 'Blade Runner', icon: '🌆' },
-    { id: 'ghost', label: 'Ghost', icon: '🐚' }
+    { id: 'ghost', label: 'Cypherpunk', icon: '👾' }
   ];
 
   function getStoredTheme() {
