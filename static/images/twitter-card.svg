@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#af2a2b"/>
+      <stop offset="100%" style="stop-color:#8c1c21"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#faf8f4"/>
+
+  <!-- Geometric shapes - abstract minimal design -->
+  <!-- Large circle (partial) bottom right -->
+  <circle cx="1100" cy="580" r="280" fill="none" stroke="#cfc6b6" stroke-width="2"/>
+
+  <!-- Accent diagonal line -->
+  <line x1="0" y1="630" x2="400" y2="230" stroke="url(#accentGrad)" stroke-width="3"/>
+
+  <!-- Small geometric accents -->
+  <rect x="80" y="80" width="40" height="40" fill="#af2a2b"/>
+  <rect x="140" y="80" width="20" height="20" fill="#cfc6b6"/>
+
+  <!-- Horizontal accent bar -->
+  <rect x="80" y="550" width="200" height="3" fill="#af2a2b"/>
+
+  <!-- Site name -->
+  <text x="600" y="290" font-family="'Palatino Linotype', 'Iowan Old Style', Palatino, serif" font-size="52" fill="#222222" text-anchor="middle" font-weight="normal">Federico Carrone</text>
+
+  <!-- Tagline or URL -->
+  <text x="600" y="360" font-family="'Palatino Linotype', 'Iowan Old Style', Palatino, serif" font-size="24" fill="#8f8777" text-anchor="middle">federicocarrone.com</text>
+
+  <!-- Subtle dots pattern -->
+  <circle cx="950" cy="120" r="4" fill="#cfc6b6"/>
+  <circle cx="980" cy="120" r="4" fill="#cfc6b6"/>
+  <circle cx="1010" cy="120" r="4" fill="#cfc6b6"/>
+  <circle cx="950" cy="150" r="4" fill="#cfc6b6"/>
+  <circle cx="980" cy="150" r="4" fill="#cfc6b6"/>
+  <circle cx="1010" cy="150" r="4" fill="#cfc6b6"/>
+</svg>

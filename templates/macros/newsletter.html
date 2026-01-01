@@ -1,0 +1,10 @@
+{% macro form() %}
+<aside class="newsletter">
+  <p class="newsletter-cta">Enjoyed this? Subscribe to get new essays by email.</p>
+  <form action="https://buttondown.com/api/emails/subscribe" method="post" class="newsletter-form" target="_blank">
+    <input type="hidden" name="tag" value="federicocarrone.com" />
+    <input type="email" name="email" placeholder="your@email.com" required />
+    <button type="submit">Subscribe</button>
+  </form>
+</aside>
+{% endmacro %}
