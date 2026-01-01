@@ -1,7 +1,7 @@
 +++
-title = "The Type System Landscape: From Generics to Dependent Types"
+title = "Type Systems: From Generics to Dependent Types"
 date = 2026-01-01
-description = "A comprehensive guide to type system concepts, from foundational generics to research-level dependent types"
+description = "Type system concepts from generics to dependent types, with code examples in Rust, Scala, and Idris"
 [taxonomies]
 keywords=["programming languages", "type systems", "rust", "functional programming"]
 [extra]
@@ -9,9 +9,9 @@ author = "Federico Carrone"
 pinned = false
 +++
 
-Every type error you've ever cursed at was a bug caught before production. Type systems are the silent guardians of our code, rejecting nonsense at compile time so we don't discover it at 3 AM in production. But type systems vary wildly in what they can express and what guarantees they provide.
+Every type error you've ever cursed at was a bug caught before production. Type systems reject nonsense at compile time so you don't discover it at 3 AM. But they vary wildly in what they can express and what guarantees they provide.
 
-This guide maps the landscape of type system concepts, from the foundational ideas every programmer uses daily to the research frontier where types can prove your matrix multiplication is dimensionally correct.
+This guide covers type system concepts from the foundational ideas every programmer uses daily to the research frontier where types can prove your matrix multiplication is dimensionally correct.
 
 <!-- more -->
 
@@ -50,9 +50,9 @@ The concepts are organized into tiers by complexity and practical relevance:
 
 You don't need to read linearly. Jump to what interests you. But concepts build on each other: if GADTs confuse you, make sure you understand [ADTs](#algebraic-data-types) first.
 
-## The Landscape
+## The Map
 
-Here's how type systems relate to each other in terms of expressiveness versus the annotation burden they impose:
+How type systems relate to each other in terms of expressiveness versus annotation burden:
 
 ```
                     EXPRESSIVENESS
@@ -108,10 +108,14 @@ This verbosity is why many developers fled to dynamic languages. But dynamic typ
 
 What if the compiler could *figure out* the types? In 1969, Roger Hindley discovered (and Robin Milner independently rediscovered in 1978) an algorithm that can infer the most general type for any expression in a certain class of type systems, without any annotations.
 
+The key observation: even without annotations, code contains type information. If you write `x + 1`, the compiler knows `x` must be a number because `+` requires numbers. If you write `x.len()`, `x` must be something with a `len` method. These constraints propagate through your program.
+
 The algorithm works by:
-1. Assigning fresh type variables to unknown types
-2. Collecting constraints from how values are used
-3. Unifying constraints to find the most general solution
+1. Assigning fresh type variables to unknown types (like algebra: let `x` be unknown)
+2. Collecting constraints from how values are used (`x + 1` means `x` must be numeric)
+3. Unifying constraints to find the most general solution (solving the equations)
+
+The "most general" part matters. If you write a function that works on any list, the algorithm infers "list of anything," not "list of integers." You get maximum reusability automatically.
 
 ### What It Adds
 
@@ -151,7 +155,7 @@ let strings = map(numbers, |n| n.to_string());
 
 | Aspect | Rating |
 |--------|--------|
-| Learning difficulty | Low (invisible to user, it just works) |
+| Learning difficulty | Low (invisible to user) |
 | Daily usage | Every line of code benefits |
 | Trade-off | Some features break inference ([GADTs](#generalized-algebraic-data-types-gadts), [higher-rank types](#rank-n-polymorphism)) |
 | Languages | ML, OCaml, Haskell, Rust, F#, Elm, Scala |
@@ -172,7 +176,9 @@ The alternative, using a universal type like `Object` or `any`, throws away type
 
 Abstract over the type itself. Write the function *once* with a type parameter, and it works for *any* type. The crucial property is **parametricity**: the function must behave the same way regardless of what type you plug in. It can't inspect the type or behave differently for integers versus strings.
 
-This constraint is a feature. It means generic functions come with "theorems for free": guarantees about their behavior that follow purely from their type signature.
+This constraint is a feature, not a limitation. When a function is parametric in `T`, it can only shuffle `T` values around. It can't create new `T`s out of thin air, can't compare them, can't print them. This means generic functions come with "theorems for free": guarantees about their behavior that follow purely from their type signature.
+
+For example, a function with signature `fn mystery<T>(x: T) -> T` can *only* return `x`. There's nothing else it could possibly return. The type signature alone proves the implementation. Similarly, `fn pair<T>(x: T) -> (T, T)` must return `(x, x)`. The parametricity constraint eliminates every other possibility.
 
 ### What It Adds
 
@@ -230,7 +236,9 @@ You have a function that operates on any `Animal`. You've defined `Dog`, `Cat`, 
 
 If type `B` has everything type `A` has (and possibly more), you can use a `B` anywhere an `A` is expected. This is subtyping: `Dog <: Animal` means Dog is a subtype of Animal.
 
-This is the Liskov Substitution Principle encoded in the type system: if `Dog <: Animal`, then any property that holds for `Animal` should hold for `Dog`.
+Think of it as a contract. An `Animal` promises certain capabilities: it has a name, it can speak. A `Dog` fulfills that contract and more: it also has a breed and can fetch. Anywhere the code expects "something that has a name and can speak," a Dog works fine. The extra capabilities are ignored but don't cause problems.
+
+This is the Liskov Substitution Principle encoded in the type system: if `Dog <: Animal`, then any property that holds for `Animal` should hold for `Dog`. You can substitute Dogs for Animals without breaking correctness.
 
 There are two flavors:
 
@@ -318,7 +326,14 @@ Types should describe *exactly* the valid states. We need two tools:
 - **Sum types** (enums, tagged unions): "this OR that", a value is one of several variants
 - **Product types** (structs, records): "this AND that", a value contains all fields
 
-Combined, these are **algebraic data types** (ADTs). The "algebra" comes from how you calculate possible values: products multiply (struct with 2 bools = 4 states), sums add (enum with 3 variants = 3 states).
+Combined, these are **algebraic data types** (ADTs). The "algebra" comes from how you calculate possible values: products multiply (struct with 2 bools = 2 × 2 = 4 states), sums add (enum with 3 variants = 3 states).
+
+Here's the algebra in action. Consider:
+- `bool` has 2 values: `true`, `false`
+- `(bool, bool)` has 2 × 2 = 4 values: `(true, true)`, `(true, false)`, `(false, true)`, `(false, false)`
+- `enum Either { Left(bool), Right(bool) }` has 2 + 2 = 4 values: `Left(true)`, `Left(false)`, `Right(true)`, `Right(false)`
+
+The power comes from combining them. You model your domain with exactly the states that make sense. If a user is either anonymous (no data) or logged in (with name and email), you write that directly. The type system then enforces that you can't access a name for an anonymous user, because that field doesn't exist in that variant.
 
 ### What It Adds
 
@@ -395,7 +410,11 @@ Given an algebraic data type, you need to branch on its variants and extract dat
 
 ### The Insight
 
-Pattern matching is the natural counterpart to [ADTs](#algebraic-data-types). If constructors *build* sum types, pattern matching *deconstructs* them. The compiler can verify you've handled every case (**exhaustiveness checking**) and warn about unreachable patterns.
+Pattern matching is the natural counterpart to [ADTs](#algebraic-data-types). If constructors *build* sum types, pattern matching *deconstructs* them. They're two sides of the same coin.
+
+The compiler knows every possible variant of your sum type. When you write a `match`, it checks that you've covered them all. Forget a case? Compile error. Add a new variant to your enum? Every `match` in your codebase that doesn't handle it becomes a compile error. This is **exhaustiveness checking**, and it's a game-changer for refactoring.
+
+The comparison to `if-else` or `switch` is instructive. In most languages, `switch` doesn't warn you about missing cases. Pattern matching does. And unlike the visitor pattern (OOP's answer to this problem), pattern matching is concise and doesn't require boilerplate classes.
 
 ### What It Adds
 
@@ -478,7 +497,11 @@ Approaches without traits:
 
 Separate the *interface* from the *type*. Define `Ord` (ordering), `Eq` (equality), `Display` (printing) as standalone interfaces called traits (Rust) or typeclasses (Haskell). Then declare that `User` implements them, *even if you didn't write User*.
 
-The compiler resolves which implementation to use at compile time, with zero runtime cost.
+This solves the "expression problem": how do you add both new types and new operations without modifying existing code? With OOP inheritance, adding new types is easy (new subclass), but adding new operations is hard (modify every class). With traits, you can add new operations (new trait) and implement them for existing types, even types from other libraries.
+
+The implementation is resolved at compile time, with zero runtime cost. When you call `user.cmp(&other)`, the compiler knows exactly which comparison function to use because it knows the concrete type. No vtable lookup, no dynamic dispatch. This is called **monomorphization**: the compiler generates specialized code for each type you use.
+
+The "coherence" rule prevents chaos: there can be at most one implementation of a trait for a type. You can't have two different ways to compare Users. This means you can always predict which implementation will be used.
 
 ### What It Adds
 
@@ -554,7 +577,7 @@ trait Greet {
 | Aspect | Rating |
 |--------|--------|
 | Learning difficulty | Medium |
-| Daily usage | Very frequent |
+| Daily usage | Frequent |
 | Trade-off | Orphan rules restrict where you can impl traits |
 | Languages | Rust, Haskell, Scala, Swift (protocols), Kotlin |
 
@@ -571,6 +594,10 @@ What you want: the item type should be *determined by* the implementing type, no
 ### The Insight
 
 Some type parameters are *outputs* (determined by the implementation), not *inputs* (chosen by the caller). Associated types express this: "when you implement this trait, you must specify what Item is."
+
+The distinction matters. With a regular type parameter like `Iterator<T>`, you're saying "this is an iterator that could work with any T." But that's not how iterators work. A `VecIterator` always produces the type that the Vec contains. The type is determined by the iterator, not chosen by the user.
+
+Think of it as a type-level function. Given a type that implements `Iterator`, you can ask "what does it produce?" and get back the associated `Item` type. `Vec<i32>` implements `Iterator` with `Item = i32`. `HashMap<K, V>` implements `Iterator` with `Item = (K, V)`. The implementing type determines the associated type.
 
 ### What It Adds
 
@@ -648,7 +675,11 @@ Your `eval` function either:
 
 Let each constructor specify its own, more precise return type. `Add` constructs an `Expr<Int>`; `Equal` constructs an `Expr<Bool>`. The type parameter tracks what the expression evaluates to.
 
-This is the "generalized" in GADTs: different constructors can have different type arguments in their return type.
+With regular ADTs, all constructors return the same type. `Some(x)` and `None` both return `Option<T>` for the same `T`. But with GADTs, different constructors can return *different* type instantiations. `LitInt(5)` returns `Expr<Int>`. `LitBool(true)` returns `Expr<Bool>`. The "generalized" means this flexibility.
+
+The magic happens when you pattern match. If you match on an `Expr<Int>` and see a `LitInt`, the compiler knows the type parameter is `Int`. It can use this knowledge to type-check the branch correctly. You can return an `Int` directly, not a wrapped type. This information flow from patterns to type checking is what makes type-safe evaluators possible.
+
+The cost: type inference breaks. The compiler can't always figure out what type an expression should have, because it depends on which constructor was used. You need explicit type annotations at GADT match sites.
 
 ### What It Adds
 
@@ -658,7 +689,7 @@ This is the "generalized" in GADTs: different constructors can have different ty
 
 ### The Code
 
-Rust doesn't support GADTs directly, so here's Scala 3, which has clean syntax:
+Rust doesn't support GADTs directly. Scala 3 has clean syntax:
 
 ```scala
 // Scala 3: GADT syntax
@@ -707,9 +738,13 @@ You want a collection of things that share a trait, but they're different concre
 
 Hide the concrete type behind an interface. An existential type says: "there *exists* some type `T` implementing this trait, but I won't tell you which." You can only use operations from the trait, nothing type-specific.
 
-The duality with generics:
+The duality with generics is illuminating:
 - **Generics (universal)**: "for *all* types T, this works"
 - **Existentials**: "there *exists* some type T, but you don't know which"
+
+With generics, the *caller* picks the type. With existentials, the *callee* (or the code that creates the value) picks the type, and the caller just uses the interface. This is information hiding at the type level.
+
+Why is this useful? Consider a plugin system. Each plugin is a different type, but they all implement `Plugin`. You want a `Vec<Plugin>` containing all your plugins. With generics alone, you'd need `Vec<SomeSpecificPlugin>`. With existentials, you get `Vec<Box<dyn Plugin>>`: a collection of "things that are some type implementing Plugin." The concrete types are hidden (existentially quantified), but you can still call Plugin methods on them.
 
 ### What It Adds
 
@@ -785,7 +820,15 @@ fn apply_to_both<T>(f: impl Fn(T) -> T, pair: (i32, String)) -> (i32, String) {
 
 In Rank-1 polymorphism (normal generics), `forall` is at the outside: the caller picks one `T` for the whole function. In Rank-2+, `forall` appears inside argument types: "the argument must be a function that works for *any* type."
 
-This forces the argument to be truly polymorphic. It can't have type-specific behavior.
+The "rank" refers to how deeply `forall` can be nested:
+- **Rank 0**: No polymorphism. `int -> int`.
+- **Rank 1**: `forall` at the top. `forall T. T -> T`. Caller picks `T`.
+- **Rank 2**: `forall` in argument position. `(forall T. T -> T) -> int`. The *argument* must be polymorphic.
+- **Rank N**: Arbitrary nesting.
+
+Why would you want this? Consider the ST monad trick in Haskell. `runST` has type `(forall s. ST s a) -> a`. The `s` type variable is universally quantified *inside* the argument. This means `runST` picks `s`, not the caller. Since `s` is chosen by `runST` and immediately goes out of scope, no reference tagged with `s` can escape. This is how Haskell provides safe, in-place mutation: the type system guarantees mutable references can't leak outside `runST`.
+
+The cost is severe: type inference becomes undecidable for Rank-2 and above. You must annotate everything. Most languages avoid this complexity.
 
 ### What It Adds
 
@@ -795,7 +838,7 @@ This forces the argument to be truly polymorphic. It can't have type-specific be
 
 ### The Code
 
-Rust can't express Rank-N types directly. Here's OCaml:
+Rust can't express Rank-N types directly. OCaml can:
 
 ```ocaml
 (* OCaml: Rank-2 polymorphism *)
@@ -838,7 +881,7 @@ let result = apply_to_both id (42, "hello")
 
 # Tier 3: Serious Complexity
 
-These features require significant learning investment but provide powerful capabilities. They're common in functional programming languages and increasingly appearing in mainstream languages.
+These features require significant learning investment but let you write abstractions impossible in simpler type systems. They're common in functional programming languages and increasingly appearing in mainstream languages.
 
 ## Higher-Kinded Types (HKT)
 
@@ -856,7 +899,7 @@ Can't we abstract over the *container itself*?
 
 ### The Insight
 
-Types have **kinds**, just as values have types:
+Types have **kinds**, just as values have types. This is the key conceptual leap:
 
 ```
 Int         : Type                    -- a plain type
@@ -864,7 +907,11 @@ Vec         : Type -> Type            -- takes a type, returns a type
 Result      : Type -> Type -> Type    -- takes two types, returns a type
 ```
 
-HKT lets you abstract over type constructors like `Vec`, `Option`, not just types like `Int`. You can define `Functor` as a trait for *any* type constructor, then implement it once for each container.
+`Int` is a complete type. But `Vec` by itself is not a type. You can't have a variable of type `Vec`. You need `Vec<i32>` or `Vec<String>`. `Vec` is a *type constructor*: give it a type, get back a type.
+
+HKT lets you abstract over type constructors like `Vec` and `Option`, instead of only types like `Int`. You can define `Functor` as a trait for *any* type constructor, then implement it once for each container.
+
+The pattern `Functor`, `Applicative`, `Monad` from functional programming all require HKT. They describe properties of *containers*, not specific types. "Functor" means "you can map over this container." That applies to `Vec`, `Option`, `Result`, `Future`, `IO`, and infinitely many other type constructors. Without HKT, you'd write `map_vec`, `map_option`, `map_result` separately. With HKT, you write one `map` that works for any `Functor`.
 
 ### What It Adds
 
@@ -878,7 +925,7 @@ Type inference becomes undecidable in general. Languages with HKT require explic
 
 ### The Code
 
-Rust doesn't have HKT. Here's Scala 3:
+Rust doesn't have HKT. Scala 3 does:
 
 ```scala
 // Scala 3: F[_] is a type constructor (kind: Type -> Type)
@@ -942,6 +989,8 @@ Garbage collectors handle memory but not files, sockets, or locks. Manual manage
 
 ### The Insight
 
+Most type systems only track *what* a value is. Linear types also track *how many times* it's used. This is a fundamental extension of what types can express.
+
 Track *how many times* a value is used:
 
 | Type | Rule | Use Case |
@@ -952,6 +1001,10 @@ Track *how many times* a value is used:
 | Relevant | At least once | Must use, can duplicate |
 
 Rust uses **affine types**: values are used at most once (moved), but you can drop them without using them. True **linear types** require using values exactly once. You can't forget to handle something.
+
+The key insight is that "use" includes transferring ownership. When you pass a `String` to a function that takes it by value, you've "used" the String. It's gone from your scope. You can't use it again. This is the "borrow checker" experience: the compiler tracks ownership and prevents use-after-move.
+
+Borrowing (`&T` and `&mut T`) is how Rust escapes the "use once" restriction when you need it. A borrow doesn't consume the value; it temporarily lends access. The original owner keeps ownership and can use the value after the borrow ends. The borrow checker ensures borrows don't outlive the owner.
 
 ### What It Adds
 
@@ -1041,7 +1094,11 @@ String process(String input)
 
 Track what **effects** a function can perform in its type. Pure functions have no effects. `readFile` has an `IO` effect. `throw` has an `Exception` effect. When you call functions, their effects combine.
 
-Effect systems make effects explicit and checkable. Some systems also provide **effect handlers**: intercept an effect and provide custom behavior (like dependency injection for effects).
+This is extending the type signature to answer the question "what can this function *do*?" not just "what does it *return*?" A function `String -> Int` with no effects can only compute on its input. A function `String -> IO Int` might read files, hit the network, or launch missiles. The effect tells you.
+
+Effect systems make effects explicit and checkable. When you call `readFile` inside your function, your function now has an `IO` effect too. Effects propagate up. Pure functions stay pure. The compiler tracks this automatically.
+
+Some systems also provide **effect handlers**: intercept an effect and provide custom behavior. Instead of performing I/O, you could log what I/O *would* happen. Instead of throwing an exception, you could collect errors. This is like dependency injection, but for effects. You write code using abstract effects, then "handle" them differently in tests versus production.
 
 ### What It Adds
 
@@ -1132,9 +1189,13 @@ But the caller might *know* y is non-zero because it's from a non-empty list len
 
 ### The Insight
 
-Attach logical predicates to types. Not just `Int`, but `{x: Int | x > 0}`. A refinement type is a base type plus a predicate that values must satisfy.
+Attach logical predicates to types. Instead of `Int`, write `{x: Int | x > 0}`. A refinement type is a base type plus a predicate that values must satisfy.
 
-The compiler uses an **SMT solver** (automated theorem prover) to verify predicates at compile time. Division by zero becomes a *type error*, caught before running.
+This is a sweet spot between regular types and full dependent types. Regular types distinguish "integer" from "string" but can't distinguish "positive integer" from "negative integer." Dependent types can express almost anything but require proofs. Refinement types let you express common properties (non-null, positive, in bounds) and use automated solvers to verify them.
+
+The compiler uses an **SMT solver** (Satisfiability Modulo Theories) to verify predicates at compile time. SMT solvers are automated theorem provers that can handle arithmetic, bit vectors, arrays, and more. When you write `divide(x, y)` where `y` must be positive, the solver checks whether `y > 0` is provable from the context. If `y` came from a list length, and lists are non-empty, the solver can prove this automatically.
+
+Division by zero becomes a *type error*, caught before running. Buffer overflows too. Array index out of bounds. Integer overflow. These become compile-time checks when you add the right refinements.
 
 ### What It Adds
 
@@ -1214,17 +1275,21 @@ You want a function that appends two vectors. The result should have length `n +
 fn append<T>(a: Vec<T>, b: Vec<T>) -> Vec<T>
 ```
 
-Refinement types help with predicates, but what if types could actually *compute*?
+Refinement types help with predicates, but what if types could *compute*?
 
 ### The Insight
 
-Types can depend on values. `Vector<3, Int>` (a vector of 3 integers) is a different type than `Vector<5, Int>`. Function types can express relationships:
+Types can depend on values. `Vector<3, Int>` (a vector of 3 integers) is a different type than `Vector<5, Int>`. These aren't the same type with the same length checked at runtime. They're *different types*. A function expecting a 3-element vector won't accept a 5-element vector, just like a function expecting a String won't accept an Int.
+
+Function types can express relationships between inputs and outputs:
 
 ```
 append : Vector<n, a> -> Vector<m, a> -> Vector<n + m, a>
 ```
 
-The return type *computes* from the input types. Types and terms live in the same world.
+The return type *computes* from the input types. If you append a 3-element vector to a 5-element vector, you get an 8-element vector. The `n + m` is evaluated at the type level. Types and terms live in the same world.
+
+This is the Curry-Howard correspondence in full force. Types are propositions. Programs are proofs. `Vector<n, a>` is a proposition: "there exists a vector of n elements of type a." Constructing such a vector proves the proposition. A function type `Vector<n, a> -> Vector<n, a>` is an implication: "if you give me a proof of n-vector, I'll give you back a proof of n-vector."
 
 ### What It Adds
 
@@ -1320,7 +1385,11 @@ Distributed systems communicate over channels. Client sends `Request`, server re
 
 Encode the communication protocol in the type of the channel. After you send a `Request`, the channel's type *changes* to expect a `Response`. The type system ensures both sides follow the protocol.
 
-Key concept: **duality**. The client's view is the *dual* of the server's view: sends become receives and vice versa.
+This is linear types applied to communication. A channel isn't just "a thing you send messages on." It's a typed state machine. After sending a request, you *must* receive a response before sending another request. The type system enforces this ordering.
+
+The channel type evolves as you use it. Start with `!Request.?Response.End`. After sending a request, you have `?Response.End`. After receiving the response, you have `End`. Each operation transforms the type. Using the wrong operation is a type error.
+
+Key concept: **duality**. The client's view is the *dual* of the server's view: sends become receives and vice versa. If the client has `!Request.?Response.End`, the server has `?Request.!Response.End`. The types are symmetric. This ensures both sides agree on the protocol, verified at compile time.
 
 ### What It Adds
 
@@ -1418,7 +1487,11 @@ Annotate each variable with a **quantity** from a semiring:
 - **1**: exactly once (linear)
 - **ω**: unlimited
 
-This unifies dependent types with linear types elegantly.
+The key problem this solves: in dependent types, type-checking might *use* a value to determine a type, but that "use" shouldn't count at runtime. The length `n` in `Vect n a` is used at the type level to ensure vectors have the right size. But at runtime, you don't want to pass `n` around. It should be erased.
+
+With QTT, you write `(0 n : Nat)` to say "n exists for type-checking but has zero runtime representation." The `0` quantity means "used zero times at runtime." The type checker uses it. The compiled code doesn't include it.
+
+This also cleanly handles linear resources. A file handle has quantity 1: use it exactly once. A normal integer has quantity ω: use it as many times as you want. The quantities form a semiring (they can be added and multiplied), which makes them compose correctly when you combine functions.
 
 ### What It Adds
 
@@ -1524,7 +1597,7 @@ ua : ∀ {A B : Type} → A ≃ B → A ≡ B
 |--------|--------|
 | Learning difficulty | Extreme |
 | Daily usage | Research only |
-| Trade-off | Very steep learning curve, specialized |
+| Trade-off | Steep learning curve, specialized |
 | Languages | Cubical Agda, redtt, cooltt, Arend |
 
 ---
@@ -1632,7 +1705,7 @@ Track *sizes* abstractly in types. A `Stream<i>` has "size" `i`. Operations migh
 
 ### What It Adds
 
-- **Accept more terminating programs**: semantic decrease, not just syntactic
+- **Accept more terminating programs**: semantic decrease, not only syntactic
 - **Safe codata**: infinite structures handled correctly
 - **Size polymorphism**: abstract over sizes
 - **Productivity checking**: corecursive functions produce output
@@ -1683,7 +1756,7 @@ zipWith f (x ∷ xs) (y ∷ ys) =
 
 # Tier 5: Cutting Edge Research
 
-These concepts are at the research frontier. They're unlikely to appear in mainstream languages soon, but they influence future designs. Brief coverage for completeness:
+These concepts are at the research frontier. They haven't reached mainstream languages yet, but they influence future designs. Brief coverage for completeness:
 
 | Concept | What It Explores | Why It Matters |
 |---------|------------------|----------------|
@@ -1918,13 +1991,13 @@ Several trends are reshaping how we think about types:
 
 Type systems exist on a spectrum from "helpful autocomplete" to "machine-checked mathematical proofs." Where you should be on that spectrum depends on what you're building.
 
-For most code, Tier 1-2 concepts (ADTs, generics, traits, pattern matching) provide enormous value for modest learning investment. They're available in Rust, Scala, Swift, Kotlin, and even TypeScript.
+For most code, Tier 1-2 concepts (ADTs, generics, traits, pattern matching) eliminate entire categories of bugs: null pointer exceptions, forgotten enum cases, type mismatches. They're available in Rust, Scala, Swift, Kotlin, and even TypeScript.
 
-Tier 3 concepts (HKT, linear types, effects) require more investment but unlock powerful abstractions. Rust's ownership model shows that "hard" concepts can become mainstream when the tooling is right.
+Tier 3 concepts (HKT, linear types, effects) require more investment but let you abstract over containers, track resources, and prove purity. Rust's ownership model shows that "hard" concepts can become mainstream when the tooling is right.
 
 Tier 4+ concepts (dependent types, session types, HoTT) are mostly for researchers and specialists, but they're where tomorrow's mainstream features come from. Linear types were "research" until Rust. Effect systems might be next.
 
-The best investment is understanding the *ideas*, not just the syntax. Once you grok "make illegal states unrepresentable," you'll apply it in any language. Once you understand why linear types matter, you'll appreciate Rust's borrow checker instead of fighting it.
+The best investment is understanding the *ideas* over the syntax. Once you grok "make illegal states unrepresentable," you'll apply it in any language. Once you understand why linear types matter, you'll appreciate Rust's borrow checker instead of fighting it.
 
 Types are not bureaucracy. They're a design tool. Use them well.
 
