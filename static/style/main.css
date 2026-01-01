@@ -217,7 +217,7 @@ code {
   font-size: .9em;
   hyphens: none;
   padding: var(--space-very-small);
-  background: #f3eee5;
+  background: var(--color-dark-blue);
 }
 
 pre {
@@ -416,6 +416,42 @@ details {
 
 main {
   margin-block: var(--space-very-large);
+}
+
+.breadcrumbs {
+  margin-block-end: var(--space-large);
+
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-small);
+    list-style: none;
+    padding: 0;
+    font-size: 0.9em;
+    color: var(--color-light-darker);
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+
+    &:not(:last-child)::after {
+      content: "›";
+      margin-inline-start: var(--space-small);
+    }
+
+    &::before {
+      display: none;
+    }
+  }
+
+  a {
+    color: var(--color-light-darker);
+
+    &:hover, &:focus {
+      color: var(--color-accent);
+    }
+  }
 }
 
 #menu {
@@ -746,12 +782,25 @@ article {
 
   :root {
     --text-size: 1rem;
+    --text-line-height: 1.7;
     --space-very-large: 2rem;
     --space-large: 1.25rem;
   }
 
+  #menu > ul {
+    height: 3.5rem;
+  }
+
+  h1.separator, h2.separator, h3.separator {
+    max-width: 85%;
+  }
+
   .article-poster, .series-poster {
     padding: 0.875rem;
+  }
+
+  .metadata > * {
+    font-size: 0.9em;
   }
 
   figure figcaption {
@@ -767,14 +816,10 @@ article {
     --color-light-darker: #aaa;
     --color-dark: #e0e0e0;
     --color-dark-lighter: #444;
-    --color-dark-blue: #252525;
+    --color-dark-blue: #2a2a2a;
     --color-accent: #e04545;
     --color-accent-darker: #c03030;
     --color-accent2: #8b1e23;
-  }
-
-  code {
-    background: #2a2a2a;
   }
 }
 

@@ -21,25 +21,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
         with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            experimental-features = nix-command flakes
 
       - name: Build CSS
-        run: npm run build-css
-
-      - name: Install Zola
-        uses: taiki-e/install-action@v2
-        with:
-          tool: zola@0.19.2
+        run: nix develop --command lightningcss static/style/*.css --minify --output-dir static/style/min/
 
       - name: Build site
-        run: zola build --output-dir public
+        run: nix develop --command zola build --output-dir public
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
