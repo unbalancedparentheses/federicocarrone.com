@@ -10,5 +10,5 @@ build:
 build-css:
 	$(NIX_RUN) lightningcss static/style/*.css --minify --output-dir static/style/min/
 
-watch:
+watch: build-css
 	$(NIX_RUN) zola serve

@@ -63,16 +63,18 @@
   {%- endif %}
 
   <script defer src="https://cloud.umami.is/script.js" data-website-id="062ee306-b2e8-479b-80fd-1afeefa0bb29"></script>
+  <script defer src="{{ get_url(path = "/js/code-copy.js", cachebust = true) }}"></script>
 </head>
 <body class="content-grid">
 
-<nav id="menu" class="full-width content-grid">
+{%- set current_path = current_path | default(value="/") -%}
+<nav id="menu" class="full-width content-grid" aria-label="Main navigation">
   <ul>
-    <li><a href="/">Home</a></li>
-    <li><a href="{{ get_url(path = '@/articles/_index.md' )}}">Articles</a></li>
-    <li><a href="{{ get_url(path = '@/series/_index.md') }}">Series</a></li>
-    <li><a href="/reading">Reading</a></li>
-    <li><a href="/about">About</a></li>
+    <li><a href="/"{% if current_path == "/" %} aria-current="page"{% endif %}>Home</a></li>
+    <li><a href="{{ get_url(path = '@/articles/_index.md' )}}"{% if current_path is starting_with("/articles") %} aria-current="page"{% endif %}>Articles</a></li>
+    <li><a href="{{ get_url(path = '@/series/_index.md') }}"{% if current_path is starting_with("/series") %} aria-current="page"{% endif %}>Series</a></li>
+    <li><a href="/reading"{% if current_path is starting_with("/reading") %} aria-current="page"{% endif %}>Reading</a></li>
+    <li><a href="/about"{% if current_path is starting_with("/about") %} aria-current="page"{% endif %}>About</a></li>
   </ul>
 </nav>
 
