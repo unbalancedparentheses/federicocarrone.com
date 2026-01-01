@@ -254,13 +254,14 @@ pre {
     --text: "Code";
 
     &::before {
-      content: var(--text) " session";
+      content: var(--text);
       position: sticky;
       top: 0;
       left: 0;
       padding: var(--space-small) var(--_padding);
       font-size: .85em;
       background: var(--border-color);
+      color: var(--color-dark);
     }
   }
 
@@ -279,6 +280,16 @@ pre {
   &.language-ocaml { --text: "OCaml" }
   &.language-python, &.language-py { --text: "Python" }
   &.language-purescript { --text: "PureScript" }
+  &.language-go { --text: "Go" }
+  &.language-erlang { --text: "Erlang" }
+  &.language-kotlin { --text: "Kotlin" }
+  &.language-koka { --text: "Koka" }
+  &.language-fstar { --text: "F*" }
+  &.language-agda { --text: "Agda" }
+  &.language-idris { --text: "Idris" }
+  &.language-coq { --text: "Coq" }
+  &.language-granule { --text: "Granule" }
+  &.language-text { --text: "" }
 }
 
 .copy-button {
@@ -878,10 +889,15 @@ article {
   ul {
     margin: 0;
     padding-inline-start: var(--space-large);
+    list-style: disc;
   }
 
   li {
     margin-block: var(--space-very-small);
+
+    &::before {
+      display: none;
+    }
   }
 
   a {
