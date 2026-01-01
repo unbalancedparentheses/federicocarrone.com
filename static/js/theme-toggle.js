@@ -1,13 +1,17 @@
 (function() {
   var STORAGE_KEY = 'theme';
-  var CYBERPUNK = 'cyberpunk';
-  var DEFAULT = 'default';
+  var THEMES = [
+    { id: 'default', label: 'Default', icon: '☀️' },
+    { id: 'cyberpunk', label: 'Neon Noir', icon: '🌃' },
+    { id: 'amber', label: 'Blade Runner', icon: '🌆' },
+    { id: 'ghost', label: 'Ghost', icon: '🐚' }
+  ];
 
   function getStoredTheme() {
     try {
-      return localStorage.getItem(STORAGE_KEY);
+      return localStorage.getItem(STORAGE_KEY) || 'default';
     } catch (e) {
-      return null;
+      return 'default';
     }
   }
 
@@ -17,42 +21,55 @@
     } catch (e) {}
   }
 
-  function applyTheme(theme) {
-    if (theme === CYBERPUNK) {
-      document.documentElement.setAttribute('data-theme', CYBERPUNK);
+  function getThemeIndex(themeId) {
+    for (var i = 0; i < THEMES.length; i++) {
+      if (THEMES[i].id === themeId) return i;
+    }
+    return 0;
+  }
+
+  function applyTheme(themeId) {
+    if (themeId && themeId !== 'default') {
+      document.documentElement.setAttribute('data-theme', themeId);
     } else {
       document.documentElement.removeAttribute('data-theme');
     }
-    updateToggleButton(theme);
+    updateToggleButton(themeId);
   }
 
-  function updateToggleButton(theme) {
+  function updateToggleButton(themeId) {
     var button = document.getElementById('theme-toggle');
-    if (button) {
-      button.setAttribute('aria-label', theme === CYBERPUNK ? 'Switch to default theme' : 'Switch to cyberpunk theme');
-      button.textContent = theme === CYBERPUNK ? '☀️' : '🌃';
-    }
+    if (!button) return;
+
+    var index = getThemeIndex(themeId);
+    var nextIndex = (index + 1) % THEMES.length;
+    var currentTheme = THEMES[index];
+    var nextTheme = THEMES[nextIndex];
+
+    button.textContent = currentTheme.icon;
+    button.setAttribute('aria-label', 'Theme: ' + currentTheme.label + '. Click for ' + nextTheme.label);
+    button.setAttribute('title', currentTheme.label + ' → ' + nextTheme.label);
   }
 
-  function toggleTheme() {
-    var current = getStoredTheme() || DEFAULT;
-    var next = current === CYBERPUNK ? DEFAULT : CYBERPUNK;
-    setStoredTheme(next);
-    applyTheme(next);
+  function cycleTheme() {
+    var current = getStoredTheme();
+    var index = getThemeIndex(current);
+    var nextIndex = (index + 1) % THEMES.length;
+    var nextTheme = THEMES[nextIndex].id;
+
+    setStoredTheme(nextTheme);
+    applyTheme(nextTheme);
   }
 
   // Apply stored theme immediately to prevent flash
-  var storedTheme = getStoredTheme();
-  if (storedTheme) {
-    applyTheme(storedTheme);
-  }
+  applyTheme(getStoredTheme());
 
   // Set up toggle button when DOM is ready
   document.addEventListener('DOMContentLoaded', function() {
     var button = document.getElementById('theme-toggle');
     if (button) {
-      button.addEventListener('click', toggleTheme);
-      updateToggleButton(getStoredTheme() || DEFAULT);
+      button.addEventListener('click', cycleTheme);
+      updateToggleButton(getStoredTheme());
     }
   });
 })();
