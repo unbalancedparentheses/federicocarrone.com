@@ -1116,26 +1116,21 @@ error[E0501]: operation requires `Unsafe` capability
 
 ### Papers
 
-- [Linear Logic](https://homepages.inf.ed.ac.uk/wadler/papers/linearlogic/linearlogic.pdf) — Wadler's introduction
-- [Substructural Type Systems](https://www.cs.cmu.edu/~fp/courses/15816-s12/misc/substructural.pdf) — Walker's survey
+- [Linear Logic](https://homepages.inf.ed.ac.uk/wadler/topics/linear-logic.html) — Wadler's papers on linear logic
 - [Linearity and Uniqueness: An Entente Cordiale](https://granule-project.github.io/papers/esop22-paper.pdf) — linear vs unique vs affine
-- [Cyclone: A Safe Dialect of C](https://www.cs.umd.edu/~mwh/papers/cyclone-safety.pdf) — region-based memory
-- [Algebraic Effects for Functional Programming](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/08/algeff-tr-2016-v2.pdf) — Leijen's tutorial
+- [Cyclone](https://cyclone.thelanguage.org/) — region-based memory safety for C
 - [An Introduction to Algebraic Effects and Handlers](https://www.eff-lang.org/handlers-tutorial.pdf) — Matija Pretnar
-- [Typed Continuations and the Origin of Algebraic Effects](https://www.microsoft.com/en-us/research/video/typed-continuations-and-the-origin-of-algebraic-effects/) — Daan Leijen
 - [Capability Myths Demolished](https://srl.cs.jhu.edu/pubs/SRL2003-02.pdf) — what capabilities actually provide
 - [The Next 700 Programming Languages](https://www.cs.cmu.edu/~crary/819-f09/Landin66.pdf) — Landin's classic
 - [Hints on Programming Language Design](https://www.cs.yale.edu/flint/cs428/doc/HintsPL.pdf) — Tony Hoare
 - [Growing a Language](https://www.cs.virginia.edu/~evans/cs655/readings/steele.pdf) — Guy Steele
-- [A Polymorphic Type System for Extensible Records and Variants](https://web.cecs.pdx.edu/~mpj/pubs/polyrec.pdf) — row polymorphism
 - [RustBelt: Securing the Foundations of the Rust Programming Language](https://plv.mpi-sws.org/rustbelt/popl18/paper.pdf) — formal verification of Rust
 - [Stacked Borrows: An Aliasing Model for Rust](https://plv.mpi-sws.org/rustbelt/stacked-borrows/paper.pdf) — Ralf Jung on aliasing
 - [Ownership is Theft: Experiences Building an Embedded OS in Rust](https://patpannuto.com/pubs/levy15ownership.pdf) — Tock OS
 - [A History of Haskell: Being Lazy with Class](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/07/history.pdf) — design decisions
 - [Why Functional Programming Matters](https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf) — John Hughes
 - [On the Criteria To Be Used in Decomposing Systems into Modules](https://www.win.tue.nl/~wstomv/edu/2ip30/references/criteria_for_modularization.pdf) — Parnas
-- [Clean Language Report](https://clean.cs.ru.nl/download/doc/CleanLangRep.3.0.pdf) — uniqueness types specification
-- [Uniqueness Typing Simplified](https://www.mbsd.cs.ru.nl/publications/papers/2010/deVries-Plasmeijer-uniqueness-simplified.pdf) — how uniqueness types work
+- [Clean](https://clean.cs.ru.nl/) — uniqueness types specification
 - [Using Lightweight Formal Methods to Validate a Key-Value Storage Node](https://www.amazon.science/publications/using-lightweight-formal-methods-to-validate-a-key-value-storage-node-in-amazon-s3) — practical verification at AWS
 
 ### Blog Posts
@@ -1148,25 +1143,22 @@ error[E0501]: operation requires `Unsafe` capability
 - [Design Principles Behind Smalltalk](https://www.cs.virginia.edu/~evans/cs655/readings/smalltalk.html) — Dan Ingalls
 - [What to Know Before Debating Type Systems](https://cdsmith.wordpress.com/2011/01/09/an-old-article-i-wrote/) — Chris Smith
 - [Execution in the Kingdom of Nouns](https://steve-yegge.blogspot.com/2006/03/execution-in-kingdom-of-nouns.html) — Steve Yegge
-- [Why Pascal is Not My Favorite Language](https://www.cs.virginia.edu/~cs655/readings/bwk-on-pascal.html) — Kernighan
 
 **Austral and Linear Types**
 - [Introducing Austral](https://borretti.me/article/introducing-austral) — Fernando Borretti's rationale
 - [How Austral's Linear Type Checker Works](https://borretti.me/article/how-australs-linear-type-checker-works) — implementation decisions
-- [Linear Types and Capabilities](https://borretti.me/article/linear-types-and-capabilities) — how they compose
+- [How Capabilities Work in Austral](https://borretti.me/article/how-capabilities-work-austral) — how capabilities compose
 - [Type Systems for Memory Safety](https://borretti.me/article/type-systems-memory-safety) — survey of approaches
-- [The Case for Compiler Complexity](https://borretti.me/article/case-for-compiler-complexity) — why simple isn't always better
 - [Linear types can change the world!](https://homepages.inf.ed.ac.uk/wadler/topics/linear-logic.html) — Wadler
 - [Retrofitting Linear Types](https://www.tweag.io/blog/2017-03-13-linear-types/) — adding linear types to Haskell
 
 **Rust Design Decisions**
 - [The Problem with Single-threaded Shared Mutability](https://manishearth.github.io/blog/2015/05/17/the-problem-with-shared-mutability/) — why Rust forbids it
 - [Rust: A unique perspective](https://limpet.net/mbrubeck/2019/02/07/rust-a-unique-perspective.html) — ownership from first principles
-- [Non-Lexical Lifetimes](https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html#non-lexical-lifetimes) — why Rust moved beyond lexical scopes
+- [The Edition Guide: Non-Lexical Lifetimes](https://doc.rust-lang.org/edition-guide/rust-2018/ownership-and-lifetimes/non-lexical-lifetimes.html) — why Rust moved beyond lexical scopes
 - [Polonius: the future of the borrow checker](https://smallcultfollowing.com/babysteps/blog/2018/04/27/an-alias-based-formulation-of-the-borrow-checker/) — Niko Matsakis
 - [After NLL: Moving from borrowed data](https://smallcultfollowing.com/babysteps/blog/2018/11/10/after-nll-moving-from-borrowed-data-and-the-sentinel-pattern/) — borrow checker limitations
 - [Ralf Jung's Blog](https://www.ralfj.de/blog/) — Stacked Borrows, unsafe, formal semantics
-- [Why Rust?](https://reberhardt.com/blog/2020/10/05/why-rust.html) — Ryan Eberhardt
 - [Learn Rust With Entirely Too Many Linked Lists](https://rust-unofficial.github.io/too-many-lists/) — ownership through pain
 - [The Rustonomicon](https://doc.rust-lang.org/nomicon/) — dark arts of unsafe Rust
 
@@ -1174,25 +1166,20 @@ error[E0501]: operation requires `Unsafe` capability
 - [The Rust I Wanted Had No Future](https://graydon2.dreamwidth.org/307105.html) — original vision
 - [Not Rust](https://graydon2.dreamwidth.org/307291.html) — what Rust deliberately avoided
 - [What next for compiled languages?](https://graydon2.dreamwidth.org/253769.html) — language evolution
-- [Rust prehistory](https://graydon2.dreamwidth.org/249666.html) — design origins
 
 **Zig Design Decisions**
-- [Allocgate](https://zig.news/kristoff/allocgate-finalizing-allocators-in-zig-3l99) — why Zig's allocator design changed
-- [What is Zig's Comptime](https://kristoff.it/blog/what-is-zigs-comptime/) — compile-time execution design
-- [Zig's I/O and You](https://zig.news/kristoff/zigs-io-and-you-2c28) — I/O design
-- [A Reply to Zig's Creator on Undefined Behavior](https://www.scattered-thoughts.net/writing/a-reply-to-zigs-creator-on-undefined-behavior/) — Jamie Brandon
-- [Why Zig When There's Already Rust?](https://ziglang.org/learn/why_zig_over_c_cpp/) — official comparison
-- [Zig vs C++](https://zig.news/david_chisnall/zig-vs-c-35eo) — David Chisnall
+- [Allocgate](https://github.com/ziglang/zig/issues/10052) — why Zig's allocator design changed
+- [What is Zig's Comptime](https://kristoff.it/blog/what-is-zig-comptime/) — compile-time execution design
 
 **Effects and Capabilities**
 - [Algebraic Effects for the Rest of Us](https://overreacted.io/algebraic-effects-for-the-rest-of-us/) — Dan Abramov
 - [What Color is Your Function?](https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/) — Bob Nystrom on effect tracking
 - [Structured Concurrency](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/) — Nathaniel Smith
-- [The Effect System FAQ](https://www.eff-lang.org/learn/faq/) — Eff team
+- [Eff Programming Language](https://www.eff-lang.org/) — algebraic effects research language
 - [Koka: Programming with Row-polymorphic Effect Types](https://koka-lang.github.io/koka/doc/book.html) — official book
 
 **Roc and Purity**
-- [Roc Design Philosophy](https://www.roc-lang.org/design_goals.html) — official goals
+- [Roc FAQ](https://www.roc-lang.org/faq) — official FAQ and design rationale
 - [Why Roc Uses Platform/App Split](https://www.roc-lang.org/platforms) — effect isolation design
 
 **Go Design Decisions**
@@ -1204,8 +1191,6 @@ error[E0501]: operation requires `Unsafe` capability
 
 **Memory and Allocators**
 - [Untangling Lifetimes: The Arena Allocator](https://www.rfleury.com/p/untangling-lifetimes-the-arena-allocator) — Ryan Fleury
-- [What's a Memory Allocator Anyway?](https://www.foonathan.net/2022/08/malloc-overview/) — Jonathan Müller
-- [malloc() and free() are a bad API](https://www.foonathan.net/2022/08/malloc-interface/) — Jonathan Müller
 - [Always Bump Downwards](https://fitzgeraldnick.com/2019/11/01/always-bump-downwards.html) — Nick Fitzgerald
 - [Memory Allocation Strategies](https://www.gingerbill.org/series/memory-allocation-strategies/) — Bill Hall's series
 
@@ -1216,11 +1201,7 @@ error[E0501]: operation requires `Unsafe` capability
 **Formal Methods in Practice**
 - [Proofs About Programs](https://www.hillelwayne.com/post/theorem-prover-showdown/) — Hillel Wayne
 - [Formal Methods Only Solve Half My Problems](https://brooker.co.za/blog/2022/06/02/formal.html) — Marc Brooker at AWS
-- [How AWS Uses Formal Methods](https://cacm.acm.org/magazines/2015/4/184701-how-amazon-web-services-uses-formal-methods/fulltext) — Communications of the ACM
-- [Where the Bugs Are](https://www.hillelwayne.com/post/where-the-bugs-are/) — where verification helps
-- [Using TLA+ in the Real World](https://www.hillelwayne.com/post/using-tla-in-the-real-world/) — Hillel Wayne
-- [Verification at Scale](https://web.stanford.edu/~engler/ASPLOS24-dave.pdf) — how to verify real systems
-- [You Should Compile Your Proofs](https://blog.brownplt.org/2024/01/04/compile-your-proofs.html) — on proof engineering
+- [How AWS Uses Formal Methods](https://lamport.azurewebsites.net/tla/amazon-excerpt.html) — Amazon's TLA+ experience
 
 **Lean 4**
 - [Functional Programming in Lean](https://lean-lang.org/functional_programming_in_lean/) — official book
@@ -1230,11 +1211,10 @@ error[E0501]: operation requires `Unsafe` capability
 **Type System Design**
 - [Parse, Don't Validate](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/) — Alexis King
 - [Names Are Not Type Safety](https://lexi-lambda.github.io/blog/2020/11/01/names-are-not-type-safety/) — Alexis King
-- [Types as Axioms](https://lexi-lambda.github.io/blog/2020/08/13/types-as-axioms-or-playing-with-fire/) — Alexis King
+- [Types as Axioms, or: Playing God with Static Types](https://lexi-lambda.github.io/blog/2020/08/13/types-as-axioms-or-playing-god-with-static-types/) — Alexis King
 - [The Expression Problem](http://homepages.inf.ed.ac.uk/wadler/papers/expression/expression.txt) — Philip Wadler
 
 **Bob Harper**
-- [What, if anything, is a programming paradigm?](https://existentialtype.wordpress.com/2011/03/19/what-if-anything-is-a-programming-paradigm/)
 - [Dynamic languages are static languages](https://existentialtype.wordpress.com/2011/03/19/dynamic-languages-are-static-languages/)
 - [Modules matter most](https://existentialtype.wordpress.com/2011/04/16/modules-matter-most/)
 

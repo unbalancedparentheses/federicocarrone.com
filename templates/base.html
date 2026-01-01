@@ -5,7 +5,7 @@
 
   <meta
   http-equiv="content-security-policy"
-  content="default-src 'self'; child-src 'self' https://www.youtube-nocookie.com; script-src 'self' https://cloud.umami.is; connect-src 'self' https://api-gateway.umami.dev"
+  content="default-src 'self'; child-src 'self' https://www.youtube-nocookie.com; script-src 'self' https://cloud.umami.is; connect-src 'self' https://api-gateway.umami.dev; form-action 'self' https://buttondown.com"
   >
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -45,7 +45,10 @@
   {%- else %}
   <meta property="og:url" content="https://federicocarrone.com" />
   {%- endif %}
-  <meta property="og:image" content="{{ get_url(path = "/image/site-poster.jpg") }}" />
+  <meta property="og:image" content="https://federicocarrone.com/images/twitter-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://federicocarrone.com/images/twitter-card.png" />
+  <meta name="twitter:site" content="@federicocarrone" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@federicocarrone" />
@@ -68,6 +71,7 @@
     <li><a href="/">Home</a></li>
     <li><a href="{{ get_url(path = '@/articles/_index.md' )}}">Articles</a></li>
     <li><a href="{{ get_url(path = '@/series/_index.md') }}">Series</a></li>
+    <li><a href="/reading">Reading</a></li>
     <li><a href="/about">About</a></li>
   </ul>
 </nav>
