@@ -1172,11 +1172,9 @@ You want a collection of things that share a trait, but they're different concre
 
 Hide the concrete type behind an interface. An existential type says: "there *exists* some type `T` implementing this trait, but I won't tell you which." You can only use operations from the trait, nothing type-specific.
 
-The duality with generics is illuminating:
-- **Generics (universal)**: "for *all* types T, this works"
-- **Existentials**: "there *exists* some type T, but you don't know which"
-
-With generics, the *caller* picks the type. With existentials, the *callee* (or the code that creates the value) picks the type, and the caller just uses the interface. This is information hiding at the type level.
+The duality with generics:
+- **Generics (universal)**: caller picks the type, "for *all* types T, this works"
+- **Existentials**: callee picks the type, "there *exists* some type T, but you don't know which"
 
 Why is this useful? Consider a plugin system. Each plugin is a different type, but they all implement `Plugin`. You want a `Vec<Plugin>` containing all your plugins. With generics alone, you'd need `Vec<SomeSpecificPlugin>`. With existentials, you get `Vec<Box<dyn Plugin>>`: a collection of "things that are some type implementing Plugin." The concrete types are hidden (existentially quantified), but you can still call Plugin methods on them.
 
@@ -1323,7 +1321,7 @@ Can't we abstract over the *container itself*?
 
 ### The Insight
 
-Types have **kinds**, just as values have types. This is the key conceptual leap:
+Types have **kinds**, just as values have types:
 
 ```text
 Int         : Type                    -- a plain type
@@ -1524,11 +1522,9 @@ String process(String input)
 
 ### The Insight
 
-Track what **effects** a function can perform in its type. Pure functions have no effects. `readFile` has an `IO` effect. `throw` has an `Exception` effect. When you call functions, their effects combine.
+Track what **effects** a function can perform in its type. Pure functions have no effects. `readFile` has an `IO` effect. `throw` has an `Exception` effect. A function `String -> Int` with no effects can only compute on its input. A function `String -> IO Int` might read files, hit the network, or launch missiles.
 
-This is extending the type signature to answer the question "what can this function *do*?" not just "what does it *return*?" A function `String -> Int` with no effects can only compute on its input. A function `String -> IO Int` might read files, hit the network, or launch missiles. The effect tells you.
-
-Effect systems make effects explicit and checkable. When you call `readFile` inside your function, your function now has an `IO` effect too. Effects propagate up. Pure functions stay pure. The compiler tracks this automatically.
+Effects propagate: call `readFile` inside your function, your function now has `IO` too. The compiler tracks this automatically.
 
 Some systems also provide **effect handlers**: intercept an effect and provide custom behavior. Instead of performing I/O, you could log what I/O *would* happen. Instead of throwing an exception, you could collect errors. This is like dependency injection, but for effects. You write code using abstract effects, then "handle" them differently in tests versus production.
 
@@ -1785,11 +1781,7 @@ Regular function types can't express "after you send X, you must receive Y befor
 
 Distributed systems communicate over channels. Client sends `Request`, server responds with `Response`. But what if the client sends two requests without waiting? Or expects a response that never comes? Protocol violations cause deadlocks or silent failures, discovered only in production.
 
-Encode the communication protocol in the type of the channel. After you send a `Request`, the channel's type *changes* to expect a `Response`. The type system ensures both sides follow the protocol.
-
-This is linear types applied to communication. A channel isn't just "a thing you send messages on." It's a typed state machine. After sending a request, you *must* receive a response before sending another request. The type system enforces this ordering.
-
-The channel type evolves as you use it. Start with `!Request.?Response.End`. After sending a request, you have `?Response.End`. After receiving the response, you have `End`. Each operation transforms the type. Using the wrong operation is a type error.
+Session types fix this by making channels typed state machines. Start with `!Request.?Response.End`. After sending a request, you have `?Response.End`. After receiving the response, you have `End`. Each operation transforms the type. Using the wrong operation is a type error.
 
 Key concept: **duality**. The client's view is the *dual* of the server's view: sends become receives and vice versa. If the client has `!Request.?Response.End`, the server has `?Request.!Response.End`. The types are symmetric. This ensures both sides agree on the protocol, verified at compile time. Well-typed programs can't deadlock.
 
