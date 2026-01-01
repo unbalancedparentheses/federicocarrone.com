@@ -1013,7 +1013,7 @@ These are fundamental type-theoretic constructs that correspond to logical opera
 - Union = logical OR (disjunction)
 - Intersection = logical AND (conjunction)
 
-The duality is elegant. Unions expand the set of possible values (more things are `A | B` than just `A`). Intersections narrow it (fewer things are `A & B` than just `A`).
+The duality is precise. Unions expand the set of possible values (more things are `A | B` than just `A`). Intersections narrow it (fewer things are `A & B` than just `A`).
 
 ### The Code
 
@@ -2452,7 +2452,7 @@ Trade-offs: No garbage collector means some patterns (cyclic structures) require
 
 **Core identity**: Parametric polymorphism plus effect encoding.
 
-Haskell pioneered typeclasses (ad-hoc polymorphism without inheritance) and proved that effect tracking via monads works at scale. The type system is extremely expressive: higher-kinded types, GADTs, type families, and with extensions, approaches dependent types.
+Haskell pioneered typeclasses (ad-hoc polymorphism without inheritance) and proved that effect tracking via monads works at scale. The type system supports higher-kinded types, GADTs, type families, and with extensions, approaches dependent types.
 
 Trade-offs: Complexity accumulates. Extensions interact in surprising ways. Lazy evaluation complicates reasoning about performance. The learning curve is legendary.
 
@@ -2464,7 +2464,7 @@ Trade-offs: Complexity accumulates. Extensions interact in surprising ways. Lazy
 
 **Core identity**: Pragmatic functional programming with sound foundations.
 
-OCaml keeps Hindley-Milner inference simple while adding powerful modules with structural typing. The module system enables abstraction and separate compilation. Recently added algebraic effects bring first-class effect handling.
+OCaml keeps Hindley-Milner inference simple while adding modules with structural typing. The module system enables abstraction and separate compilation. Recently added algebraic effects bring first-class effect handling.
 
 Trade-offs: Less expressive than Haskell, fewer libraries than mainstream languages. But the simplicity is intentional: the type system stays predictable.
 
@@ -2843,6 +2843,6 @@ Types are not bureaucracy. They're a design tool. Use them well.
 - **Koka**: Clean effect system design
 
 **Papers:**
-- "Propositions as Types" by Philip Wadler, the Curry-Howard correspondence explained beautifully
+- "Propositions as Types" by Philip Wadler, covers the Curry-Howard correspondence
 - "Theorems for Free" by Philip Wadler, what parametricity guarantees
 - "Linear Types Can Change the World", why linearity matters
