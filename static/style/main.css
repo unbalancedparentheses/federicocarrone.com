@@ -878,12 +878,14 @@ article {
 .toc {
   margin-block: var(--space-large);
   padding: var(--space);
-  background: var(--color-dark-blue);
-  border: var(--border-width) var(--border-color) solid;
+  padding-inline-start: var(--space-large);
+  border-left: 4px var(--color-accent) solid;
 
   h2 {
-    font-size: 1.1em;
+    font-size: 1em;
+    font-weight: bold;
     margin-block: 0 var(--space);
+    color: var(--color-light-darker);
   }
 
   ul {
@@ -897,6 +899,10 @@ article {
 
     &::before {
       display: none;
+    }
+
+    &::marker {
+      color: var(--color-light-darker);
     }
   }
 
@@ -1106,8 +1112,8 @@ article {
 }
 
 [data-theme="cyberpunk"] .toc {
-  border-color: #2a2a3a;
-  background: rgba(0, 255, 255, 0.02);
+  border-left-color: #0ff;
+  box-shadow: -2px 0 10px rgba(0, 255, 255, 0.2);
 }
 
 [data-theme="cyberpunk"] .newsletter {
