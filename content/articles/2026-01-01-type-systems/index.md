@@ -11,19 +11,15 @@ pinned = true
 
 Every type error you've ever cursed at was a bug caught before production. Type systems reject nonsense at compile time so you don't discover it at 3 AM. But they vary wildly in what they can express and what guarantees they provide.
 
-This guide covers type system concepts from the foundational ideas every programmer uses daily to the research frontier where types can prove your matrix multiplication is dimensionally correct.
-
 <!-- more -->
-
-## TL;DR
 
 If you learn nothing else: ADTs + pattern matching + generics. These three concepts will improve your code in any language and take days to learn, not months.
 
-The concepts here roughly progress from generics (reusable code) through traits (shared behavior) to linear types (resource safety) to dependent types (proving correctness). Each step buys you more compile-time guarantees at the cost of more work satisfying the type checker. If you know Java or TypeScript and want to go deeper, Rust hits a good balance between expressiveness and practicality.
+The concepts here progress from generics (reusable code) through traits (shared behavior) to linear types (resource safety) to dependent types (proving correctness). Each step buys you more compile-time guarantees at the cost of more work satisfying the type checker.
 
-## How to Read This Guide
+## Structure
 
-The concepts are organized into tiers by complexity and practical relevance:
+Concepts are organized into tiers:
 
 | Tier | What's Here | You Should Know If... |
 |------|-------------|----------------------|
@@ -199,8 +195,6 @@ The further right you go, the more you can express in types. The further down yo
 
 Dynamic typing is a valid type system category, not the absence of types. In dynamic languages, types exist and are checked, just at runtime rather than compile time.
 
-### How It Works
-
 Values carry type tags at runtime. Operations check these tags before executing:
 
 ```python
@@ -215,7 +209,7 @@ add(1, "b")     # TypeError at runtime!
 
 The type error still happens. It just happens when you run the code, not when you compile it. This trades earlier error detection for flexibility and development speed.
 
-### Why Choose Dynamic Typing
+Dynamic typing works well for:
 
 - **Prototyping and exploration**: When you don't yet know what shape your data will take
 - **Scripts and glue code**: Short-lived code where development speed matters more than maintenance
@@ -232,8 +226,6 @@ Python, Ruby, JavaScript, Lisp, Clojure, Erlang, Elixir. Most have optional type
 ## Gradual Typing
 
 Gradual typing blends static and dynamic checking within the same language. You can add types incrementally, and the system inserts runtime checks at the boundaries between typed and untyped code.
-
-### How It Works
 
 In a gradually typed system, you can leave parts of your code untyped (using `any` or equivalent) while fully typing other parts. The type checker verifies the typed portions statically. At runtime, checks are inserted where typed code interacts with untyped code.
 
