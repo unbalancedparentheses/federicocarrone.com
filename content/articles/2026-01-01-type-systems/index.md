@@ -6,7 +6,7 @@ description = "Type system concepts from generics to dependent types, with code 
 keywords=["programming languages", "type systems", "rust", "functional programming"]
 [extra]
 author = "Federico Carrone"
-pinned = false
+pinned = true
 +++
 
 Every type error you've ever cursed at was a bug caught before production. Type systems reject nonsense at compile time so you don't discover it at 3 AM. But they vary wildly in what they can express and what guarantees they provide.
