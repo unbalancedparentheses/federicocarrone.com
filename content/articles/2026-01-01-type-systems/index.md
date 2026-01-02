@@ -283,13 +283,6 @@ def untyped_function(y):
 result: int = untyped_function(5)  # Runtime TypeError
 ```
 
-| Aspect | Benefit | Cost |
-|--------|---------|------|
-| Migration | Incremental adoption | Partial guarantees |
-| Flexibility | Mix paradigms | Runtime check overhead |
-| Tooling | Some IDE support | Less precise than full static |
-| Guarantees | Better than nothing | Weaker than full static |
-
 TypeScript, Python (with mypy/pyright), PHP (with Hack), Racket (Typed Racket), Dart (before null safety), C# (with nullable reference types).
 
 # Tier 1: Foundational
