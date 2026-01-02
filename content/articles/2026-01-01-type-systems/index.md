@@ -2460,16 +2460,6 @@ Type systems enable tooling that untyped languages can't match:
 
 Languages like TypeScript transformed JavaScript development primarily through **tooling**, not runtime safety. The types exist largely to power the IDE experience.
 
-### Developer Experience Trade-offs
-
-| Aspect | Stronger Types | Weaker Types |
-|--------|----------------|--------------|
-| **Initial velocity** | Slower (annotations, fighting checker) | Faster (just write code) |
-| **Refactoring confidence** | High (compiler catches breakage) | Low (hope tests cover it) |
-| **Onboarding** | Easier (types document intent) | Harder (read implementation) |
-| **Compile times** | Longer (type checking is work) | Shorter or none |
-| **Error messages** | Sometimes cryptic | N/A |
-
 The sweet spot varies by project. A weekend script doesn't need Rust's borrow checker. A database engine does.
 
 ---
