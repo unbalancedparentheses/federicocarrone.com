@@ -33,47 +33,18 @@ You don't need to read linearly. Jump to what interests you. But concepts build 
 
 ## Orthogonal Dimensions
 
-Type systems are not a linear progression. They combine **orthogonal axes** independently. A language chooses a point on each axis.
+Type systems are not a linear progression. They combine orthogonal axes independently:
 
-```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        TYPE SYSTEM TAXONOMY                                 │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  1. CHECKING          Static ←───────────────────────────→ Dynamic          │
-│                              ↑                                              │
-│                           Gradual                                           │
-│                                                                             │
-│  2. EQUALITY          Nominal ←─────────────────────────→ Structural        │
-│                                                                             │
-│  3. POLYMORPHISM      None → Parametric → Bounded → Higher-Kinded           │
-│                         ↓                                                   │
-│                      Ad-hoc (overloading, traits, typeclasses)              │
-│                                                                             │
-│  4. INFERENCE         Explicit → Local → Bidirectional → Full (HM)          │
-│                                                                             │
-│  5. PREDICATES        Simple → Refinement → Dependent                       │
-│                                                                             │
-│  6. RESOURCES         Unrestricted → Relevant → Affine → Linear → Ordered   │
-│                                                                             │
-│  7. EFFECTS           Implicit → Monadic → Algebraic                        │
-│                                                                             │
-│  8. FLOW              Insensitive ←───────────────────→ Flow-Sensitive      │
-│                                                                             │
-│  9. COMMUNICATION     Untyped → Typed Messages → Actors → Session Types     │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-EXAMPLE LANGUAGE POSITIONS:
-
-  Rust        = Static + Nominal + Parametric + Bidirectional + Affine + Sensitive
-  TypeScript  = Gradual + Structural + Parametric + Constraint + Sensitive
-  Haskell     = Static + Nominal + Higher-Kinded + HM + Monadic
-  Python      = Dynamic + Nominal + Ad-hoc + Explicit
-  Go          = Static + Structural + Parametric + Local + Typed Channels
+```
+CHECKING:     Static ←──── Gradual ────→ Dynamic
+EQUALITY:     Nominal ←────────────────→ Structural
+POLYMORPHISM: None → Parametric → Bounded → Higher-Kinded
+INFERENCE:    Explicit → Local → Bidirectional → Full (HM)
+RESOURCES:    Unrestricted → Affine → Linear
+EFFECTS:      Implicit → Monadic → Algebraic
 ```
 
-Each axis is independent. You can have static + structural (TypeScript), static + nominal (Java), or gradual + nominal (Python+mypy). The combinations create the design space.
+Real languages pick a point on each axis. Rust is static + nominal + affine. TypeScript is gradual + structural. Haskell is static + nominal + higher-kinded + monadic. The combinations create the design space.
 
 ### 1. Time of Checking
 
@@ -362,10 +333,13 @@ This constraint is a feature, not a limitation. When a function is parametric in
 
 For example, a function with signature `fn mystery<T>(x: T) -> T` can *only* return `x`. There's nothing else it could possibly return. The type signature alone proves the implementation. Similarly, `fn pair<T>(x: T) -> (T, T)` must return `(x, x)`. The parametricity constraint eliminates every other possibility.
 
+What this gives you:
 - Write once, use with any type
 - No code duplication
 - Compiler verifies each usage with concrete types
-- Parametricity guarantees properties: a function `fn identity<T>(x: T) -> T` can *only* return `x`
+- Parametricity guarantees: a function `fn id<T>(x: T) -> T` can *only* return `x`
+
+Fair warning: the syntax gets ugly. You will eventually write `fn process<T: Read + Write + Clone + Send + 'static>` and question your life choices. This is the price of expressiveness. It's still better than duplicating code.
 
 ```rust
 // Rust: One function works for any type T
@@ -397,13 +371,13 @@ fn mystery<T>(x: T) -> T {
 
 ## Subtyping
 
-You have a function that operates on any `Animal`. You've defined `Dog`, `Cat`, and `Bird` types. Without some way to express "a Dog *is* an Animal," you'd need separate functions for each type, or abandon type safety.
+You have a function that logs any HTTP response. You've also defined `JsonResponse` and `XmlResponse` types with extra fields. Without some way to express "a JsonResponse *is* an HttpResponse," you'd need separate logging functions for each, or abandon type safety.
 
-If type `B` has everything type `A` has (and possibly more), you can use a `B` anywhere an `A` is expected. This is subtyping: `Dog <: Animal` means Dog is a subtype of Animal.
+If type `B` has everything type `A` has (and possibly more), you can use a `B` anywhere an `A` is expected. This is subtyping: `JsonResponse <: HttpResponse` means JsonResponse is a subtype of HttpResponse.
 
-Think of it as a contract. An `Animal` promises certain capabilities: it has a name, it can speak. A `Dog` fulfills that contract and more: it also has a breed and can fetch. Anywhere the code expects "something that has a name and can speak," a Dog works fine. The extra capabilities are ignored but don't cause problems.
+Think of it as a contract. An `HttpResponse` promises certain capabilities: it has a status code and body. A `JsonResponse` fulfills that contract and adds more: it also has a parsed object and content type. Anywhere the code expects "something with status and body," a JsonResponse works fine. The extra fields are ignored but don't cause problems.
 
-This is the Liskov Substitution Principle encoded in the type system: if `Dog <: Animal`, then any property that holds for `Animal` should hold for `Dog`. You can substitute Dogs for Animals without breaking correctness.
+This is the Liskov Substitution Principle encoded in the type system: if `JsonResponse <: HttpResponse`, then any property that holds for HttpResponse should hold for JsonResponse.
 
 ### Nominal vs Structural: Two Philosophies
 
@@ -460,45 +434,35 @@ func process(r Reader) { ... }
 process(MyFile{})  // OK
 ```
 
-- Polymorphism through substitutability
-- Model "is-a" relationships
-- Accept broader types in function parameters
-- Return narrower types from functions
-
 ```typescript
 // TypeScript: Structural subtyping
-interface Animal {
-    name: string;
-    speak(): string;
+interface HttpResponse {
+    status: number;
+    body: string;
 }
 
-interface Dog {
-    name: string;
-    breed: string;
-    speak(): string;
-    fetch(): void;
+interface JsonResponse {
+    status: number;
+    body: string;
+    contentType: "application/json";
+    parsed: object;
 }
 
-function greet(animal: Animal): string {
-    return `${animal.name} says ${animal.speak()}`;
+function logResponse(res: HttpResponse): void {
+    console.log(`${res.status}: ${res.body}`);
 }
 
-const dog: Dog = {
-    name: "Rex",
-    breed: "German Shepherd",
-    speak: () => "Woof!",
-    fetch: () => console.log("Fetching...")
+const jsonRes: JsonResponse = {
+    status: 200,
+    body: '{"ok": true}',
+    contentType: "application/json",
+    parsed: { ok: true }
 };
 
-greet(dog);  // OK! Dog has everything Animal needs
-
-// The compiler checks structural compatibility
-// Dog has name: string ✓
-// Dog has speak(): string ✓
-// Extra fields (breed, fetch) are fine
+logResponse(jsonRes);  // OK! JsonResponse has everything HttpResponse needs
 ```
 
-The downside: subtyping complicates type inference and introduces variance questions. When `Dog <: Animal`, is `List<Dog>` a subtype of `List<Animal>`? It depends on whether the list is read-only (covariant), write-only (contravariant), or mutable (invariant). See [Variance](#variance) for details. Rust sidesteps this by using traits instead of subtyping for polymorphism.
+The downside: subtyping complicates type inference and introduces variance questions. When `JsonResponse <: HttpResponse`, is `List<JsonResponse>` a subtype of `List<HttpResponse>`? It depends on whether the list is read-only (covariant), write-only (contravariant), or mutable (invariant). See [Variance](#variance) for details. Rust sidesteps this by using traits instead of subtyping for polymorphism.
 
 ---
 
@@ -839,18 +803,18 @@ function process(value: string | number | null) {
 }
 
 // Works with user-defined type guards too
-interface Cat { meow(): void; }
-interface Dog { bark(): void; }
+interface Success { data: object; }
+interface Failure { error: string; code: number; }
 
-function isCat(pet: Cat | Dog): pet is Cat {
-    return (pet as Cat).meow !== undefined;
+function isSuccess(result: Success | Failure): result is Success {
+    return (result as Success).data !== undefined;
 }
 
-function speak(pet: Cat | Dog) {
-    if (isCat(pet)) {
-        pet.meow();  // TypeScript knows pet is Cat here
+function handle(result: Success | Failure) {
+    if (isSuccess(result)) {
+        console.log(result.data);   // TypeScript knows result is Success
     } else {
-        pet.bark();  // TypeScript knows pet is Dog here
+        console.error(result.error); // TypeScript knows result is Failure
     }
 }
 ```
@@ -1236,6 +1200,8 @@ HKT is standard in Haskell, Scala, and PureScript. Rust avoids full HKT but adde
 ## Linear and Affine Types
 
 Resources must be managed: files closed, memory freed, locks released. Forget to close a file? Leak. Close it twice? Crash. Use it after closing? Undefined behavior.
+
+I didn't understand why affine types mattered until I spent three days debugging a double-free in a C++ codebase. The ownership was "obvious" to whoever wrote it—six months earlier. Rust would have rejected the code instantly.
 
 Garbage collectors handle memory but not files, sockets, or locks. Manual management is error-prone—Microsoft reports that 70% of their security vulnerabilities are memory safety issues, and use-after-free remains a top exploit vector. Can the type system track resource usage?
 
@@ -2063,38 +2029,35 @@ A few concepts that don't fit the tier structure but are practically important:
 
 ## Variance
 
-When `Dog <: Animal`, what's the relationship between `Container<Dog>` and `Container<Animal>`? It depends on how the container uses its type parameter.
+When `JsonResponse <: HttpResponse`, what's the relationship between `List<JsonResponse>` and `List<HttpResponse>`? It depends on how the container uses its type parameter.
 
-This question matters for every generic type. You might expect `Container<Dog>` to be a subtype of `Container<Animal>` always. But that's wrong in general, and understanding why is key to writing correct generic code.
+This question matters for every generic type. You might expect `List<JsonResponse>` to be a subtype of `List<HttpResponse>` always. But that's wrong in general, and understanding why is key to writing correct generic code.
 
-The intuition: if you can only *get* values out of a container (produce), then `Container<Dog>` can substitute for `Container<Animal>`. You asked for animals, I give you dogs, dogs are animals, everyone's happy. But if you can *put* values into a container (consume), it's the reverse. A container that accepts any animal can accept dogs. But a container that only accepts dogs can't substitute for one that accepts any animal, because someone might try to put a cat in it.
+The intuition: if you can only *read* from a container (produce), then `List<JsonResponse>` can substitute for `List<HttpResponse>`. You asked for HTTP responses, I give you JSON responses, JSON responses are HTTP responses, everyone's happy. But if you can *write* to a container (consume), it's the reverse. A container that accepts any HTTP response can accept JSON responses. But a container that only accepts JSON responses can't substitute for one that accepts any HTTP response, because someone might try to put an XML response in it.
 
-Mutable containers are the problem case. You can both get and put. Neither subtyping direction is safe. `Container<Dog>` must be invariant: no subtyping relationship with `Container<Animal>`.
+Mutable containers are the problem case. You can both read and write. Neither subtyping direction is safe. Java's decision to make arrays covariant was a mistake we're still paying for—you can put an Integer into a Number[] that's actually a Double[] at runtime, and it explodes.
 
 ```typescript
 // TypeScript: variance annotations
 
-// Covariant (out): Container<Dog> <: Container<Animal>
-// "Producers" are covariant
-interface Producer<out T> {
-    produce(): T;
+// Covariant (out): Producer<JsonResponse> <: Producer<HttpResponse>
+interface ResponseSource<out T> {
+    fetch(): T;
 }
-// If it produces Dogs, it produces Animals
+// If it produces JsonResponses, it produces HttpResponses
 
-// Contravariant (in): Container<Animal> <: Container<Dog>
-// "Consumers" are contravariant
-interface Consumer<in T> {
-    consume(x: T): void;
+// Contravariant (in): Handler<HttpResponse> <: Handler<JsonResponse>
+interface ResponseHandler<in T> {
+    handle(x: T): void;
 }
-// If it eats any Animal, it can eat Dogs
+// If it handles any HttpResponse, it can handle JsonResponses
 
 // Invariant: no subtyping relationship
-// Mutable containers must be invariant
-interface MutableBox<T> {
-    get(): T;       // covariant use
-    set(x: T): void; // contravariant use
+interface ResponseCache<T> {
+    get(): T;          // covariant use
+    store(x: T): void; // contravariant use
 }
-// Both uses = invariant
+// Both uses = invariant (no safe subtyping)
 ```
 
 ---
