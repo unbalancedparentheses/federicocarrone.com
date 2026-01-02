@@ -2225,7 +2225,7 @@ Rust's type system is built around *resource management*. Affine types (values u
 
 Trade-offs: No garbage collector means some patterns (cyclic structures) require workarounds. Expect to fight the borrow checker for a few weeks before it clicks. But for systems code, the safety guarantees are unmatched outside research languages.
 
-**Best for**: Systems programming, performance-critical applications, anywhere memory safety matters.
+Best for: Systems programming, performance-critical applications, anywhere memory safety matters.
 
 ---
 
@@ -2237,7 +2237,7 @@ Haskell pioneered typeclasses (ad-hoc polymorphism without inheritance) and prov
 
 Trade-offs: Complexity accumulates. Extensions interact in surprising ways. Lazy evaluation complicates reasoning about performance. Productive Haskell requires internalizing concepts that don't transfer from imperative languages.
 
-**Best for**: Compilers, financial systems, anywhere correctness matters more than onboarding speed.
+Best for: Compilers, financial systems, anywhere correctness matters more than onboarding speed.
 
 ---
 
@@ -2249,7 +2249,7 @@ OCaml keeps Hindley-Milner inference simple while adding modules with structural
 
 Trade-offs: Less expressive than Haskell, fewer libraries than mainstream languages. But the simplicity is intentional: the type system stays predictable.
 
-**Best for**: Compilers (including Rust's original), theorem provers, DSL implementation.
+Best for: Compilers (including Rust's original), theorem provers, DSL implementation.
 
 ---
 
@@ -2261,7 +2261,7 @@ Scala pushes the boundaries of what's expressible in a statically typed language
 
 Trade-offs: The expressiveness creates complexity. Compile times suffer. Some corners are unsound. The type system can be "too powerful" for teams that don't need it.
 
-**Best for**: Complex domain modeling, big data (Spark), anywhere you need JVM compatibility with advanced types.
+Best for: Complex domain modeling, big data (Spark), anywhere you need JVM compatibility with advanced types.
 
 ---
 
@@ -2273,7 +2273,7 @@ TypeScript chose structural typing to model JavaScript's duck typing, and gradua
 
 Trade-offs: Intentionally unsound in several places (bivariant function parameters, type assertions). The goal is usability and tooling, not proofs. `any` is always an escape hatch.
 
-**Best for**: Large JavaScript codebases, teams migrating from untyped to typed, frontend development.
+Best for: Large JavaScript codebases, teams migrating from untyped to typed, frontend development.
 
 ---
 
@@ -2285,7 +2285,7 @@ Python's type system is bolted on: the runtime ignores type hints entirely. Tool
 
 Trade-offs: No runtime guarantees. Type coverage varies across the ecosystem. But the flexibility is intentional: Python prioritizes "getting things done" over proving correctness.
 
-**Best for**: Scripting, data science, rapid prototyping, anywhere development speed trumps runtime safety.
+Best for: Scripting, data science, rapid prototyping, anywhere development speed trumps runtime safety.
 
 ---
 
@@ -2297,7 +2297,7 @@ Java's generics use type erasure for backward compatibility, limiting what's exp
 
 Trade-offs: Verbose. Limited inference. No value types (until Valhalla). But stability and backward compatibility matter for enterprise software. Code written in 2004 still compiles.
 
-**Best for**: Enterprise systems, Android development, anywhere long-term stability matters.
+Best for: Enterprise systems, Android development, anywhere long-term stability matters.
 
 ---
 
@@ -2309,7 +2309,7 @@ C# evolves faster than Java, adding features like nullable reference types (flow
 
 Trade-offs: Windows-centric history (though .NET Core is cross-platform). Less expressive than Scala or Haskell. But the evolution is pragmatic: features that work in enterprise settings.
 
-**Best for**: Windows development, game development (Unity), enterprise .NET systems.
+Best for: Windows development, game development (Unity), enterprise .NET systems.
 
 ---
 
@@ -2321,7 +2321,7 @@ Go deliberately limits the type system. Interfaces are structural (implement by 
 
 Trade-offs: Lack of expressiveness means repetitive code. No sum types means error handling via multiple returns. But the simplicity aids onboarding and tooling.
 
-**Best for**: Cloud infrastructure, CLI tools, services where simplicity aids maintenance.
+Best for: Cloud infrastructure, CLI tools, services where simplicity aids maintenance.
 
 ---
 
@@ -2333,7 +2333,7 @@ C++ templates are Turing-complete, enabling extreme metaprogramming. Move semant
 
 Trade-offs: Easy to write undefined behavior. Compile errors are notorious. But when you need zero-overhead abstraction with full control, nothing else competes.
 
-**Best for**: Game engines, embedded systems, performance-critical code where control matters more than safety.
+Best for: Game engines, embedded systems, performance-critical code where control matters more than safety.
 
 ---
 
@@ -2345,7 +2345,7 @@ These are proof assistants first, programming languages second. Full dependent t
 
 Trade-offs: Writing proofs is hard. Libraries are limited. But for verified software (CompCert, seL4), they're the gold standard.
 
-**Best for**: Formal verification, mathematics formalization, critical systems requiring proofs.
+Best for: Formal verification, mathematics formalization, critical systems requiring proofs.
 
 ---
 
