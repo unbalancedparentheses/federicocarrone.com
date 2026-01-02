@@ -2219,7 +2219,7 @@ Rather than ranking languages linearly, this section maps popular languages acro
 
 ### Rust
 
-**Core identity**: Ownership and affine typing for systems safety.
+Ownership and affine typing for systems safety.
 
 Rust's type system is built around *resource management*. Affine types (values used at most once) combine with the borrow checker to eliminate use-after-free, data races, and resource leaks at compile time. Lifetimes are region types that prove references don't outlive their referents.
 
@@ -2231,7 +2231,7 @@ Trade-offs: No garbage collector means some patterns (cyclic structures) require
 
 ### Haskell
 
-**Core identity**: Parametric polymorphism plus effect encoding.
+Parametric polymorphism plus effect encoding.
 
 Haskell pioneered typeclasses (ad-hoc polymorphism without inheritance) and proved that effect tracking via monads works at scale. The type system supports higher-kinded types, GADTs, type families, and with extensions, approaches dependent types.
 
@@ -2243,7 +2243,7 @@ Trade-offs: Complexity accumulates. Extensions interact in surprising ways. Lazy
 
 ### OCaml
 
-**Core identity**: Pragmatic functional programming with sound foundations.
+Pragmatic functional programming with sound foundations.
 
 OCaml keeps Hindley-Milner inference simple while adding modules with structural typing. The module system enables abstraction and separate compilation. Recently added algebraic effects bring first-class effect handling.
 
@@ -2255,7 +2255,7 @@ Trade-offs: Less expressive than Haskell, fewer libraries than mainstream langua
 
 ### Scala
 
-**Core identity**: Maximum expressiveness on the JVM.
+Maximum expressiveness on the JVM.
 
 Scala pushes the boundaries of what's expressible in a statically typed language: path-dependent types, implicits for type-level computation, union and intersection types. Scala 3 cleans up the syntax while adding match types and explicit term inference.
 
@@ -2267,7 +2267,7 @@ Trade-offs: The expressiveness creates complexity. Compile times suffer. Some co
 
 ### TypeScript
 
-**Core identity**: Structural gradual typing with strong flow sensitivity.
+Structural gradual typing with strong flow sensitivity.
 
 TypeScript chose structural typing to model JavaScript's duck typing, and gradual typing to enable incremental adoption. Its flow-sensitive type narrowing is among the best: the type of a variable changes based on control flow. Union types and discriminated unions bring algebraic data types to JavaScript.
 
@@ -2279,7 +2279,7 @@ Trade-offs: Intentionally unsound in several places (bivariant function paramete
 
 ### Python
 
-**Core identity**: Runtime flexibility with optional static hints.
+Runtime flexibility with optional static hints.
 
 Python's type system is bolted on: the runtime ignores type hints entirely. Tools like mypy and pyright check them statically. This enables gradual adoption but means types are advisory, not enforced.
 
@@ -2291,7 +2291,7 @@ Trade-offs: No runtime guarantees. Type coverage varies across the ecosystem. Bu
 
 ### Java
 
-**Core identity**: Nominal enterprise typing with conservative evolution.
+Nominal enterprise typing with conservative evolution.
 
 Java's generics use type erasure for backward compatibility, limiting what's expressible. The type system is nominal: explicit declarations define relationships. Evolution is slow and deliberate.
 
@@ -2303,7 +2303,7 @@ Trade-offs: Verbose. Limited inference. No value types (until Valhalla). But sta
 
 ### C#
 
-**Core identity**: Pragmatic nominal typing with steady evolution.
+Pragmatic nominal typing with steady evolution.
 
 C# evolves faster than Java, adding features like nullable reference types (flow-sensitive null tracking), pattern matching, and records. The type system is nominal but increasingly expressive.
 
@@ -2315,7 +2315,7 @@ Trade-offs: Windows-centric history (though .NET Core is cross-platform). Less e
 
 ### Go
 
-**Core identity**: Structural minimalism.
+Structural minimalism.
 
 Go deliberately limits the type system. Interfaces are structural (implement by having the methods), generics were added reluctantly. The philosophy: simple tools for simple problems.
 
@@ -2327,7 +2327,7 @@ Trade-offs: Lack of expressiveness means repetitive code. No sum types means err
 
 ### C++
 
-**Core identity**: Unchecked power.
+Unchecked power.
 
 C++ templates are Turing-complete, enabling extreme metaprogramming. Move semantics approximate affine types but aren't enforced. The type system can express almost anything but guarantees almost nothing.
 
@@ -2339,7 +2339,7 @@ Trade-offs: Easy to write undefined behavior. Compile errors are notorious. But 
 
 ### Lean and Coq
 
-**Core identity**: Types are proofs.
+Types are proofs.
 
 These are proof assistants first, programming languages second. Full dependent types mean types can express any mathematical proposition, and programs are proofs of those propositions. Type checking is theorem proving.
 
@@ -2595,8 +2595,6 @@ Tier 3 concepts (HKT, linear types, effects) require more investment but let you
 Tier 4+ concepts (dependent types, session types, HoTT) are mostly for researchers and specialists, but they're where tomorrow's mainstream features come from. Linear types were "research" until Rust. Effect systems might be next.
 
 The best investment is understanding the *ideas* over the syntax. Once you grok "make illegal states unrepresentable," you'll apply it in any language. Once you understand why linear types matter, you'll appreciate Rust's borrow checker instead of fighting it.
-
-Types are not bureaucracy. They're a design tool. Use them well.
 
 ---
 
