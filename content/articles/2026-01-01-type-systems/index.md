@@ -223,8 +223,6 @@ The type error still happens. It just happens when you run the code, not when yo
 - **Highly dynamic domains**: Serialization, ORMs, and metaprogramming where static types fight the problem
 - **Duck typing**: If it quacks like a duck, use it as a duck. No need for explicit interface declarations
 
-### The Trade-off
-
 Dynamic typing isn't "no types." It's "types checked later." The benefits are real:
 
 | Aspect | Dynamic | Static |
@@ -236,8 +234,6 @@ Dynamic typing isn't "no types." It's "types checked later." The benefits are re
 | Documentation | Implicit | Types as docs |
 
 The question isn't "static vs dynamic" but "how much static?" Python with type hints, TypeScript with strict mode, Rust with full ownership tracking: these represent different points on a spectrum. Pick the point that matches your problem.
-
-### Languages
 
 Python, Ruby, JavaScript, Lisp, Clojure, Erlang, Elixir. Most have optional type systems now (Python's type hints, TypeScript for JavaScript).
 
@@ -271,8 +267,6 @@ function fromExternal(json: any): User {
 }
 ```
 
-### The Insight
-
 The **gradual guarantee** is the formal property that makes this work: adding type annotations should not change program behavior (unless there's a type error). You can migrate from untyped to typed code one function at a time without breaking anything.
 
 This enables incremental adoption:
@@ -297,16 +291,12 @@ def untyped_function(y):
 result: int = untyped_function(5)  # Runtime TypeError
 ```
 
-### The Trade-off
-
 | Aspect | Benefit | Cost |
 |--------|---------|------|
 | Migration | Incremental adoption | Partial guarantees |
 | Flexibility | Mix paradigms | Runtime check overhead |
 | Tooling | Some IDE support | Less precise than full static |
 | Guarantees | Better than nothing | Weaker than full static |
-
-### Languages
 
 TypeScript, Python (with mypy/pyright), PHP (with Hack), Racket (Typed Racket), Dart (before null safety), C# (with nullable reference types).
 
@@ -316,8 +306,6 @@ These concepts are solved problems with efficient algorithms. Every modern stati
 
 ## Hindley-Milner Type Inference
 
-### The Problem
-
 Static typing traditionally meant annotating everything. Java's infamous:
 
 ```java
@@ -325,8 +313,6 @@ Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
 ```
 
 This verbosity is why many developers fled to dynamic languages. But dynamic typing means discovering type mismatches at runtime, often in production.
-
-### The Insight
 
 What if the compiler could *figure out* the types? In 1969, Roger Hindley discovered (and Robin Milner independently rediscovered in 1978) an algorithm that can infer the most general type for any expression in a certain class of type systems, without any annotations.
 
@@ -339,14 +325,10 @@ The algorithm works by:
 
 The "most general" part matters. If you write a function that works on any list, the algorithm infers "list of anything," not "list of integers." You get maximum reusability automatically.
 
-### What It Adds
-
 - The brevity of Python with the safety of static typing
 - Write code without type annotations; the compiler figures them out
 - Catch type errors at compile time, not runtime
 - The inferred type is always the *most general*, so your function works for all types that fit
-
-### The Code
 
 ```rust
 // Rust: The compiler infers all types here
@@ -393,13 +375,9 @@ This scales better than pure HM to richer type systems. GADTs, higher-rank types
 
 ## Parametric Polymorphism (Generics)
 
-### The Problem
-
 You write a function to get the first element of a list of integers. Then you need it for strings. Then for custom types. You end up with `first_int`, `first_string`, `first_user`, duplicated code that differs only in types.
 
 The alternative, using a universal type like `Object` or `any`, throws away type safety entirely. You're back to hoping you don't pass the wrong thing.
-
-### The Insight
 
 Abstract over the type itself. Write the function *once* with a type parameter, and it works for *any* type. The crucial property is **parametricity**: the function must behave the same way regardless of what type you plug in. It can't inspect the type or behave differently for integers versus strings.
 
@@ -407,14 +385,10 @@ This constraint is a feature, not a limitation. When a function is parametric in
 
 For example, a function with signature `fn mystery<T>(x: T) -> T` can *only* return `x`. There's nothing else it could possibly return. The type signature alone proves the implementation. Similarly, `fn pair<T>(x: T) -> (T, T)` must return `(x, x)`. The parametricity constraint eliminates every other possibility.
 
-### What It Adds
-
 - Write once, use with any type
 - No code duplication
 - Compiler verifies each usage with concrete types
 - Parametricity guarantees properties: a function `fn identity<T>(x: T) -> T` can *only* return `x`
-
-### The Code
 
 ```rust
 // Rust: One function works for any type T
@@ -446,11 +420,7 @@ fn mystery<T>(x: T) -> T {
 
 ## Subtyping
 
-### The Problem
-
 You have a function that operates on any `Animal`. You've defined `Dog`, `Cat`, and `Bird` types. Without some way to express "a Dog *is* an Animal," you'd need separate functions for each type, or abandon type safety.
-
-### The Insight
 
 If type `B` has everything type `A` has (and possibly more), you can use a `B` anywhere an `A` is expected. This is subtyping: `Dog <: Animal` means Dog is a subtype of Animal.
 
@@ -513,14 +483,10 @@ func process(r Reader) { ... }
 process(MyFile{})  // OK
 ```
 
-### What It Adds
-
 - Polymorphism through substitutability
 - Model "is-a" relationships
 - Accept broader types in function parameters
 - Return narrower types from functions
-
-### The Code
 
 ```typescript
 // TypeScript: Structural subtyping
@@ -561,8 +527,6 @@ The downside: subtyping complicates type inference and introduces variance quest
 
 ## Algebraic Data Types
 
-### The Problem
-
 You're modeling a user who can be either anonymous or logged in. In a typical OOP language, you might write:
 
 ```java
@@ -573,8 +537,6 @@ class User {
 ```
 
 Tony Hoare calls null references his "billion dollar mistake"—but the problem runs deeper than null. This type allows four states: anonymous with no name, anonymous with a name (!), logged in with a name, logged in without a name (!). Two of these are nonsense, but your type permits them. Every function must check for and handle impossible states.
-
-### The Insight
 
 Types should describe *exactly* the valid states. We need two tools:
 
@@ -590,14 +552,10 @@ Here's the algebra in action. Consider:
 
 The power comes from combining them. You model your domain with exactly the states that make sense. If a user is either anonymous (no data) or logged in (with name and email), you write that directly. The type system then enforces that you can't access a name for an anonymous user, because that field doesn't exist in that variant.
 
-### What It Adds
-
 - **Make illegal states unrepresentable**: if your type can't hold invalid data, you can't have bugs from invalid data
 - No null checks for "impossible" cases
 - Self-documenting domain models
 - Exhaustive [pattern matching](#pattern-matching) (covered next)
-
-### The Code
 
 ```rust
 // Rust: This type CANNOT represent an invalid state
@@ -652,11 +610,7 @@ If you come from OOP, ADTs require rethinking how you model data. Instead of cla
 
 ## Pattern Matching
 
-### The Problem
-
 Given an algebraic data type, you need to branch on its variants and extract data. With OOP, you'd use `instanceof` checks or the visitor pattern, both verbose and error-prone. Worse: when you add a new variant, the compiler doesn't tell you about all the places that need updating.
-
-### The Insight
 
 Pattern matching is the natural counterpart to [ADTs](#algebraic-data-types). If constructors *build* sum types, pattern matching *deconstructs* them. They're two sides of the same coin.
 
@@ -664,14 +618,10 @@ The compiler knows every possible variant of your sum type. When you write a `ma
 
 The comparison to `if-else` or `switch` is instructive. In most languages, `switch` doesn't warn you about missing cases. Pattern matching does. And unlike the visitor pattern (OOP's answer to this problem), pattern matching is concise and doesn't require boilerplate classes.
 
-### What It Adds
-
 - **Exhaustiveness checking**: forget a case, get a compile error
 - **Refactoring safety**: add a variant, compiler shows everywhere to update
 - **Destructuring built-in**: extract fields while matching
 - Cleaner than if-else chains or visitor patterns
-
-### The Code
 
 ```rust
 // Rust: Compiler ensures all cases handled
@@ -725,16 +675,12 @@ These features appear in modern production languages but require more sophistica
 
 ## Traits / Typeclasses
 
-### The Problem
-
 You want to sort a list. Sorting requires comparison. How does the generic sort function know how to compare your custom `User` type?
 
 Approaches without traits:
 - **Inheritance**: `User extends Comparable`, but what if User comes from a library you don't control?
 - **Pass a comparator every time**: verbose, easy to forget
 - **Duck typing**: no compile-time safety, crashes at runtime if method missing
-
-### The Insight
 
 Separate the *interface* from the *type*. Define `Ord` (ordering), `Eq` (equality), `Display` (printing) as standalone interfaces called traits (Rust) or typeclasses (Haskell). Then declare that `User` implements them, *even if you didn't write User*.
 
@@ -744,14 +690,10 @@ The implementation is resolved at compile time, with zero runtime cost. When you
 
 The "coherence" rule prevents chaos: there can be at most one implementation of a trait for a type. You can't have two different ways to compare Users. This means you can always predict which implementation will be used.
 
-### What It Adds
-
 - **Ad-hoc polymorphism**: different behavior for different types, resolved at compile time
 - **Retroactive implementation**: add interfaces to types you don't own
 - **Coherence**: at most one implementation per type (no ambiguity)
 - **Trait bounds**: require capabilities, not inheritance
-
-### The Code
 
 ```rust
 // Rust: Define a trait
@@ -819,13 +761,9 @@ Rust's orphan rules restrict where you can implement traits to prevent conflicti
 
 ## Associated Types
 
-### The Problem
-
 You're defining an `Iterator` trait. Each iterator produces items of some type. With regular generics, you'd write `Iterator<Item>`. But this makes `Iterator<i32>` and `Iterator<String>` *different traits*, and a type can only implement one of them.
 
 What you want: the item type should be *determined by* the implementing type, not chosen by the user.
-
-### The Insight
 
 Some type parameters are *outputs* (determined by the implementation), not *inputs* (chosen by the caller). Associated types express this: "when you implement this trait, you must specify what Item is."
 
@@ -833,13 +771,9 @@ The distinction matters. With a regular type parameter like `Iterator<T>`, you'r
 
 Think of it as a type-level function. Given a type that implements `Iterator`, you can ask "what does it produce?" and get back the associated `Item` type. `Vec<i32>` implements `Iterator` with `Item = i32`. `HashMap<K, V>` implements `Iterator` with `Item = (K, V)`. The implementing type determines the associated type.
 
-### What It Adds
-
 - **Cleaner APIs**: one trait, not a family of traits
 - **Type-level functions**: the implementing type determines the associated type
 - **Better error messages**: "Item not found" vs. "Iterator<??> not satisfied"
-
-### The Code
 
 ```rust
 // Rust: The standard Iterator trait
@@ -890,8 +824,6 @@ Associated types are less flexible than type parameters when you need the same t
 
 ## Flow-Sensitive Typing
 
-### The Problem
-
 You check if a value is null before using it. You know it's not null inside the `if` block. But does the type system know?
 
 ```java
@@ -904,15 +836,11 @@ if (x != null) {
 }
 ```
 
-### The Insight
-
 **Flow-sensitive typing** (also called **occurrence typing** or **type narrowing**) refines types based on control flow. After a type check, the type system narrows the variable's type in branches where the check succeeded.
 
 Type information *changes* as you move through code. The type of `x` isn't fixed at its declaration. It evolves based on what the program has learned. After `if (x !== null)`, the type of `x` in the `then` branch is narrower than at the start.
 
 This bridges static and dynamic typing philosophies. Dynamic languages always know the runtime type. Static languages traditionally fix types at declaration. Flow-sensitive typing lets static types benefit from runtime checks without losing static guarantees.
-
-### The Code
 
 ```typescript
 // TypeScript: flow-sensitive typing
@@ -967,26 +895,18 @@ fun process(x: Any) {
 }
 ```
 
-### What It Adds
-
 - **Eliminates redundant casts**: The compiler tracks what you've already checked
 - **Catches impossible branches**: If a branch can never execute, the compiler warns
 - **Natural null handling**: Null checks automatically narrow types
 - **Type guards**: User-defined functions can narrow types
 
-### The Trade-off
-
 Flow-sensitive typing complicates the type system. The type of a variable depends on *where* you are in the code, not just its declaration. This makes type checking more complex and can lead to surprising behavior when variables are reassigned or captured in closures.
-
-### Languages
 
 TypeScript, Kotlin, Ceylon, Flow (JavaScript), Rust (with pattern matching), Swift, and increasingly other modern languages.
 
 ---
 
 ## Intersection and Union Types
-
-### The Problem
 
 You have a value that could be one of several types. Or a value that must satisfy multiple interfaces simultaneously. Regular generics and subtyping don't express these relationships cleanly.
 
@@ -995,15 +915,11 @@ You have a value that could be one of several types. Or a value that must satisf
 // How do you require an object to be BOTH Serializable AND Comparable?
 ```
 
-### The Insight
-
 **Union types** (`A | B`) represent "this OR that." A value of type `A | B` is either an `A` or a `B`. You must handle both possibilities before using type-specific operations.
 
 **Intersection types** (`A & B`) represent "this AND that." A value of type `A & B` has all properties of both `A` and `B`. It satisfies both interfaces simultaneously.
 
 These correspond to logical OR (union) and AND (intersection).
-
-### The Code
 
 ```typescript
 // TypeScript: Union types
@@ -1070,8 +986,6 @@ def manage(service: Runnable & Stoppable): Unit =
   service.stop()
 ```
 
-### What It Adds
-
 - **Precise typing for heterogeneous data**: JSON, configs, APIs with variant responses
 - **Mixin composition**: Combine interfaces without inheritance hierarchies
 - **Discriminated unions**: Type-safe pattern matching on tagged variants
@@ -1090,23 +1004,17 @@ In formal type theory, intersection types have deeper significance. The **inters
 
 This enables **principal typings** for some systems and is used in program analysis and partial evaluation.
 
-### Languages
-
 TypeScript (extensive), Scala 3, Flow, Ceylon, Pike, CDuce, and research languages. Java has limited intersection types in generics (`<T extends A & B>`). Haskell achieves similar effects through typeclasses.
 
 ---
 
 ## Generalized Algebraic Data Types (GADTs)
 
-### The Problem
-
 You're building a type-safe expression language. You have `Add(expr, expr)` and `Equal(expr, expr)`. `Add` should return an integer; `Equal` should return a boolean. But with regular ADTs, the `Expr` type has no way to track what type of value each expression produces.
 
 Your `eval` function either:
 - Returns `Object` and requires downcasting (unsafe)
 - Returns a sum type like `Value::Int | Value::Bool` and requires checking (verbose)
-
-### The Insight
 
 Let each constructor specify its own, more precise return type. `Add` constructs an `Expr<Int>`; `Equal` constructs an `Expr<Bool>`. The type parameter tracks what the expression evaluates to.
 
@@ -1116,13 +1024,9 @@ Pattern matching reveals the payoff. If you match on an `Expr<Int>` and see a `L
 
 The cost: type inference breaks. The compiler can't always figure out what type an expression should have, because it depends on which constructor was used. You need explicit type annotations at GADT match sites.
 
-### What It Adds
-
 - **Type-safe interpreters and DSLs**: the type tracks the expression's result type
 - **Eliminates impossible patterns**: if you match on `Expr<Int>`, you know it's not `LitBool`
 - **More precise types**: information flows from patterns to the type checker
-
-### The Code
 
 Rust doesn't support GADTs directly. Scala 3 has clean syntax:
 
@@ -1158,11 +1062,7 @@ GADTs are available in Haskell, OCaml, and Scala 3. TypeScript has limited suppo
 
 ## Existential Types
 
-### The Problem
-
 You want a collection of things that share a trait, but they're different concrete types: `Vec<???>` containing integers, strings, and custom structs. But `Vec<T>` requires one specific `T`.
-
-### The Insight
 
 Hide the concrete type behind an interface. An existential type says: "there *exists* some type `T` implementing this trait, but I won't tell you which." You can only use operations from the trait, nothing type-specific.
 
@@ -1172,13 +1072,9 @@ The duality with generics:
 
 Why is this useful? Consider a plugin system. Each plugin is a different type, but they all implement `Plugin`. You want a `Vec<Plugin>` containing all your plugins. With generics alone, you'd need `Vec<SomeSpecificPlugin>`. With existentials, you get `Vec<Box<dyn Plugin>>`: a collection of "things that are some type implementing Plugin." The concrete types are hidden (existentially quantified), but you can still call Plugin methods on them.
 
-### What It Adds
-
 - **Heterogeneous collections**: mix different types with shared interfaces
 - **Information hiding**: callers can't depend on the concrete type
 - **Dynamic dispatch**: select implementation at runtime
-
-### The Code
 
 ```rust
 // Rust: dyn Trait is an existential type
@@ -1224,8 +1120,6 @@ The cost: `dyn Trait` has runtime overhead (vtable lookup) and you can't recover
 
 ## Rank-N Polymorphism
 
-### The Problem
-
 Normally, the *caller* of a generic function chooses the type parameter. But sometimes you want the *callee* to choose. Consider a function that applies a transformation to both elements of a pair, but the elements have different types.
 
 ```rust
@@ -1234,8 +1128,6 @@ fn apply_to_both<T>(f: impl Fn(T) -> T, pair: (i32, String)) -> (i32, String) {
     (f(pair.0), f(pair.1))  // Error! T can't be both i32 and String
 }
 ```
-
-### The Insight
 
 In Rank-1 polymorphism (normal generics), `forall` is at the outside: the caller picks one `T` for the whole function. In Rank-2+, `forall` appears inside argument types: "the argument must be a function that works for *any* type."
 
@@ -1249,13 +1141,9 @@ Why would you want this? Consider the ST monad trick in Haskell. `runST` has typ
 
 The cost is severe: type inference becomes undecidable for Rank-2 and above. You must annotate everything. Most languages avoid this complexity.
 
-### What It Adds
-
 - **More precise types**: "must work for all types" is a strong requirement
 - **Encapsulation**: ST monad uses Rank-2 types to ensure references can't escape
 - **Enable patterns impossible with Rank-1**
-
-### The Code
 
 Rust can't express Rank-N types directly. OCaml can:
 
@@ -1301,8 +1189,6 @@ These features require significant learning investment but let you write abstrac
 
 ## Higher-Kinded Types (HKT)
 
-### The Problem
-
 `Vec`, `Option`, `Result`: they're all "containers" you can map a function over. You write `map` for `Vec`. Then for `Option`. Then for `Result`. The implementations look structurally identical:
 
 ```rust
@@ -1312,8 +1198,6 @@ fn map_result<A, B, E>(item: Result<A, E>, f: impl Fn(A) -> B) -> Result<B, E>
 ```
 
 Can't we abstract over the *container itself*?
-
-### The Insight
 
 Types have **kinds**, just as values have types:
 
@@ -1329,17 +1213,11 @@ HKT lets you abstract over type constructors like `Vec` and `Option`, instead of
 
 The pattern `Functor`, `Applicative`, `Monad` from functional programming all require HKT. They describe properties of *containers*, not specific types. "Functor" means "you can map over this container." That applies to `Vec`, `Option`, `Result`, `Future`, `IO`, and infinitely many other type constructors. Without HKT, you'd write `map_vec`, `map_option`, `map_result` separately. With HKT, you write one `map` that works for any `Functor`.
 
-### What It Adds
-
 - **Functor, Monad, Applicative**: abstract patterns over any container
 - **Write code once**: works for `Option`, `Result`, `Vec`, `Future`, `IO`, ...
 - **Foundation of functional programming abstractions**
 
-### Why It's Complex
-
 Type inference becomes undecidable in general. Languages with HKT require explicit annotations. Rust deliberately avoids full HKT (using GATs as a workaround for some cases).
-
-### The Code
 
 Rust doesn't have HKT. Scala 3 does:
 
@@ -1380,13 +1258,9 @@ HKT is standard in Haskell, Scala, and PureScript. Rust avoids full HKT but adde
 
 ## Linear and Affine Types
 
-### The Problem
-
 Resources must be managed: files closed, memory freed, locks released. Forget to close a file? Leak. Close it twice? Crash. Use it after closing? Undefined behavior.
 
 Garbage collectors handle memory but not files, sockets, or locks. Manual management is error-prone—Microsoft reports that 70% of their security vulnerabilities are memory safety issues, and use-after-free remains a top exploit vector. Can the type system track resource usage?
-
-### The Insight
 
 Most type systems only track *what* a value is. Linear types also track *how many times* it's used. This is the **substructural** family, named because they restrict the structural rules of logic (weakening, contraction, exchange):
 
@@ -1406,14 +1280,10 @@ Rust uses **affine types**: values are used at most once (moved), but you can dr
 
 Borrowing (`&T` and `&mut T`) is how Rust escapes the "use once" restriction when you need it. A borrow doesn't consume the value; it temporarily lends access. The original owner keeps ownership and can use the value after the borrow ends. The borrow checker ensures borrows don't outlive the owner.
 
-### What It Adds
-
 - **Memory safety without GC**: no runtime overhead, no pauses
 - **Resource safety**: can't forget to close files
 - **Prevent use-after-free**: type system rejects it
 - **No data races**: ownership prevents shared mutable state
-
-### The Code
 
 ```rust
 // Rust: Affine types (values used at most once)
@@ -1503,8 +1373,6 @@ These ideas originated in research (region inference in MLKit, capability calcul
 
 ## Effect Systems
 
-### The Problem
-
 Does this function do I/O? Throw exceptions? Modify global state? In most languages, you can't tell from the signature. A function that *looks* pure might read from the network, crash your program, or modify a global variable.
 
 ```java
@@ -1512,22 +1380,16 @@ Does this function do I/O? Throw exceptions? Modify global state? In most langua
 String process(String input)
 ```
 
-### The Insight
-
 Track what **effects** a function can perform in its type. Pure functions have no effects. `readFile` has an `IO` effect. `throw` has an `Exception` effect. A function `String -> Int` with no effects can only compute on its input. A function `String -> IO Int` might read files, hit the network, or launch missiles.
 
 Effects propagate: call `readFile` inside your function, your function now has `IO` too. The compiler tracks this automatically.
 
 Some systems also provide **effect handlers**: intercept an effect and provide custom behavior. Instead of performing I/O, you could log what I/O *would* happen. Instead of throwing an exception, you could collect errors. This is like dependency injection, but for effects. You write code using abstract effects, then "handle" them differently in tests versus production.
 
-### What It Adds
-
 - **Effects visible in signatures**: see at a glance what a function can do
 - **Purity is provable**: no-effect functions are guaranteed pure
 - **Effect polymorphism**: generic over what effects are used
 - **Effect handlers**: programmable control flow, algebraic effects
-
-### The Code
 
 ```koka
 // Koka: Effects are part of the type
@@ -1579,8 +1441,6 @@ Effect systems are in Koka, Eff, Frank, and Unison. Haskell uses monads as a wor
 
 ## Refinement Types
 
-### The Problem
-
 Your function divides two numbers. The divisor can't be zero. You add a runtime check:
 
 ```rust
@@ -1592,8 +1452,6 @@ fn divide(x: i32, y: i32) -> i32 {
 
 But the caller might *know* y is non-zero because it's from a non-empty list length. You're checking unnecessarily. And what if you forget the check somewhere?
 
-### The Insight
-
 Attach logical predicates to types. Instead of `Int`, write `{x: Int | x > 0}`. A refinement type is a base type plus a predicate that values must satisfy.
 
 This is a sweet spot between regular types and full dependent types. Regular types distinguish "integer" from "string" but can't distinguish "positive integer" from "negative integer." Dependent types can express almost anything but require proofs. Refinement types let you express common properties (non-null, positive, in bounds) and use automated solvers to verify them.
@@ -1602,14 +1460,10 @@ The compiler uses an **SMT solver** (Satisfiability Modulo Theories) to verify p
 
 Division by zero becomes a *type error*, caught before running. Buffer overflows too. Array index out of bounds. Integer overflow. These become compile-time checks when you add the right refinements.
 
-### What It Adds
-
 - **Prove properties at compile time**: non-zero, positive, in bounds
 - **Eliminate runtime checks**: when the compiler can prove safety
 - **Catch errors earlier**: type checker finds the bug, not production
 - **Lightweight verification**: more than types, less than full proofs
-
-### The Code
 
 ```fstar
 // F*: Refinement types with dependent types
@@ -1676,8 +1530,6 @@ These concepts are primarily found in research languages and proof assistants. T
 
 ## Dependent Types
 
-### The Problem
-
 You want a function that appends two vectors. The result should have length `n + m`. With regular types, you can express "returns a vector" but not "returns a vector whose length is the sum of the inputs."
 
 ```rust
@@ -1686,8 +1538,6 @@ fn append<T>(a: Vec<T>, b: Vec<T>) -> Vec<T>
 ```
 
 Refinement types help with predicates, but what if types could *compute*?
-
-### The Insight
 
 Types can depend on values. `Vector<3, Int>` (a vector of 3 integers) is a different type than `Vector<5, Int>`. These aren't the same type with the same length checked at runtime. They're *different types*. A function expecting a 3-element vector won't accept a 5-element vector, just like a function expecting a String won't accept an Int.
 
@@ -1703,14 +1553,10 @@ This is the Curry-Howard correspondence in full force. Types are propositions. P
 
 The payoff: matrix multiplication that's dimensionally checked at compile time. `Matrix<n, m> × Matrix<m, p> → Matrix<n, p>`. If dimensions don't match, the code doesn't compile.
 
-### Why It's Hard
-
 - **Type checking requires evaluation**: undecidable in general
 - **Termination checking required**: non-terminating functions break type checking
 - **Proving is different from programming**: you need to think about why code is correct, not just that it works
 - **Verbose proofs**: sometimes more proof code than actual code
-
-### The Code
 
 ```idris
 -- Idris 2: Dependent types
@@ -1788,8 +1634,6 @@ Distributed systems communicate over channels. Client sends `Request`, server re
 Session types fix this by making channels typed state machines. Start with `!Request.?Response.End`. After sending a request, you have `?Response.End`. After receiving the response, you have `End`. Each operation transforms the type. Using the wrong operation is a type error.
 
 Key concept: **duality**. The client's view is the *dual* of the server's view: sends become receives and vice versa. If the client has `!Request.?Response.End`, the server has `?Request.!Response.End`. The types are symmetric. This ensures both sides agree on the protocol, verified at compile time. Well-typed programs can't deadlock.
-
-### The Code
 
 ```text
 // Session types: Types encode protocols
@@ -1916,8 +1760,6 @@ Full session types remain mostly academic, but the ideas are seeping into practi
 
 ## Quantitative Type Theory (QTT)
 
-### The Problem
-
 Linear types track usage (use exactly once). Dependent types need to inspect values at the type level. But inspecting a value for typing shouldn't count as "using" it at runtime!
 
 ```idris
@@ -1929,8 +1771,6 @@ data Vect : Nat -> Type -> Type
 
 How do you combine linear/affine types with dependent types cleanly?
 
-### The Insight
-
 Annotate each variable with a **quantity** from a semiring:
 - **0**: compile-time only (erased at runtime)
 - **1**: exactly once (linear)
@@ -1941,8 +1781,6 @@ The key problem this solves: in dependent types, type-checking might *use* a val
 With QTT, you write `(0 n : Nat)` to say "n exists for type-checking but has zero runtime representation." The `0` quantity means "used zero times at runtime." The type checker uses it. The compiled code doesn't include it.
 
 This also cleanly handles linear resources. A file handle has quantity 1: use it exactly once. A normal integer has quantity ω: use it as many times as you want. The quantities form a semiring, which makes them compose correctly when you combine functions.
-
-### The Code
 
 ```idris
 -- Idris 2 uses QTT natively
@@ -1977,19 +1815,13 @@ Idris 2 uses QTT. Granule is a research language exploring graded types more gen
 
 ## Cubical Type Theory
 
-### The Problem
-
 Homotopy Type Theory (HoTT) introduced revolutionary ideas: types as spaces, equality as paths. The **univalence axiom** says equivalent types are equal. But it was just an axiom that didn't compute. Asking "are these two proofs of equality the same?" got no answer.
-
-### The Insight
 
 Make equality *computational*. In standard type theory, you can prove two things are equal, but you can't always *compute* with that equality. Univalence (equivalent types are equal) was an axiom: you could assert it, but it didn't reduce to anything. Asking "is this proof of equality the same as that one?" might not give an answer.
 
 Cubical type theory fixes this by taking homotopy seriously. A proof of equality `a = b` is literally a path from `a` to `b`. Formally, it's a function from the interval type `I` (representing [0,1]) to the type, where the function maps 0 to `a` and 1 to `b`. You can walk along the path. You can reverse it (symmetry). You can concatenate paths (transitivity).
 
 This geometric intuition makes equality computational. Univalence becomes a theorem: given an equivalence between types, you can construct a path between them. And crucially, transporting values along this path actually *applies* the equivalence. Everything reduces. Everything computes. You also get functional extensionality (functions equal if they agree on all inputs) and higher inductive types (quotients, circles, spheres as types) for free.
-
-### The Code
 
 ```agda
 -- Cubical Agda
@@ -2030,8 +1862,6 @@ Cubical Agda, redtt, cooltt, and Arend implement cubical type theory. Unless you
 
 ## Separation Logic Types
 
-### The Problem
-
 You're writing code with pointers. How do you know two pointers don't alias? That modifying `*x` won't affect `*y`? In C, you don't. It's undefined behavior waiting to happen.
 
 ```c
@@ -2043,8 +1873,6 @@ void swap(int *x, int *y) {
 // What if x == y? This breaks!
 ```
 
-### The Insight
-
 Reason about **ownership of heap regions**. The key operator is **separating conjunction** (`*`): `P * Q` means "P holds for some heap region, Q holds for a *separate* region." If you prove you own separate regions, they can't alias.
 
 Classical logic has conjunction (∧): "P and Q are both true." Separation logic adds a new conjunction (*): "P holds for part of memory, Q holds for a *different* part of memory, and these parts don't overlap." This is the missing piece for reasoning about pointers.
@@ -2054,8 +1882,6 @@ When you write `{x ↦ 5 * y ↦ 10}`, you're asserting: x points to 5, y points
 The **frame rule** makes proofs modular. If you prove `{P} code {Q}` (running code in state P yields state Q), then `{P * R} code {Q * R}` for any R. Whatever R describes is *framed out*, untouched by code. You can reason about each piece of memory independently.
 
 Rust's borrow checker embodies these ideas. Mutable borrows are exclusive ownership of a memory region. The guarantee that you can't have two `&mut` to the same location is the separating conjunction at work. Concurrent separation logic extends this to reason about shared-memory concurrency.
-
-### The Code
 
 ```text
 // Separation logic specifications (pseudocode)
@@ -2104,8 +1930,6 @@ You get separation logic ideas implicitly through Rust's borrow checker. For exp
 
 ## Sized Types
 
-### The Problem
-
 Dependent type systems need to know all functions terminate. Otherwise type checking could loop forever. Typically they require **structural recursion**: arguments must get smaller in a syntactic sense.
 
 But this rejects valid programs:
@@ -2117,8 +1941,6 @@ merge (x:xs) (y:ys) = x : y : merge xs ys
 
 Neither `xs` nor `ys` is structurally smaller than both original arguments!
 
-### The Insight
-
 Track *sizes* abstractly in types. A `Stream<i>` has "size" `i`. Operations might not be syntactically smaller but are *semantically* smaller in size. The type checker tracks sizes symbolically.
 
 The problem is termination checking. Dependent type checkers must ensure all functions terminate, otherwise type-checking could loop forever. Simple structural recursion ("the argument gets smaller") works for many cases but rejects valid programs.
@@ -2126,8 +1948,6 @@ The problem is termination checking. Dependent type checkers must ensure all fun
 Consider merging two streams. At each step, you take one element from each stream. Neither stream is "structurally smaller" than both inputs. But semantically, you're making progress: you're consuming both streams. Sized types capture this. Each stream has an abstract size. After taking an element, the remaining stream has a smaller size. The type checker sees sizes decreasing and accepts the function.
 
 For coinductive data (infinite structures like streams), you need **productivity checking**: you must produce output in finite time. Sized types handle this too. The output stream's size depends on the input sizes in a way that guarantees you always make progress.
-
-### The Code
 
 ```agda
 {-# OPTIONS --sized-types #-}
@@ -2166,11 +1986,7 @@ Agda supports sized types. They're useful when the termination checker is too st
 
 ## Pure Type Systems
 
-### The Problem
-
 There are many typed lambda calculi: simply typed, System F, System Fω, the Calculus of Constructions, Martin-Löf type theory. Each has its own rules for what can depend on what. Is there a unified framework?
-
-### The Insight
 
 **Pure Type Systems** (PTS) provide a single parameterized framework that encompasses most typed lambda calculi. A PTS is defined by three sets:
 
