@@ -3,7 +3,7 @@ title = "Concrete"
 sort_by = "date"
 template = "series-overview.html"
 page_template = "series-episode.html"
-weight = 0
+weight = 1
 description = ""
 [extra]
 complete = false
