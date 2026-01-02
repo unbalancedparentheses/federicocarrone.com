@@ -223,15 +223,7 @@ The type error still happens. It just happens when you run the code, not when yo
 - **Highly dynamic domains**: Serialization, ORMs, and metaprogramming where static types fight the problem
 - **Duck typing**: If it quacks like a duck, use it as a duck. No need for explicit interface declarations
 
-Dynamic typing isn't "no types." It's "types checked later." The benefits are real:
-
-| Aspect | Dynamic | Static |
-|--------|---------|--------|
-| Error detection | Runtime | Compile time |
-| Development speed | Often faster initially | Faster refactoring |
-| Flexibility | High | Constrained by types |
-| Tooling | Limited inference | Rich IDE support |
-| Documentation | Implicit | Types as docs |
+Dynamic typing isn't "no types." It's "types checked later."
 
 The question isn't "static vs dynamic" but "how much static?" Python with type hints, TypeScript with strict mode, Rust with full ownership tracking: these represent different points on a spectrum. Pick the point that matches your problem.
 
