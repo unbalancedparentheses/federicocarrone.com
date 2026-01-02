@@ -21,121 +21,6 @@ If you learn nothing else: ADTs + pattern matching + generics. These three conce
 
 The concepts here roughly progress from generics (reusable code) through traits (shared behavior) to linear types (resource safety) to dependent types (proving correctness). Each step buys you more compile-time guarantees at the cost of more work satisfying the type checker. If you know Java or TypeScript and want to go deeper, Rust hits a good balance between expressiveness and practicality.
 
-## Dynamic Type Systems
-
-Dynamic typing is a valid type system category, not the absence of types. In dynamic languages, types exist and are checked, just at runtime rather than compile time.
-
-### How It Works
-
-Values carry type tags at runtime. Operations check these tags before executing:
-
-```python
-# Python: types checked at runtime
-def add(a, b):
-    return a + b
-
-add(1, 2)       # Works: both ints
-add("a", "b")   # Works: both strings
-add(1, "b")     # TypeError at runtime!
-```
-
-The type error still happens. It just happens when you run the code, not when you compile it. This trades earlier error detection for flexibility and development speed.
-
-### Why Choose Dynamic Typing
-
-- **Prototyping and exploration**: When you don't yet know what shape your data will take
-- **Scripts and glue code**: Short-lived code where development speed matters more than maintenance
-- **REPLs and interactive development**: Immediate feedback without compilation
-- **Highly dynamic domains**: Serialization, ORMs, and metaprogramming where static types fight the problem
-- **Duck typing**: If it quacks like a duck, use it as a duck. No need for explicit interface declarations
-
-### The Trade-off
-
-Dynamic typing isn't "no types." It's "types checked later." The benefits are real:
-
-| Aspect | Dynamic | Static |
-|--------|---------|--------|
-| Error detection | Runtime | Compile time |
-| Development speed | Often faster initially | Faster refactoring |
-| Flexibility | High | Constrained by types |
-| Tooling | Limited inference | Rich IDE support |
-| Documentation | Implicit | Types as docs |
-
-The question isn't "static vs dynamic" but "how much static?" Python with type hints, TypeScript with strict mode, Rust with full ownership tracking: these represent different points on a spectrum. Pick the point that matches your problem.
-
-### Languages
-
-Python, Ruby, JavaScript, Lisp, Clojure, Erlang, Elixir. Most have optional type systems now (Python's type hints, TypeScript for JavaScript).
-
-## Gradual Typing
-
-Gradual typing blends static and dynamic checking within the same language. You can add types incrementally, and the system inserts runtime checks at the boundaries between typed and untyped code.
-
-### How It Works
-
-In a gradually typed system, you can leave parts of your code untyped (using `any` or equivalent) while fully typing other parts. The type checker verifies the typed portions statically. At runtime, checks are inserted where typed code interacts with untyped code.
-
-```typescript
-// TypeScript: gradual typing in action
-function greet(name: string): string {
-    return `Hello, ${name}`;
-}
-
-// Fully typed: checked statically
-greet("Ada");  // OK at compile time
-
-// Escape hatch: 'any' bypasses static checking
-function processUnknown(data: any): void {
-    // No compile-time checking on 'data'
-    console.log(data.someProperty);  // Could fail at runtime
-}
-
-// The boundary: where typed meets untyped
-function fromExternal(json: any): User {
-    // Runtime validation needed here
-    return json as User;  // Risky! No guarantee json matches User
-}
-```
-
-### The Insight
-
-The **gradual guarantee** is the formal property that makes this work: adding type annotations should not change program behavior (unless there's a type error). You can migrate from untyped to typed code one function at a time without breaking anything.
-
-This enables incremental adoption:
-1. Start with a dynamically typed codebase
-2. Add types to critical paths first
-3. Gradually expand type coverage
-4. Runtime checks catch boundary violations
-
-### Blame Tracking
-
-When a type error occurs at a boundary, who's at fault? **Blame tracking** attributes errors to the untyped side of the boundary. If typed code calls untyped code and gets a wrong type back, blame falls on the untyped code.
-
-```python
-# Python with type hints
-def typed_function(x: int) -> int:
-    return x + 1
-
-def untyped_function(y):
-    return "not an int"  # Bug here
-
-# At runtime, the error is blamed on untyped_function
-result: int = untyped_function(5)  # Runtime TypeError
-```
-
-### The Trade-off
-
-| Aspect | Benefit | Cost |
-|--------|---------|------|
-| Migration | Incremental adoption | Partial guarantees |
-| Flexibility | Mix paradigms | Runtime check overhead |
-| Tooling | Some IDE support | Less precise than full static |
-| Guarantees | Better than nothing | Weaker than full static |
-
-### Languages
-
-TypeScript, Python (with mypy/pyright), PHP (with Hack), Racket (Typed Racket), Dart (before null safety), C# (with nullable reference types).
-
 ## How to Read This Guide
 
 The concepts are organized into tiers by complexity and practical relevance:
@@ -309,6 +194,121 @@ How type systems relate in terms of expressiveness versus annotation burden:
 The further right you go, the more you can express in types. The further down you go, the more work you must do to satisfy the type checker. The sweet spot depends on your domain.
 
 ---
+
+## Dynamic Type Systems
+
+Dynamic typing is a valid type system category, not the absence of types. In dynamic languages, types exist and are checked, just at runtime rather than compile time.
+
+### How It Works
+
+Values carry type tags at runtime. Operations check these tags before executing:
+
+```python
+# Python: types checked at runtime
+def add(a, b):
+    return a + b
+
+add(1, 2)       # Works: both ints
+add("a", "b")   # Works: both strings
+add(1, "b")     # TypeError at runtime!
+```
+
+The type error still happens. It just happens when you run the code, not when you compile it. This trades earlier error detection for flexibility and development speed.
+
+### Why Choose Dynamic Typing
+
+- **Prototyping and exploration**: When you don't yet know what shape your data will take
+- **Scripts and glue code**: Short-lived code where development speed matters more than maintenance
+- **REPLs and interactive development**: Immediate feedback without compilation
+- **Highly dynamic domains**: Serialization, ORMs, and metaprogramming where static types fight the problem
+- **Duck typing**: If it quacks like a duck, use it as a duck. No need for explicit interface declarations
+
+### The Trade-off
+
+Dynamic typing isn't "no types." It's "types checked later." The benefits are real:
+
+| Aspect | Dynamic | Static |
+|--------|---------|--------|
+| Error detection | Runtime | Compile time |
+| Development speed | Often faster initially | Faster refactoring |
+| Flexibility | High | Constrained by types |
+| Tooling | Limited inference | Rich IDE support |
+| Documentation | Implicit | Types as docs |
+
+The question isn't "static vs dynamic" but "how much static?" Python with type hints, TypeScript with strict mode, Rust with full ownership tracking: these represent different points on a spectrum. Pick the point that matches your problem.
+
+### Languages
+
+Python, Ruby, JavaScript, Lisp, Clojure, Erlang, Elixir. Most have optional type systems now (Python's type hints, TypeScript for JavaScript).
+
+## Gradual Typing
+
+Gradual typing blends static and dynamic checking within the same language. You can add types incrementally, and the system inserts runtime checks at the boundaries between typed and untyped code.
+
+### How It Works
+
+In a gradually typed system, you can leave parts of your code untyped (using `any` or equivalent) while fully typing other parts. The type checker verifies the typed portions statically. At runtime, checks are inserted where typed code interacts with untyped code.
+
+```typescript
+// TypeScript: gradual typing in action
+function greet(name: string): string {
+    return `Hello, ${name}`;
+}
+
+// Fully typed: checked statically
+greet("Ada");  // OK at compile time
+
+// Escape hatch: 'any' bypasses static checking
+function processUnknown(data: any): void {
+    // No compile-time checking on 'data'
+    console.log(data.someProperty);  // Could fail at runtime
+}
+
+// The boundary: where typed meets untyped
+function fromExternal(json: any): User {
+    // Runtime validation needed here
+    return json as User;  // Risky! No guarantee json matches User
+}
+```
+
+### The Insight
+
+The **gradual guarantee** is the formal property that makes this work: adding type annotations should not change program behavior (unless there's a type error). You can migrate from untyped to typed code one function at a time without breaking anything.
+
+This enables incremental adoption:
+1. Start with a dynamically typed codebase
+2. Add types to critical paths first
+3. Gradually expand type coverage
+4. Runtime checks catch boundary violations
+
+### Blame Tracking
+
+When a type error occurs at a boundary, who's at fault? **Blame tracking** attributes errors to the untyped side of the boundary. If typed code calls untyped code and gets a wrong type back, blame falls on the untyped code.
+
+```python
+# Python with type hints
+def typed_function(x: int) -> int:
+    return x + 1
+
+def untyped_function(y):
+    return "not an int"  # Bug here
+
+# At runtime, the error is blamed on untyped_function
+result: int = untyped_function(5)  # Runtime TypeError
+```
+
+### The Trade-off
+
+| Aspect | Benefit | Cost |
+|--------|---------|------|
+| Migration | Incremental adoption | Partial guarantees |
+| Flexibility | Mix paradigms | Runtime check overhead |
+| Tooling | Some IDE support | Less precise than full static |
+| Guarantees | Better than nothing | Weaker than full static |
+
+### Languages
+
+TypeScript, Python (with mypy/pyright), PHP (with Hack), Racket (Typed Racket), Dart (before null safety), C# (with nullable reference types).
 
 # Tier 1: Foundational
 
@@ -555,7 +555,7 @@ greet(dog);  // OK! Dog has everything Animal needs
 // Extra fields (breed, fetch) are fine
 ```
 
-The downside: subtyping complicates type inference and introduces variance questions (see [Variance](#variance)). Rust sidesteps this by using traits instead of subtyping for polymorphism.
+The downside: subtyping complicates type inference and introduces variance questions. When `Dog <: Animal`, is `List<Dog>` a subtype of `List<Animal>`? It depends on whether the list is read-only (covariant), write-only (contravariant), or mutable (invariant). See [Variance](#variance) for details. Rust sidesteps this by using traits instead of subtyping for polymorphism.
 
 ---
 
