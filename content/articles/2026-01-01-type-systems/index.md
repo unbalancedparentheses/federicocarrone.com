@@ -17,13 +17,9 @@ This guide covers type system concepts from the foundational ideas every program
 
 ## TL;DR
 
-**If you learn nothing else**: ADTs + pattern matching + generics. These three concepts will improve your code in any language and take days to learn, not months.
+If you learn nothing else: ADTs + pattern matching + generics. These three concepts will improve your code in any language and take days to learn, not months.
 
-**The progression**: Generics (write reusable code) → Traits (define shared behavior) → Linear types (manage resources safely) → Dependent types (prove correctness).
-
-**The trade-off**: More expressive types catch more bugs at compile time, but require more work from the programmer. Find your sweet spot based on what you're building.
-
-**Where to start**: If you know Java/TypeScript, learn Rust. It has the best type system that's still practical for everyday programming.
+The concepts here roughly progress from generics (reusable code) through traits (shared behavior) to linear types (resource safety) to dependent types (proving correctness). Each step buys you more compile-time guarantees at the cost of more work satisfying the type checker. If you know Java or TypeScript and want to go deeper, Rust hits a good balance between expressiveness and practicality.
 
 ## Dynamic Type Systems
 
@@ -576,9 +572,7 @@ class User {
 }
 ```
 
-Now you can represent four states: anonymous with no name, anonymous with a name (!), logged in with a name, logged in without a name (!). Two of these are nonsense, but your type allows them. Every function must check for and handle impossible states.
-
-**Real-world cost**: Tony Hoare, inventor of null references, calls them his "billion dollar mistake." The inability to distinguish "no value" from "value present" at the type level has caused countless NullPointerExceptions, segfaults, and security vulnerabilities. Languages with proper ADTs (Rust's `Option`, Haskell's `Maybe`) eliminate this entire class of bugs.
+Tony Hoare calls null references his "billion dollar mistake"—but the problem runs deeper than null. This type allows four states: anonymous with no name, anonymous with a name (!), logged in with a name, logged in without a name (!). Two of these are nonsense, but your type permits them. Every function must check for and handle impossible states.
 
 ### The Insight
 
@@ -1390,9 +1384,7 @@ HKT is standard in Haskell, Scala, and PureScript. Rust avoids full HKT but adde
 
 Resources must be managed: files closed, memory freed, locks released. Forget to close a file? Leak. Close it twice? Crash. Use it after closing? Undefined behavior.
 
-Garbage collectors handle memory but not files, sockets, or locks. Manual management is error-prone. Can the type system track resource usage?
-
-**Real-world cost**: The Heartbleed bug (2014) was a buffer over-read in OpenSSL that exposed passwords, private keys, and session tokens from millions of servers. Use-after-free vulnerabilities remain a top source of security exploits. Microsoft reported that 70% of their security vulnerabilities are memory safety issues. Languages with affine/linear types (Rust) eliminate these bugs by construction.
+Garbage collectors handle memory but not files, sockets, or locks. Manual management is error-prone—Microsoft reports that 70% of their security vulnerabilities are memory safety issues, and use-after-free remains a top exploit vector. Can the type system track resource usage?
 
 ### The Insight
 
@@ -2310,7 +2302,7 @@ At first, this sounds pointless. Why have a type parameter that doesn't affect t
 
 Consider a `UserId` and a `ProductId`. Both are just integers at runtime. But mixing them up is a bug. With phantom types, `Id<User>` and `Id<Product>` are different types, even though both hold a single integer. The phantom parameter (`User` or `Product`) exists only for the type checker. Zero runtime cost. Full compile-time safety.
 
-**Real-world cost**: The Mars Climate Orbiter (1999) was lost because one team used metric units while another used imperial. The $327 million spacecraft burned up in the Martian atmosphere. Phantom types can encode units in the type system, making such mismatches compile-time errors instead of mission-ending disasters. `Distance<Meters>` and `Distance<Feet>` can't be mixed.
+The Mars Climate Orbiter (1999) was lost because one team used metric units while another used imperial—$327 million burned up in the Martian atmosphere. Phantom types turn unit mismatches into compile errors: `Distance<Meters>` and `Distance<Feet>` can't be mixed.
 
 ```rust
 use std::marker::PhantomData;
@@ -2426,7 +2418,7 @@ Rather than ranking languages linearly, this section maps popular languages acro
 
 Rust's type system is built around *resource management*. Affine types (values used at most once) combine with the borrow checker to eliminate use-after-free, data races, and resource leaks at compile time. Lifetimes are region types that prove references don't outlive their referents.
 
-Trade-offs: No garbage collector means some patterns (cyclic structures) require workarounds. The learning curve is steep. But for systems code, the safety guarantees are unmatched outside research languages.
+Trade-offs: No garbage collector means some patterns (cyclic structures) require workarounds. Expect to fight the borrow checker for a few weeks before it clicks. But for systems code, the safety guarantees are unmatched outside research languages.
 
 **Best for**: Systems programming, performance-critical applications, anywhere memory safety matters.
 
@@ -2438,7 +2430,7 @@ Trade-offs: No garbage collector means some patterns (cyclic structures) require
 
 Haskell pioneered typeclasses (ad-hoc polymorphism without inheritance) and proved that effect tracking via monads works at scale. The type system supports higher-kinded types, GADTs, type families, and with extensions, approaches dependent types.
 
-Trade-offs: Complexity accumulates. Extensions interact in surprising ways. Lazy evaluation complicates reasoning about performance. The learning curve is legendary.
+Trade-offs: Complexity accumulates. Extensions interact in surprising ways. Lazy evaluation complicates reasoning about performance. Productive Haskell requires internalizing concepts that don't transfer from imperative languages.
 
 **Best for**: Compilers, financial systems, anywhere correctness matters more than onboarding speed.
 
