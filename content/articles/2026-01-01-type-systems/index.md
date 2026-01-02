@@ -1656,6 +1656,20 @@ val nth : #a:Type -> l:list a -> i:nat{i < length l} -> a
 
 The SMT solver can fail or timeout on complex predicates. When it works, it's like magic. When it doesn't, you're debugging why the solver can't prove something you know is true. F*, Dafny, Liquid Haskell, and Ada/SPARK all use this approach.
 
+### When Refinement Types Aren't Enough
+
+Refinement types work well for predicates on values: `{x: Int | x > 0}`, bounds checks, non-nullity, arithmetic constraints. SMT solvers handle these automatically. But they hit walls.
+
+The first wall is induction. SMT solvers are decision procedures for specific theories—linear arithmetic, bit vectors, arrays. They don't do induction. Refinement types can say "this list has length > 0" but struggle with "this vector has length n + m." You can write `{v: Vec | len(v) = len(a) + len(b)}`, and for simple cases SMT solvers can verify it. But proving it across recursive calls—showing each step preserves the invariant—requires induction the solver can't do. When the property involves recursion, you're beyond what automation handles.
+
+The second wall is type-level computation. You want `printf "%d + %d = %d"` to have type `Int -> Int -> Int -> String`. The format string determines the type. This isn't a predicate on a value—it's computing a type from a value. Refinement types can't express this.
+
+The third wall is state. Session types need types that change based on what operations you've performed. Refinement types constrain values but can't express "after calling `open()`, the handle is in state Open." For this you need dependent types or linear types.
+
+If an SMT solver can verify your property in a few seconds, refinement types work. If you need induction, type computation, or state tracking, you've crossed into dependent type territory.
+
+F* sits on the boundary—it has both refinement types (SMT-backed) and full dependent types (proof-backed). You start with refinements and escalate to manual proofs when the solver fails. This is a reasonable mental model: refinement types are dependent types where an automated prover handles the easy cases.
+
 ---
 
 # Tier 4: Research Level
