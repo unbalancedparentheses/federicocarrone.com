@@ -13,7 +13,7 @@ Every type error you've ever cursed at was a bug caught before production. Type 
 
 <!-- more -->
 
-If you learn nothing else: ADTs + pattern matching + generics. These three concepts will improve your code in any language and take days to learn, not months.
+If you learn nothing else: ADTs + pattern matching + generics. These three concepts will improve your code in any language and take days to learn.
 
 The concepts here progress from generics (reusable code) through traits (shared behavior) to linear types (resource safety) to dependent types (proving correctness). Each step buys you more compile-time guarantees at the cost of more work satisfying the type checker.
 
@@ -31,226 +31,9 @@ Concepts are organized into tiers:
 
 You don't need to read linearly. Jump to what interests you. But concepts build on each other: if GADTs confuse you, make sure you understand [ADTs](#algebraic-data-types) first.
 
-## Orthogonal Dimensions
-
-Type systems are not a linear progression. They combine orthogonal axes independently:
-
-```
-CHECKING:     Static ←──── Gradual ────→ Dynamic
-EQUALITY:     Nominal ←────────────────→ Structural
-POLYMORPHISM: None → Parametric → Bounded → Higher-Kinded
-INFERENCE:    Explicit → Local → Bidirectional → Full (HM)
-RESOURCES:    Unrestricted → Affine → Linear
-EFFECTS:      Implicit → Monadic → Algebraic
-```
-
-Real languages pick a point on each axis. Rust is static + nominal + affine. TypeScript is gradual + structural. Haskell is static + nominal + higher-kinded + monadic. The combinations create the design space.
-
-### 1. Time of Checking
-
-| Approach | When Types Checked | Examples |
-|----------|-------------------|----------|
-| **Static** | Compile time | Rust, Haskell, Java |
-| **Dynamic** | Runtime | Python, Ruby, JavaScript |
-| **Gradual** | Both, with boundaries | TypeScript, Python+mypy |
-
-### 2. Type Equality
-
-| Approach | Types Equal When... | Examples |
-|----------|---------------------|----------|
-| **Nominal** | Same declared name | Java, Rust, C# |
-| **Structural** | Same shape/fields | TypeScript, Go interfaces |
-
-### 3. Polymorphism
-
-| Kind | What It Abstracts | Examples |
-|------|-------------------|----------|
-| **Parametric** | Type variables (`T`) | Generics in all typed languages |
-| **Ad-hoc** | Different impls per type | Overloading, typeclasses, traits |
-| **Subtype** | Substitutability | OOP inheritance, structural subtyping |
-| **Bounded** | Constrained type variables | `T: Ord`, `T extends Comparable` |
-
-### 4. Type Inference
-
-| Strategy | How Types Inferred | Examples |
-|----------|-------------------|----------|
-| **Hindley-Milner** | Global, principal types | ML, Haskell, OCaml |
-| **Bidirectional** | Up and down the AST | Rust, Scala, Agda |
-| **Local** | Within expressions only | Java `var`, C++ `auto` |
-| **Constraint-based** | Solve constraint systems | TypeScript, gradual systems |
-
-### 5. Predicate Refinement
-
-| Level | What Types Express | Examples |
-|-------|-------------------|----------|
-| **Simple** | Base types only | Most languages |
-| **Refinement** | Types + predicates (`{x: Int \| x > 0}`) | Liquid Haskell, F* |
-| **Dependent** | Types compute from values | Idris, Agda, Lean |
-
-### 6. Substructural / Resource Tracking
-
-| Discipline | Usage Rule | Examples |
-|------------|-----------|----------|
-| **Unrestricted** | Any number of times | Most languages |
-| **Affine** | At most once | Rust ownership |
-| **Linear** | Exactly once | Linear Haskell, Rust borrows |
-| **Relevant** | At least once | Research systems |
-| **Ordered** | Once, in order | Stack disciplines |
-
-### 7. Effect Tracking
-
-| Approach | What's Tracked | Examples |
-|----------|---------------|----------|
-| **None** | Effects implicit | Java, Python, Go |
-| **Monadic** | Effects in type wrappers | Haskell IO |
-| **Algebraic** | First-class effect handlers | Koka, OCaml 5 |
-
-### 8. Flow Sensitivity
-
-| Approach | Type Changes With... | Examples |
-|----------|---------------------|----------|
-| **Insensitive** | Fixed at declaration | Java, C |
-| **Sensitive** | Control flow | TypeScript, Kotlin, Rust |
-
-### 9. Concurrency / Communication
-
-| Approach | What's Typed | Examples |
-|----------|-------------|----------|
-| **Untyped** | No protocol checking | Most languages |
-| **Marker traits** | Send/Sync capabilities | Rust |
-| **Session types** | Protocol state machines | Research, Links |
-
----
-
-**Real languages combine these axes.** Rust is static + nominal + parametric + bidirectional + affine + flow-sensitive + marker traits. TypeScript is gradual + structural + parametric + constraint-based + flow-sensitive. There's no single "best" combination; each serves different goals.
-
-## The Expressiveness Map
-
-How type systems relate in terms of expressiveness versus annotation burden:
-
-```text
-                    EXPRESSIVENESS
-                    Low ──────────────────► High
-                    │
-         Simple     │  ML            Haskell+Exts
-         Inference  │   │               │
-                    │   ▼               ▼
-                    │  Rust ────► Rust+GATs
-                    │   │               │
-                    │   │      Scala 3  │
-                    │   │         │     │
-                    │   ▼         ▼     ▼
-                    │         OCaml+Mods
-                    │              │
-                    │              ▼
-         Needs      │         F*/Lean ◄── Refinements
-         Annotations│              │
-                    │              ▼
-                    │         Idris/Agda ◄── Full Dependent
-                    │              │
-                    │              ▼
-         Proof      │         Coq/Lean4 ◄── Proof Assistant
-         Required   │              │
-                    │              ▼
-                    │         Cubical ◄── HoTT
-                    │
-                    ▼
-              ANNOTATION BURDEN
-```
-
-The further right you go, the more you can express in types. The further down you go, the more work you must do to satisfy the type checker. The sweet spot depends on your domain.
-
----
-
-## Dynamic Type Systems
-
-Dynamic typing is a valid type system category, not the absence of types. In dynamic languages, types exist and are checked, just at runtime rather than compile time.
-
-Values carry type tags at runtime. Operations check these tags before executing:
-
-```python
-# Python: types checked at runtime
-def add(a, b):
-    return a + b
-
-add(1, 2)       # Works: both ints
-add("a", "b")   # Works: both strings
-add(1, "b")     # TypeError at runtime!
-```
-
-The type error still happens. It just happens when you run the code, not when you compile it. This trades earlier error detection for flexibility and development speed.
-
-Dynamic typing works well for:
-
-- **Prototyping and exploration**: When you don't yet know what shape your data will take
-- **Scripts and glue code**: Short-lived code where development speed matters more than maintenance
-- **REPLs and interactive development**: Immediate feedback without compilation
-- **Highly dynamic domains**: Serialization, ORMs, and metaprogramming where static types fight the problem
-- **Duck typing**: If it quacks like a duck, use it as a duck. No need for explicit interface declarations
-
-Dynamic typing isn't "no types." It's "types checked later."
-
-The question isn't "static vs dynamic" but "how much static?" Python with type hints, TypeScript with strict mode, Rust with full ownership tracking: these represent different points on a spectrum. Pick the point that matches your problem.
-
-Python, Ruby, JavaScript, Lisp, Clojure, Erlang, Elixir. Most have optional type systems now (Python's type hints, TypeScript for JavaScript).
-
-## Gradual Typing
-
-Gradual typing blends static and dynamic checking within the same language. You can add types incrementally, and the system inserts runtime checks at the boundaries between typed and untyped code.
-
-In a gradually typed system, you can leave parts of your code untyped (using `any` or equivalent) while fully typing other parts. The type checker verifies the typed portions statically. At runtime, checks are inserted where typed code interacts with untyped code.
-
-```typescript
-// TypeScript: gradual typing in action
-function greet(name: string): string {
-    return `Hello, ${name}`;
-}
-
-// Fully typed: checked statically
-greet("Ada");  // OK at compile time
-
-// Escape hatch: 'any' bypasses static checking
-function processUnknown(data: any): void {
-    // No compile-time checking on 'data'
-    console.log(data.someProperty);  // Could fail at runtime
-}
-
-// The boundary: where typed meets untyped
-function fromExternal(json: any): User {
-    // Runtime validation needed here
-    return json as User;  // Risky! No guarantee json matches User
-}
-```
-
-The **gradual guarantee** is the formal property that makes this work: adding type annotations should not change program behavior (unless there's a type error). You can migrate from untyped to typed code one function at a time without breaking anything.
-
-This enables incremental adoption:
-1. Start with a dynamically typed codebase
-2. Add types to critical paths first
-3. Gradually expand type coverage
-4. Runtime checks catch boundary violations
-
-### Blame Tracking
-
-When a type error occurs at a boundary, who's at fault? **Blame tracking** attributes errors to the untyped side of the boundary. If typed code calls untyped code and gets a wrong type back, blame falls on the untyped code.
-
-```python
-# Python with type hints
-def typed_function(x: int) -> int:
-    return x + 1
-
-def untyped_function(y):
-    return "not an int"  # Bug here
-
-# At runtime, the error is blamed on untyped_function
-result: int = untyped_function(5)  # Runtime TypeError
-```
-
-TypeScript, Python (with mypy/pyright), PHP (with Hack), Racket (Typed Racket), Dart (before null safety), C# (with nullable reference types).
-
 # Tier 1: Foundational
 
-These concepts are solved problems with efficient algorithms. Every modern statically-typed language supports them. If you use a typed language, you're already using these. Understanding them deeply makes you more effective.
+Every modern statically-typed language supports them. If you use a typed language, you're already using these. 
 
 ## Hindley-Milner Type Inference
 
@@ -2560,6 +2343,229 @@ Tier 4+ concepts (dependent types, session types, HoTT) are mostly for researche
 The best investment is understanding the *ideas* over the syntax. Once you grok "make illegal states unrepresentable," you'll apply it in any language. Once you understand why linear types matter, you'll appreciate Rust's borrow checker instead of fighting it.
 
 ---
+
+---
+
+# Appendix: Type System Taxonomy
+
+This appendix provides a reference taxonomy of type system dimensions. These concepts are useful for understanding how languages differ, but aren't prerequisites for the main content.
+
+## Orthogonal Dimensions
+
+Type systems are not a linear progression. They combine orthogonal axes independently:
+
+```
+CHECKING:     Static ← Gradual → Dynamic
+EQUALITY:     Nominal ← → Structural
+POLYMORPHISM: None → Parametric → Bounded → Higher-Kinded
+INFERENCE:    Explicit → Local → Bidirectional → Full (HM)
+RESOURCES:    Unrestricted → Affine → Linear
+EFFECTS:      Implicit → Monadic → Algebraic
+```
+
+Real languages pick a point on each axis. Rust is static + nominal + affine. TypeScript is gradual + structural. Haskell is static + nominal + higher-kinded + monadic. The combinations create the design space.
+
+### 1. Time of Checking
+
+| Approach | When Types Checked | Examples |
+|----------|-------------------|----------|
+| **Static** | Compile time | Rust, Haskell, Java |
+| **Dynamic** | Runtime | Python, Ruby, JavaScript |
+| **Gradual** | Both, with boundaries | TypeScript, Python+mypy |
+
+### 2. Type Equality
+
+| Approach | Types Equal When... | Examples |
+|----------|---------------------|----------|
+| **Nominal** | Same declared name | Java, Rust, C# |
+| **Structural** | Same shape/fields | TypeScript, Go interfaces |
+
+### 3. Polymorphism
+
+| Kind | What It Abstracts | Examples |
+|------|-------------------|----------|
+| **Parametric** | Type variables (`T`) | Generics in all typed languages |
+| **Ad-hoc** | Different impls per type | Overloading, typeclasses, traits |
+| **Subtype** | Substitutability | OOP inheritance, structural subtyping |
+| **Bounded** | Constrained type variables | `T: Ord`, `T extends Comparable` |
+
+### 4. Type Inference
+
+| Strategy | How Types Inferred | Examples |
+|----------|-------------------|----------|
+| **Hindley-Milner** | Global, principal types | ML, Haskell, OCaml |
+| **Bidirectional** | Up and down the AST | Rust, Scala, Agda |
+| **Local** | Within expressions only | Java `var`, C++ `auto` |
+| **Constraint-based** | Solve constraint systems | TypeScript, gradual systems |
+
+### 5. Predicate Refinement
+
+| Level | What Types Express | Examples |
+|-------|-------------------|----------|
+| **Simple** | Base types only | Most languages |
+| **Refinement** | Types + predicates (`{x: Int \| x > 0}`) | Liquid Haskell, F* |
+| **Dependent** | Types compute from values | Idris, Agda, Lean |
+
+### 6. Substructural / Resource Tracking
+
+| Discipline | Usage Rule | Examples |
+|------------|-----------|----------|
+| **Unrestricted** | Any number of times | Most languages |
+| **Affine** | At most once | Rust ownership |
+| **Linear** | Exactly once | Linear Haskell, Rust borrows |
+| **Relevant** | At least once | Research systems |
+| **Ordered** | Once, in order | Stack disciplines |
+
+### 7. Effect Tracking
+
+| Approach | What's Tracked | Examples |
+|----------|---------------|----------|
+| **None** | Effects implicit | Java, Python, Go |
+| **Monadic** | Effects in type wrappers | Haskell IO |
+| **Algebraic** | First-class effect handlers | Koka, OCaml 5 |
+
+### 8. Flow Sensitivity
+
+| Approach | Type Changes With... | Examples |
+|----------|---------------------|----------|
+| **Insensitive** | Fixed at declaration | Java, C |
+| **Sensitive** | Control flow | TypeScript, Kotlin, Rust |
+
+### 9. Concurrency / Communication
+
+| Approach | What's Typed | Examples |
+|----------|-------------|----------|
+| **Untyped** | No protocol checking | Most languages |
+| **Marker traits** | Send/Sync capabilities | Rust |
+| **Session types** | Protocol state machines | Research, Links |
+
+---
+
+**Real languages combine these axes.** Rust is static + nominal + parametric + bidirectional + affine + flow-sensitive + marker traits. TypeScript is gradual + structural + parametric + constraint-based + flow-sensitive. There's no single "best" combination; each serves different goals.
+
+## The Expressiveness Map
+
+How type systems relate in terms of expressiveness versus annotation burden:
+
+```text
+                    EXPRESSIVENESS
+                    Low ──────────────────► High
+                    │
+         Simple     │  ML            Haskell+Exts
+         Inference  │   │               │
+                    │   ▼               ▼
+                    │  Rust ────► Rust+GATs
+                    │   │               │
+                    │   │      Scala 3  │
+                    │   │         │     │
+                    │   ▼         ▼     ▼
+                    │         OCaml+Mods
+                    │              │
+                    │              ▼
+         Needs      │         F*/Lean ◄── Refinements
+         Annotations│              │
+                    │              ▼
+                    │         Idris/Agda ◄── Full Dependent
+                    │              │
+                    │              ▼
+         Proof      │         Coq/Lean4 ◄── Proof Assistant
+         Required   │              │
+                    │              ▼
+                    │         Cubical ◄── HoTT
+                    │
+                    ▼
+              ANNOTATION BURDEN
+```
+
+The further right you go, the more you can express in types. The further down you go, the more work you must do to satisfy the type checker. The sweet spot depends on your domain.
+
+---
+
+## Dynamic Type Systems
+
+In dynamic languages, types exist and are checked, just at runtime rather than compile time.
+
+Values carry type tags at runtime. Operations check these tags before executing:
+
+```python
+# Python: types checked at runtime
+def add(a, b):
+    return a + b
+
+add(1, 2)       # Works: both ints
+add("a", "b")   # Works: both strings
+add(1, "b")     # TypeError at runtime!
+```
+
+The type error still happens. It just happens when you run the code, not when you compile it. This trades earlier error detection for flexibility and development speed.
+
+Dynamic typing works well for:
+
+- **Prototyping and exploration**: When you don't yet know what shape your data will take
+- **Scripts and glue code**: Short-lived code where development speed matters more than maintenance
+- **REPLs and interactive development**: Immediate feedback without compilation
+- **Highly dynamic domains**: Serialization, ORMs, and metaprogramming where static types fight the problem
+
+Dynamic typing is "types checked later."
+
+The question isn't "static vs dynamic" but "how much static?" Python with type hints, TypeScript with strict mode, Rust with full ownership tracking: these represent different points on a spectrum. Pick the point that matches your problem.
+
+Python, Ruby, JavaScript, Lisp, Clojure, Erlang, Elixir. Most have optional type systems now (Python's type hints, TypeScript for JavaScript).
+
+## Gradual Typing
+
+Gradual typing blends static and dynamic checking within the same language. You can add types incrementally, and the system inserts runtime checks at the boundaries between typed and untyped code.
+
+In a gradually typed system, you can leave parts of your code untyped (using `any` or equivalent) while fully typing other parts. The type checker verifies the typed portions statically. At runtime, checks are inserted where typed code interacts with untyped code.
+
+```typescript
+// TypeScript: gradual typing in action
+function greet(name: string): string {
+    return `Hello, ${name}`;
+}
+
+// Fully typed: checked statically
+greet("Ada");  // OK at compile time
+
+// Escape hatch: 'any' bypasses static checking
+function processUnknown(data: any): void {
+    // No compile-time checking on 'data'
+    console.log(data.someProperty);  // Could fail at runtime
+}
+
+// The boundary: where typed meets untyped
+function fromExternal(json: any): User {
+    // Runtime validation needed here
+    return json as User;  // Risky! No guarantee json matches User
+}
+```
+
+The **gradual guarantee** is the formal property that makes this work: adding type annotations should not change program behavior (unless there's a type error). You can migrate from untyped to typed code one function at a time without breaking anything.
+
+This enables incremental adoption:
+1. Start with a dynamically typed codebase
+2. Add types to critical paths first
+3. Gradually expand type coverage
+4. Runtime checks catch boundary violations
+
+### Blame Tracking
+
+When a type error occurs at a boundary, who's at fault? **Blame tracking** attributes errors to the untyped side of the boundary. If typed code calls untyped code and gets a wrong type back, blame falls on the untyped code.
+
+```python
+# Python with type hints
+def typed_function(x: int) -> int:
+    return x + 1
+
+def untyped_function(y):
+    return "not an int"  # Bug here
+
+# At runtime, the error is blamed on untyped_function
+result: int = untyped_function(5)  # Runtime TypeError
+```
+
+TypeScript, Python (with mypy/pyright), PHP (with Hack), Racket (Typed Racket), Dart (before null safety), C# (with nullable reference types).
+
 
 ## Further Reading
 
