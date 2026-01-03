@@ -1,7 +1,7 @@
 +++
 title = "Type Systems: From Generics to Dependent Types"
 date = 2026-01-01
-description = "Type system concepts from generics to dependent types, with code examples in Rust, Scala, and Idris"
+description = "A practical guide through the landscape of type systems, from everyday generics to dependent types that prove correctness, with examples in Rust, Scala, and Idris"
 [taxonomies]
 keywords=["programming languages", "type systems", "rust", "functional programming"]
 [extra]
