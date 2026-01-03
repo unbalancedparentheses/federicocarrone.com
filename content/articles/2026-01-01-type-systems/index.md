@@ -35,75 +35,6 @@ You don't need to read linearly. Jump to what interests you. But concepts build 
 
 Every modern statically-typed language supports them. If you use a typed language, you're already using these. 
 
-## Hindley-Milner Type Inference
-
-Static typing traditionally meant annotating everything. Java's infamous:
-
-```java
-Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
-```
-
-This verbosity is why many developers fled to dynamic languages. But dynamic typing means discovering type mismatches at runtime, often in production.
-
-What if the compiler could *figure out* the types? In 1969, Roger Hindley discovered (and Robin Milner independently rediscovered in 1978) an algorithm that can infer the most general type for any expression in a certain class of type systems, without any annotations.
-
-The key observation: even without annotations, code contains type information. If you write `x + 1`, the compiler knows `x` must be a number because `+` requires numbers. If you write `x.len()`, `x` must be something with a `len` method. These constraints propagate through your program.
-
-The algorithm works by:
-1. Assigning fresh type variables to unknown types (like algebra: let `x` be unknown)
-2. Collecting constraints from how values are used (`x + 1` means `x` must be numeric)
-3. Unifying constraints to find the most general solution (solving the equations)
-
-The "most general" part matters. If you write a function that works on any list, the algorithm infers "list of anything," not "list of integers." You get maximum reusability automatically.
-
-- The brevity of Python with the safety of static typing
-- Write code without type annotations; the compiler figures them out
-- Catch type errors at compile time, not runtime
-- The inferred type is always the *most general*, so your function works for all types that fit
-
-```rust
-// Rust: The compiler infers all types here
-fn compose<A, B, C>(f: impl Fn(B) -> C, g: impl Fn(A) -> B) -> impl Fn(A) -> C {
-    move |x| f(g(x))
-}
-
-let add_one = |x| x + 1;        // inferred: i32 -> i32
-let double = |x| x * 2;         // inferred: i32 -> i32
-let add_one_then_double = compose(double, add_one);
-
-// No type annotations needed, compiler infers everything
-let result = add_one_then_double(5);  // 12
-```
-
-```rust
-// Even complex generic code needs minimal annotations
-fn map<T, U>(items: Vec<T>, f: impl Fn(T) -> U) -> Vec<U> {
-    items.into_iter().map(f).collect()
-}
-
-let numbers = vec![1, 2, 3];
-let strings = map(numbers, |n| n.to_string());
-// Compiler infers: T = i32, U = String
-```
-
-The trade-off: some advanced features ([GADTs](#generalized-algebraic-data-types-gadts), [higher-rank types](#rank-n-polymorphism)) break inference and require annotations. But for everyday code, you get static typing's safety without its traditional verbosity. Available in ML, OCaml, Haskell, Rust, F#, Elm, and Scala.
-
-### Beyond HM: Other Inference Strategies
-
-Hindley-Milner is the gold standard for inference in purely functional languages, but other strategies exist:
-
-| Strategy | How It Works | Used In |
-|----------|--------------|---------|
-| **Bidirectional** | Types flow both up (inference) and down (checking) | Rust, Scala, Agda |
-| **Constraint-based** | Collect constraints, solve with SMT/unification | Gradual typing, refinement types |
-| **Local** | Infer within expressions, require declarations at boundaries | Java (var), C++ (auto) |
-
-**Bidirectional typing** is particularly important for modern languages. Instead of pure inference (bottom-up) or pure checking (top-down), types flow both ways. When you write `let x: Vec<i32> = vec![1, 2, 3]`, the expected type `Vec<i32>` flows *down* to help infer the element type. When you write `let x = vec![1, 2, 3]`, the literal types flow *up* to infer `Vec<i32>`.
-
-This scales better than pure HM to richer type systems. GADTs, higher-rank types, and dependent types all work well with bidirectional typing because explicit annotations guide inference where needed.
-
----
-
 ## Parametric Polymorphism (Generics)
 
 You write a function to get the first element of a list of integers. Then you need it for strings. Then for custom types. You end up with `first_int`, `first_string`, `first_user`, duplicated code that differs only in types.
@@ -149,103 +80,6 @@ fn mystery<T>(x: T) -> T {
     x
 }
 ```
-
----
-
-## Subtyping
-
-You have a function that logs any HTTP response. You've also defined `JsonResponse` and `XmlResponse` types with extra fields. Without some way to express "a JsonResponse *is* an HttpResponse," you'd need separate logging functions for each, or abandon type safety.
-
-If type `B` has everything type `A` has (and possibly more), you can use a `B` anywhere an `A` is expected. This is subtyping: `JsonResponse <: HttpResponse` means JsonResponse is a subtype of HttpResponse.
-
-Think of it as a contract. An `HttpResponse` promises certain capabilities: it has a status code and body. A `JsonResponse` fulfills that contract and adds more: it also has a parsed object and content type. Anywhere the code expects "something with status and body," a JsonResponse works fine. The extra fields are ignored but don't cause problems.
-
-This is the Liskov Substitution Principle encoded in the type system: if `JsonResponse <: HttpResponse`, then any property that holds for HttpResponse should hold for JsonResponse.
-
-### Nominal vs Structural: Two Philosophies
-
-This is a fundamental classification of type systems, not just a detail of subtyping:
-
-| Aspect | Nominal | Structural |
-|--------|---------|------------|
-| Type equality | Based on declared name | Based on shape/structure |
-| Subtyping | Explicit declaration required | Implicit if structure matches |
-| Philosophy | "What it's called" | "What it can do" |
-| Abstraction | Strong boundaries | Flexible composition |
-| Refactoring | Rename breaks compatibility | Structure changes break compatibility |
-
-**Nominal typing** requires explicit declarations. Even if two types have identical fields, they're different types unless related by declaration:
-
-```java
-// Java: nominal typing
-class Meters { double value; }
-class Feet { double value; }
-
-// These are DIFFERENT types despite identical structure
-Meters m = new Meters();
-Feet f = m;  // ERROR: incompatible types
-```
-
-**Structural typing** cares only about shape. If it has the right fields and methods, it fits:
-
-```typescript
-// TypeScript: structural typing
-interface Point { x: number; y: number; }
-
-// Any object with x and y is a Point
-const p: Point = { x: 1, y: 2 };           // OK
-const q: Point = { x: 1, y: 2, z: 3 };     // OK (extra field allowed)
-
-class Coordinate { x: number; y: number; }
-const r: Point = new Coordinate();          // OK (same structure)
-```
-
-**Go's approach** is interesting: nominal for defined types, but interfaces are structural. A type implements an interface if it has the right methods, no declaration needed.
-
-```go
-// Go: structural interfaces
-type Reader interface {
-    Read(p []byte) (n int, err error)
-}
-
-// MyFile implements Reader without declaring it
-type MyFile struct { ... }
-func (f MyFile) Read(p []byte) (int, error) { ... }
-
-// Works: MyFile has the right method
-func process(r Reader) { ... }
-process(MyFile{})  // OK
-```
-
-```typescript
-// TypeScript: Structural subtyping
-interface HttpResponse {
-    status: number;
-    body: string;
-}
-
-interface JsonResponse {
-    status: number;
-    body: string;
-    contentType: "application/json";
-    parsed: object;
-}
-
-function logResponse(res: HttpResponse): void {
-    console.log(`${res.status}: ${res.body}`);
-}
-
-const jsonRes: JsonResponse = {
-    status: 200,
-    body: '{"ok": true}',
-    contentType: "application/json",
-    parsed: { ok: true }
-};
-
-logResponse(jsonRes);  // OK! JsonResponse has everything HttpResponse needs
-```
-
-The downside: subtyping complicates type inference and introduces variance questions. When `JsonResponse <: HttpResponse`, is `List<JsonResponse>` a subtype of `List<HttpResponse>`? It depends on whether the list is read-only (covariant), write-only (contravariant), or mutable (invariant). See [Variance](#variance) for details. Rust sidesteps this by using traits instead of subtyping for polymorphism.
 
 ---
 
@@ -390,6 +224,103 @@ fn first_two<T: Clone>(items: &[T]) -> Option<(T, T)> {
 ```
 
 Pattern matching is now in C# 8+, Python 3.10+, and most functional languages. Once you use it, you won't go back.
+
+---
+
+## Subtyping
+
+You have a function that logs any HTTP response. You've also defined `JsonResponse` and `XmlResponse` types with extra fields. Without some way to express "a JsonResponse *is* an HttpResponse," you'd need separate logging functions for each, or abandon type safety.
+
+If type `B` has everything type `A` has (and possibly more), you can use a `B` anywhere an `A` is expected. This is subtyping: `JsonResponse <: HttpResponse` means JsonResponse is a subtype of HttpResponse.
+
+Think of it as a contract. An `HttpResponse` promises certain capabilities: it has a status code and body. A `JsonResponse` fulfills that contract and adds more: it also has a parsed object and content type. Anywhere the code expects "something with status and body," a JsonResponse works fine. The extra fields are ignored but don't cause problems.
+
+This is the Liskov Substitution Principle encoded in the type system: if `JsonResponse <: HttpResponse`, then any property that holds for HttpResponse should hold for JsonResponse.
+
+### Nominal vs Structural: Two Philosophies
+
+This is a fundamental classification of type systems, not just a detail of subtyping:
+
+| Aspect | Nominal | Structural |
+|--------|---------|------------|
+| Type equality | Based on declared name | Based on shape/structure |
+| Subtyping | Explicit declaration required | Implicit if structure matches |
+| Philosophy | "What it's called" | "What it can do" |
+| Abstraction | Strong boundaries | Flexible composition |
+| Refactoring | Rename breaks compatibility | Structure changes break compatibility |
+
+**Nominal typing** requires explicit declarations. Even if two types have identical fields, they're different types unless related by declaration:
+
+```java
+// Java: nominal typing
+class Meters { double value; }
+class Feet { double value; }
+
+// These are DIFFERENT types despite identical structure
+Meters m = new Meters();
+Feet f = m;  // ERROR: incompatible types
+```
+
+**Structural typing** cares only about shape. If it has the right fields and methods, it fits:
+
+```typescript
+// TypeScript: structural typing
+interface Point { x: number; y: number; }
+
+// Any object with x and y is a Point
+const p: Point = { x: 1, y: 2 };           // OK
+const q: Point = { x: 1, y: 2, z: 3 };     // OK (extra field allowed)
+
+class Coordinate { x: number; y: number; }
+const r: Point = new Coordinate();          // OK (same structure)
+```
+
+**Go's approach** is interesting: nominal for defined types, but interfaces are structural. A type implements an interface if it has the right methods, no declaration needed.
+
+```go
+// Go: structural interfaces
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+
+// MyFile implements Reader without declaring it
+type MyFile struct { ... }
+func (f MyFile) Read(p []byte) (int, error) { ... }
+
+// Works: MyFile has the right method
+func process(r Reader) { ... }
+process(MyFile{})  // OK
+```
+
+```typescript
+// TypeScript: Structural subtyping
+interface HttpResponse {
+    status: number;
+    body: string;
+}
+
+interface JsonResponse {
+    status: number;
+    body: string;
+    contentType: "application/json";
+    parsed: object;
+}
+
+function logResponse(res: HttpResponse): void {
+    console.log(`${res.status}: ${res.body}`);
+}
+
+const jsonRes: JsonResponse = {
+    status: 200,
+    body: '{"ok": true}',
+    contentType: "application/json",
+    parsed: { ok: true }
+};
+
+logResponse(jsonRes);  // OK! JsonResponse has everything HttpResponse needs
+```
+
+The downside: subtyping complicates type inference and introduces variance questions. When `JsonResponse <: HttpResponse`, is `List<JsonResponse>` a subtype of `List<HttpResponse>`? It depends on whether the list is read-only (covariant), write-only (contravariant), or mutable (invariant). See [Variance](#variance) for details. Rust sidesteps this by using traits instead of subtyping for polymorphism.
 
 ---
 
@@ -2349,6 +2280,78 @@ The best investment is understanding the *ideas* over the syntax. Once you grok 
 # Appendix: Type System Taxonomy
 
 This appendix provides a reference taxonomy of type system dimensions. These concepts are useful for understanding how languages differ, but aren't prerequisites for the main content.
+
+
+## Hindley-Milner Type Inference
+
+This section covers how type inference works under the hood - useful for understanding compiler behavior but not required for using type systems effectively.
+
+Static typing traditionally meant annotating everything. Java's infamous:
+
+```java
+Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
+```
+
+This verbosity is why many developers fled to dynamic languages. But dynamic typing means discovering type mismatches at runtime, often in production.
+
+What if the compiler could *figure out* the types? In 1969, Roger Hindley discovered (and Robin Milner independently rediscovered in 1978) an algorithm that can infer the most general type for any expression in a certain class of type systems, without any annotations.
+
+The key observation: even without annotations, code contains type information. If you write `x + 1`, the compiler knows `x` must be a number because `+` requires numbers. If you write `x.len()`, `x` must be something with a `len` method. These constraints propagate through your program.
+
+The algorithm works by:
+1. Assigning fresh type variables to unknown types (like algebra: let `x` be unknown)
+2. Collecting constraints from how values are used (`x + 1` means `x` must be numeric)
+3. Unifying constraints to find the most general solution (solving the equations)
+
+The "most general" part matters. If you write a function that works on any list, the algorithm infers "list of anything," not "list of integers." You get maximum reusability automatically.
+
+- The brevity of Python with the safety of static typing
+- Write code without type annotations; the compiler figures them out
+- Catch type errors at compile time, not runtime
+- The inferred type is always the *most general*, so your function works for all types that fit
+
+```rust
+// Rust: The compiler infers all types here
+fn compose<A, B, C>(f: impl Fn(B) -> C, g: impl Fn(A) -> B) -> impl Fn(A) -> C {
+    move |x| f(g(x))
+}
+
+let add_one = |x| x + 1;        // inferred: i32 -> i32
+let double = |x| x * 2;         // inferred: i32 -> i32
+let add_one_then_double = compose(double, add_one);
+
+// No type annotations needed, compiler infers everything
+let result = add_one_then_double(5);  // 12
+```
+
+```rust
+// Even complex generic code needs minimal annotations
+fn map<T, U>(items: Vec<T>, f: impl Fn(T) -> U) -> Vec<U> {
+    items.into_iter().map(f).collect()
+}
+
+let numbers = vec![1, 2, 3];
+let strings = map(numbers, |n| n.to_string());
+// Compiler infers: T = i32, U = String
+```
+
+The trade-off: some advanced features ([GADTs](#generalized-algebraic-data-types-gadts), [higher-rank types](#rank-n-polymorphism)) break inference and require annotations. But for everyday code, you get static typing's safety without its traditional verbosity. Available in ML, OCaml, Haskell, Rust, F#, Elm, and Scala.
+
+### Beyond HM: Other Inference Strategies
+
+Hindley-Milner is the gold standard for inference in purely functional languages, but other strategies exist:
+
+| Strategy | How It Works | Used In |
+|----------|--------------|---------|
+| **Bidirectional** | Types flow both up (inference) and down (checking) | Rust, Scala, Agda |
+| **Constraint-based** | Collect constraints, solve with SMT/unification | Gradual typing, refinement types |
+| **Local** | Infer within expressions, require declarations at boundaries | Java (var), C++ (auto) |
+
+**Bidirectional typing** is particularly important for modern languages. Instead of pure inference (bottom-up) or pure checking (top-down), types flow both ways. When you write `let x: Vec<i32> = vec![1, 2, 3]`, the expected type `Vec<i32>` flows *down* to help infer the element type. When you write `let x = vec![1, 2, 3]`, the literal types flow *up* to infer `Vec<i32>`.
+
+This scales better than pure HM to richer type systems. GADTs, higher-rank types, and dependent types all work well with bidirectional typing because explicit annotations guide inference where needed.
+
+---
 
 ## Orthogonal Dimensions
 
