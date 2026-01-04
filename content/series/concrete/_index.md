@@ -4,6 +4,7 @@ sort_by = "date"
 template = "series-overview.html"
 page_template = "series-episode.html"
 weight = 1
+insert_anchor_links = "left"
 description = ""
 [extra]
 complete = false
