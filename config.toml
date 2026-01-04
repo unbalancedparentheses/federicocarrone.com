@@ -15,5 +15,17 @@ feed_filenames = ["atom.xml", "rss.xml"]
 [markdown]
 highlight_code = true
 highlight_theme = "css"
+smart_punctuation = true
+bottom_footnotes = true
+render_emoji = false
+external_links_target_blank = true
+external_links_no_follow = false
+external_links_no_referrer = false
+lazy_async_image = true
+
+[slugify]
+paths = "on"
+taxonomies = "on"
+anchors = "on"
 
 [extra]
