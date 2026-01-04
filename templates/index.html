@@ -12,10 +12,12 @@
 {%- endblock long_title %}
 
 {% block body %}
+<h1 class="visually-hidden">Federico Carrone's Blog</h1>
+
 <p>I am Federico Carrone, an entrepreneur working at the intersection of technology, finance, and culture. I created <a href="https://ergodicgroup.com">Ergodic Group</a>, a privately held holding company through which I build and hold companies in distributed systems, cryptography, AI, gaming, and real assets. I operate with the conviction that digital infrastructure, capital markets, and cultural production are converging into a single strategic domain, and I focus on long horizon structures where time acts as a filter for quality, judgment, and durability rather than a constraint.</p>
 
   <section typeof="ItemList">
-    <h1 property="name">Latest series</h1>
+    <h2 property="name">Latest series</h2>
 
     <div role="list">
     {% set section = get_section(path = "series/_index.md") -%}
@@ -28,7 +30,7 @@
   </section>
 
   <section vocab="https://schema.org" typeof="ItemList">
-    <h1 property="name">Pinned articles</h1>
+    <h2 property="name">Pinned articles</h2>
 
     <div role="list">
     {% set section = get_section(path = "articles/_index.md") -%}

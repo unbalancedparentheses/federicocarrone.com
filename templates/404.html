@@ -4,20 +4,24 @@
 {% block long_title %}Page Not Found{% endblock long_title %}
 
 {% block body %}
-<article>
+<article class="error-page">
   <header>
-    <h1>Page Not Found</h1>
+    <h1>404</h1>
+    <p class="error-subtitle">Page Not Found</p>
   </header>
 
-  <p>The page you're looking for doesn't exist or has been moved.</p>
+  <p>The page you're looking for doesn't exist, has been moved, or the URL might be incorrect.</p>
 
-  <p>Here are some places you might want to go:</p>
+  <p>Try one of these instead:</p>
 
   <ul>
-    <li><a href="/">Home</a></li>
-    <li><a href="/articles">Articles</a></li>
-    <li><a href="/series">Series</a></li>
-    <li><a href="/about">About</a></li>
+    <li><a href="/">Home</a> — Start fresh</li>
+    <li><a href="/articles">Articles</a> — Browse all articles</li>
+    <li><a href="/series">Series</a> — Multi-part deep dives</li>
+    <li><a href="/reading">Reading</a> — Book recommendations</li>
+    <li><a href="/about">About</a> — Learn more about me</li>
   </ul>
+
+  <p>If you followed a link here, please <a href="mailto:mail@fcarrone.com">let me know</a> so I can fix it.</p>
 </article>
 {% endblock body %}
