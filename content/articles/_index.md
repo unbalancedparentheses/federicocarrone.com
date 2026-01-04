@@ -4,5 +4,5 @@ sort_by = "date"
 template = "articles.html"
 page_template = "article.html"
 description = "All articles from federicocarrone.com where we explore various topics"
-insert_anchor_links = "heading"
+insert_anchor_links = "left"
 +++
