@@ -163,6 +163,31 @@ h1 {
   font-size: 1.8em;
 }
 
+/* Heading anchor links */
+:is(h2, h3, h4, h5, h6) {
+  position: relative;
+
+  > a.zola-anchor {
+    position: absolute;
+    left: -1.5ch;
+    opacity: 0;
+    font-weight: normal;
+    text-decoration: none;
+    color: var(--color-light-darker);
+    transition: opacity 0.15s;
+
+    &:hover {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+  }
+
+  &:hover > a.zola-anchor,
+  > a.zola-anchor:focus {
+    opacity: 1;
+  }
+}
+
 h2, .h2 {
   font-size: 1.4em;
 }
@@ -290,6 +315,25 @@ pre {
   &.language-coq { --text: "Coq" }
   &.language-granule { --text: "Granule" }
   &.language-text { --text: "" }
+  &.language-c { --text: "C" }
+  &.language-cpp { --text: "C++" }
+  &.language-elixir { --text: "Elixir" }
+  &.language-markdown, &.language-md { --text: "Markdown" }
+  &.language-yaml, &.language-yml { --text: "YAML" }
+  &.language-css { --text: "CSS" }
+  &.language-javascript, &.language-js { --text: "JavaScript" }
+  &.language-lua { --text: "Lua" }
+  &.language-ruby, &.language-rb { --text: "Ruby" }
+  &.language-zig { --text: "Zig" }
+  &.language-nim { --text: "Nim" }
+  &.language-lisp { --text: "Lisp" }
+  &.language-scheme { --text: "Scheme" }
+  &.language-clojure { --text: "Clojure" }
+  &.language-bash { --text: "Bash" }
+  &.language-dockerfile { --text: "Dockerfile" }
+  &.language-nix { --text: "Nix" }
+  &.language-solidity { --text: "Solidity" }
+  &.language-cairo { --text: "Cairo" }
 }
 
 .copy-button {
@@ -373,7 +417,21 @@ figure {
   }
 
   &:has(> table) {
-    overflow: scroll hidden;
+    --_scroll-shadow-size: 20px;
+    position: relative;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    /* Scroll shadow indicators */
+    background:
+      linear-gradient(to right, var(--color-lighter), var(--color-lighter)),
+      linear-gradient(to right, var(--color-lighter), var(--color-lighter)),
+      linear-gradient(to right, rgba(0, 0, 0, 0.15), transparent),
+      linear-gradient(to left, rgba(0, 0, 0, 0.15), transparent);
+    background-position: left center, right center, left center, right center;
+    background-repeat: no-repeat;
+    background-size: var(--_scroll-shadow-size) 100%, var(--_scroll-shadow-size) 100%, var(--_scroll-shadow-size) 100%, var(--_scroll-shadow-size) 100%;
+    background-attachment: local, local, scroll, scroll;
   }
 }
 
@@ -622,6 +680,10 @@ footer {
       outline: none;
       border-color: var(--color-accent);
     }
+
+    &:invalid:not(:placeholder-shown) {
+      border-color: var(--color-accent);
+    }
   }
 
   button {
@@ -630,12 +692,42 @@ footer {
     background: var(--color-dark);
     color: var(--color-light);
     cursor: pointer;
-    transition: background-color 0.15s, border-color 0.15s;
+    transition: background-color 0.15s, border-color 0.15s, opacity 0.15s;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: var(--color-accent);
       border-color: var(--color-accent);
     }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* 404 Error page */
+.error-page {
+  text-align: center;
+  padding-block: var(--space-very-large);
+
+  header h1 {
+    font-size: 4em;
+    color: var(--color-light-darker);
+    margin-block-end: 0;
+  }
+
+  .error-subtitle {
+    font-size: 1.4em;
+    color: var(--color-light-darker);
+    margin-block: 0 var(--space-very-large);
+  }
+
+  ul {
+    text-align: left;
+    max-width: 300px;
+    margin-inline: auto;
+    margin-block: var(--space-large);
   }
 }
 
@@ -812,6 +904,19 @@ article {
 .text-align-start { text-align: start }
 .text-align-end { text-align: end }
 
+/* Visually hidden but accessible to screen readers */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .footnote-reference a {
   margin-inline: var(--space-very-very-small);
 
@@ -935,6 +1040,15 @@ article {
 
   #menu > ul {
     height: 3.5rem;
+  }
+
+  #reading-progress {
+    height: 4px;
+  }
+
+  /* Hide anchor links on mobile (no hover) */
+  :is(h2, h3, h4, h5, h6) > a.zola-anchor {
+    display: none;
   }
 
   h1.separator, h2.separator, h3.separator {
