@@ -12,12 +12,12 @@
 
   <title>{%- block title -%}federicocarrone.com{%- endblock title -%}</title>
 
-  <link rel="stylesheet" href="{{ get_url(path = "/style/min/main.css", cachebust = true) }}" />
-  <link rel="stylesheet" href="{{ get_url(path = "/style/min/syntax-theme.css", cachebust = true) }}" />
   <script>
     (function(){var t;try{t=localStorage.getItem('theme')}catch(e){}
     if(t&&t!=='default')document.documentElement.setAttribute('data-theme',t);})();
   </script>
+  <link rel="stylesheet" href="{{ get_url(path = "/style/min/main.css", cachebust = true) }}" />
+  <link rel="stylesheet" href="{{ get_url(path = "/style/min/syntax-theme.css", cachebust = true) }}" />
   <script defer src="{{ get_url(path = "/js/theme-toggle.js", cachebust = true) }}"></script>
 
   <link rel="icon" href="{{ get_url(path = "/favicon.ico") }}" />
