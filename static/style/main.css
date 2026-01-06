@@ -1301,19 +1301,11 @@ article {
 
 [data-theme="minimal"] body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 1.0625rem;
-  line-height: 1.75;
+  font-size: var(--text-size);
+  line-height: var(--text-line-height);
   font-variant: normal;
   letter-spacing: 0;
   background: var(--color-light);
-}
-
-/* Wider content on large screens */
-@media (min-width: 1200px) {
-  [data-theme="minimal"] .content-grid {
-    --content-max-width: 780px;
-    --breakout-max-width: 900px;
-  }
 }
 
 [data-theme="minimal"] h1,
