@@ -1287,15 +1287,15 @@ article {
    Clean, ultra-minimalist - inspired by Paul Graham, Derek Sivers
    ============================================ */
 [data-theme="minimal"] {
-  --color-light: #ffffff;
-  --color-lighter: #fafafa;
-  --color-light-darker: #666666;
+  --color-light: #f9f9f9;
+  --color-lighter: #f3f3f3;
+  --color-light-darker: #888888;
   --color-dark: #333333;
-  --color-dark-lighter: #eeeeee;
-  --color-dark-blue: #fafafa;
+  --color-dark-lighter: #e5e5e5;
+  --color-dark-blue: #f3f3f3;
   --color-accent: #333333;
   --color-accent-darker: #333333;
-  --color-accent2: #666666;
+  --color-accent2: #888888;
   --color-white: #ffffff;
 }
 
@@ -1529,13 +1529,17 @@ article {
 }
 
 /* Minimal theme - heading anchor links */
-[data-theme="minimal"] :is(h2, h3, h4, h5, h6) > a.zola-anchor {
-  left: -1.25em;
-  width: 1em;
+[data-theme="minimal"] :is(h1, h2, h3, h4, h5, h6) > a.zola-anchor {
+  position: absolute;
+  left: -1.5ch;
+  opacity: 0;
+  text-decoration: none;
 }
 
-[data-theme="minimal"] :is(h2, h3, h4, h5, h6) > a.zola-anchor:hover {
-  color: var(--color-dark);
+[data-theme="minimal"] :is(h1, h2, h3, h4, h5, h6):hover > a.zola-anchor,
+[data-theme="minimal"] :is(h1, h2, h3, h4, h5, h6) > a.zola-anchor:focus {
+  opacity: 1;
+  color: var(--color-light-darker);
 }
 
 /* Minimal theme dark mode */
