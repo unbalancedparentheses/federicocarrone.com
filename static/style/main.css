@@ -1322,10 +1322,6 @@ article {
 [data-theme="minimal"] h2 { font-size: 1.625rem; }
 [data-theme="minimal"] h3 { font-size: 1.25rem; }
 
-[data-theme="minimal"] p {
-  text-align: left;
-  hyphens: none;
-}
 
 [data-theme="minimal"] a {
   color: #111;
