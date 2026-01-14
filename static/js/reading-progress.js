@@ -14,8 +14,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var start = articleTop;
     var end = articleTop + articleHeight - windowHeight;
-    var progress = (scrollY - start) / (end - start);
 
+    // Hide progress bar if content fits in viewport (no scrolling needed)
+    if (end <= start) {
+      progressBar.style.transform = 'scaleX(0)';
+      return;
+    }
+
+    var progress = (scrollY - start) / (end - start);
     progress = Math.max(0, Math.min(1, progress));
     progressBar.style.transform = 'scaleX(' + progress + ')';
   }
