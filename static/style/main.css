@@ -578,13 +578,13 @@ main {
 
   > ul {
     display: grid;
-    grid-template-columns: repeat(5, auto);
+    grid-template-columns: repeat(6, auto);
     padding: 0;
     height: var(--space-very-large);
     align-items: center;
 
     @media (min-width: 901px) {
-      grid-template-columns: repeat(6, auto);
+      grid-template-columns: repeat(7, auto);
     }
   }
 
