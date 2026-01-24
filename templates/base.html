@@ -76,10 +76,10 @@
 <nav id="menu" class="full-width content-grid" aria-label="Main navigation">
   <ul>
     <li><a href="/"{% if current_path == "/" %} aria-current="page"{% endif %}>Home</a></li>
+    <li><a href="/log"{% if current_path is starting_with("/log") %} aria-current="page"{% endif %}>Log</a></li>
     <li><a href="{{ get_url(path = '@/articles/_index.md' )}}"{% if current_path is starting_with("/articles") %} aria-current="page"{% endif %}>Articles</a></li>
     <li><a href="{{ get_url(path = '@/series/_index.md') }}"{% if current_path is starting_with("/series") %} aria-current="page"{% endif %}>Series</a></li>
     <li><a href="/talks"{% if current_path is starting_with("/talks") %} aria-current="page"{% endif %}>Talks</a></li>
-    <li><a href="/log"{% if current_path is starting_with("/log") %} aria-current="page"{% endif %}>Log</a></li>
     <li><a href="/reading"{% if current_path is starting_with("/reading") %} aria-current="page"{% endif %}>Reading</a></li>
     <li><a href="/about"{% if current_path is starting_with("/about") %} aria-current="page"{% endif %}>About</a></li>
     <li class="theme-toggle-wrapper"><button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">☀️</button></li>
