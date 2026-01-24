@@ -1,5 +1,6 @@
 +++
 date = 2026-01-24T18:00:00
+slug = "2026-01-24-unprepared"
 +++
 
 Humanity is completely unprepared for what's coming.
