@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title -%}
+  Log
+{%- endblock title %}
+
+{% block long_title -%}
+  Log
+{%- endblock long_title %}
+
+{% block body %}
+<section class="log-timeline">
+  <header>
+    <h1>Log</h1>
+    <p>Short notes and thoughts.</p>
+  </header>
+
+  <div class="log-entries" role="list">
+    {% for page in section.pages %}
+    <article class="log-entry" role="listitem">
+      <time datetime="{{ page.date }}">{{ page.date | date(format = "%B %d, %Y at %H:%M") }}</time>
+      <div class="log-content">
+        {{ page.content | safe }}
+      </div>
+      <a href="{{ page.permalink | safe }}" class="log-permalink" title="Permalink">permalink</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock body %}

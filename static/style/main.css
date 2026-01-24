@@ -578,13 +578,13 @@ main {
 
   > ul {
     display: grid;
-    grid-template-columns: repeat(6, auto);
+    grid-template-columns: repeat(7, auto);
     padding: 0;
     height: var(--space-very-large);
     align-items: center;
 
     @media (min-width: 901px) {
-      grid-template-columns: repeat(7, auto);
+      grid-template-columns: repeat(8, auto);
     }
   }
 
@@ -1020,6 +1020,81 @@ article {
   }
 }
 
+/* Log timeline */
+.log-timeline {
+  header {
+    margin-block-end: var(--space-very-large);
+
+    h1 {
+      margin-block-end: var(--space-small);
+    }
+
+    p {
+      color: var(--color-light-darker);
+      margin: 0;
+    }
+  }
+}
+
+.log-entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-large);
+}
+
+.log-entry {
+  padding: var(--space);
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-lighter);
+
+  time {
+    display: block;
+    color: var(--color-light-darker);
+    font-size: 0.9em;
+    margin-block-end: var(--space-small);
+  }
+
+  .log-content {
+    p {
+      margin: 0;
+    }
+
+    p + p {
+      margin-block-start: var(--space);
+    }
+  }
+
+  .log-permalink {
+    display: inline-block;
+    margin-block-start: var(--space);
+    font-size: 0.85em;
+    color: var(--color-light-darker);
+
+    &:hover {
+      color: var(--color-accent);
+    }
+  }
+}
+
+.log-single {
+  header {
+    margin-block-end: var(--space-large);
+
+    time {
+      color: var(--color-light-darker);
+    }
+  }
+
+  .log-content {
+    margin-block-end: var(--space-very-large);
+  }
+
+  .log-nav {
+    padding-block-start: var(--space-large);
+    border-top: var(--border-width) var(--border-color) solid;
+  }
+}
+
 /* Mobile adjustments */
 @media (max-width: 600px) {
   .content-grid {
@@ -1266,4 +1341,13 @@ article {
 [data-theme="ghost"] ::selection {
   background: rgba(74, 222, 128, 0.3);
   color: #fff;
+}
+
+[data-theme="ghost"] .log-entry {
+  border-left-color: #4ade80;
+  background: var(--color-lighter);
+}
+
+[data-theme="ghost"] .log-single .log-nav {
+  border-top-color: rgba(74, 222, 128, 0.2);
 }
