@@ -23,6 +23,7 @@
   <link rel="icon" href="{{ get_url(path = "/favicon.ico") }}" />
   <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="{{ get_url(path = "rss.xml", trailing_slash = false) }}" />
   <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="{{ get_url(path = "atom.xml", trailing_slash = false) }}" />
+  <link rel="alternate" type="text/plain" title="LLM Context" href="{{ get_url(path = "llms.txt", trailing_slash = false) }}" />
 
   <link rel="preconnect" href="https://cloud.umami.is" crossorigin />
   <link rel="dns-prefetch" href="https://cloud.umami.is" />
@@ -67,6 +68,37 @@
   <script defer src="https://cloud.umami.is/script.js" data-website-id="062ee306-b2e8-479b-80fd-1afeefa0bb29"></script>
   <script defer src="{{ get_url(path = "/js/code-copy.js", cachebust = true) }}"></script>
   <script defer src="{{ get_url(path = "/js/reading-progress.js", cachebust = true) }}"></script>
+
+  {# JSON-LD structured data for articles #}
+  {% set first_component = page.components | default(value = []) | first %}
+  {% if first_component == "articles" or first_component == "series" %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{ page.title | safe }}",
+    "author": {
+      "@type": "Person",
+      "name": "Federico Carrone",
+      "url": "https://federicocarrone.com/about/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Federico Carrone",
+      "url": "https://federicocarrone.com"
+    },
+    "url": "{{ page.permalink | safe }}",
+    "datePublished": "{{ page.date | date(format="%Y-%m-%d") }}"{% if page.updated %},
+    "dateModified": "{{ page.updated | date(format="%Y-%m-%d") }}"{% endif %}{% if page.description %},
+    "description": "{{ page.description | safe }}"{% endif %}{% if page.taxonomies.keywords %},
+    "keywords": "{{ page.taxonomies.keywords | join(sep=", ") }}"{% endif %},
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "{{ page.permalink | safe }}"
+    }
+  }
+  </script>
+  {% endif %}
 </head>
 <body class="content-grid">
 

@@ -1,0 +1,30 @@
+# Federico Carrone
+
+> Personal website of Federico Carrone, entrepreneur working at the intersection of technology, finance, and culture. Founder of Ergodic Group and LambdaClass.
+
+Federico Carrone writes about distributed systems, cryptography, type systems, formal verification, philosophy, and the convergence of digital infrastructure, capital markets, and cultural production.
+
+## Articles
+
+- [Type Systems: From Untyped Lambda Calculus to Dependent Types](https://federicocarrone.com/articles/type-systems/): Comprehensive exploration of type systems from untyped lambda calculus through dependent types, covering Hindley-Milner, linear types, and formal verification
+- [The Death of the Inner Self](https://federicocarrone.com/articles/the-death-of-the-inner-self/): Philosophy essay on interiority, consciousness, and the modern erosion of inner life
+- [Notes on Culture, Infrastructure, Time and Ergodicity](https://federicocarrone.com/articles/notes-on-culture-infrastructure-time-and-ergodicity/): Reflections on how time, path dependence, and ergodicity shape technology and culture
+- [Crypto Doctrine](https://federicocarrone.com/articles/crypto-doctrine/): Strategic framework for thinking about cryptocurrency and blockchain technology
+- [Transforming the Future with Zero Knowledge Proofs, Fully Homomorphic Encryption and New Distributed Systems Algorithms](https://federicocarrone.com/articles/transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms/): Overview of cryptographic primitives reshaping computing
+
+## Series
+
+- [Ethereum Series](https://federicocarrone.com/series/ethereum/): Deep dive into Ethereum as infrastructure and financial system
+- [Concrete Programming Language](https://federicocarrone.com/series/concrete/): Systems programming language designed for formal reasoning
+
+## About
+
+- [About Federico Carrone](https://federicocarrone.com/about/): Background, philosophy, and approach to building technology companies
+
+## Optional
+
+- [All Articles](https://federicocarrone.com/articles/): Complete list of articles
+- [All Series](https://federicocarrone.com/series/): Complete list of article series
+- [Reading List](https://federicocarrone.com/reading/): Books and resources
+- [Talks](https://federicocarrone.com/talks/): Conference talks and presentations
+- [Log](https://federicocarrone.com/log/): Short notes and thoughts
