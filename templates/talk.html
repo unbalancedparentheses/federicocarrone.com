@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title -%}
+  {{ page.title }} — federicocarrone.com
+{%- endblock title %}
+
+{% block long_title -%}
+  {{ page.title }} — federicocarrone.com
+{%- endblock long_title %}
+
+{% block body %}
+<article class="talk">
+  <header>
+    <h1>{{ page.title }}</h1>
+    <div class="metadata">
+      <time datetime="{{ page.date }}">{{ page.date | date(format = "%B %d, %Y") }}</time>
+      {% if page.extra.event %}
+      <span>{{ page.extra.event }}</span>
+      {% endif %}
+    </div>
+  </header>
+
+  {{ page.content | safe }}
+
+  <nav class="talk-nav">
+    <a href="/talks">← Back to Talks</a>
+  </nav>
+</article>
+{% endblock body %}

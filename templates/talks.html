@@ -12,8 +12,19 @@
 <article class="talks">
   <header>
     <h1>Talks</h1>
+    <p>Talks and podcasts by Federico Carrone</p>
   </header>
 
-  {{ section.content | safe }}
+  <div class="timeline">
+  {% for page in section.pages %}
+    <div class="timeline-item">
+      <a href="{{ page.permalink | safe }}">{{ page.title }}</a>
+      <div class="timeline-meta">
+        <time datetime="{{ page.date }}">{{ page.date | date(format = "%b %d, %Y") }}</time>
+        {% if page.extra.event %} · {{ page.extra.event }}{% endif %}
+      </div>
+    </div>
+  {% endfor %}
+  </div>
 </article>
 {% endblock body %}

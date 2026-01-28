@@ -20,7 +20,7 @@
     <h2 property="name">Latest</h2>
 
     <div class="timeline" role="list">
-    {# Collect all pages from articles, series, and log #}
+    {# Collect all pages from articles, series, log, and talks #}
     {% set_global all_items = [] -%}
 
     {# Articles #}
@@ -44,6 +44,12 @@
       {% set_global all_items = all_items | concat(with=[page]) -%}
     {% endfor -%}
 
+    {# Talks #}
+    {% set talks_section = get_section(path = "talks/_index.md") -%}
+    {% for page in talks_section.pages -%}
+      {% set_global all_items = all_items | concat(with=[page]) -%}
+    {% endfor -%}
+
     {# Sort by date descending and limit to 15 #}
     {% for page in all_items | sort(attribute = "date") | reverse | slice(end = 15) -%}
       {# Detect type from path #}
@@ -51,6 +57,8 @@
         {% set item_type = "article" -%}
       {% elif page.path is starting_with("/log/") -%}
         {% set item_type = "log" -%}
+      {% elif page.path is starting_with("/talks/") -%}
+        {% set item_type = "talk" -%}
       {% else -%}
         {% set item_type = "series" -%}
       {% endif -%}
