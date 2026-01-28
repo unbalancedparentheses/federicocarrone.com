@@ -50,8 +50,9 @@
       {% set_global all_items = all_items | concat(with=[page]) -%}
     {% endfor -%}
 
-    {# Sort by date descending and limit to 15 #}
-    {% for page in all_items | sort(attribute = "date") | reverse | slice(end = 15) -%}
+    {# Sort by date descending #}
+    {% set sorted_items = all_items | sort(attribute = "date") | reverse -%}
+    {% for page in sorted_items -%}
       {# Detect type from path #}
       {% if page.path is starting_with("/articles/") -%}
         {% set item_type = "article" -%}
@@ -63,7 +64,7 @@
         {% set item_type = "series" -%}
       {% endif -%}
 
-      <div role="listitem" class="timeline-item" property="itemListElement" typeof="Article">
+      <div role="listitem" class="timeline-item{% if loop.index > 15 %} timeline-item--hidden{% endif %}" property="itemListElement" typeof="Article">
         <a href="{{ page.permalink | safe }}" property="url">
           <span property="name">{% if page.title %}{{ page.title | markdown(inline = true) | safe }}{% else %}{{ page.content | striptags | truncate(length=60) }}...{% endif %}</span>
         </a>
@@ -74,5 +75,8 @@
       </div>
     {% endfor %}
     </div>
+    {% if sorted_items | length > 15 %}
+    <button class="timeline-show-more" onclick="document.querySelector('.timeline').classList.add('timeline--expanded'); this.style.display='none';">Show all ({{ sorted_items | length }} items)</button>
+    {% endif %}
   </section>
 {% endblock body %}

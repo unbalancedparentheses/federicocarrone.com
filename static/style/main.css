@@ -1117,6 +1117,30 @@ article {
     color: var(--color-light-darker);
     margin-top: var(--space-very-small);
   }
+
+  &.timeline-item--hidden {
+    display: none;
+  }
+}
+
+.timeline--expanded .timeline-item--hidden {
+  display: block;
+}
+
+.timeline-show-more {
+  margin-top: var(--space);
+  padding: var(--space-small) var(--space);
+  font-size: 0.9em;
+  color: var(--color-accent);
+  background: none;
+  border: 1px solid var(--color-accent);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+
+  &:hover {
+    background: var(--color-accent);
+    color: var(--color-white);
+  }
 }
 
 /* Mobile adjustments */
