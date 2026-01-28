@@ -29,5 +29,3 @@ I believe that:
 2. The West still leads in many areas that require deep institutions and long accumulated competence, including parts of frontier research and high trust services.
 3. But AI compresses the services premium by making a large portion of cognition cheap and replicable. That is why open models matter. They are a weapon that attacks the margin structure of the thinking economy.
 4. If you sell intelligence, this is bad news. If you own distribution, hardware, data, or a workflow people cannot easily leave, you survive. If you own atoms and you get thinking for free, you get a scary combination.
-
-I would love to know if anybody believes I'm wrong.
