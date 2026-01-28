@@ -56,19 +56,12 @@
       {% endif -%}
 
       <div role="listitem" class="timeline-item" property="itemListElement" typeof="Article">
+        <a href="{{ page.permalink | safe }}" property="url">
+          <span property="name">{% if page.title %}{{ page.title | markdown(inline = true) | safe }}{% else %}{{ page.content | striptags | truncate(length=60) }}...{% endif %}</span>
+        </a>
         <div class="timeline-meta">
           <time datetime="{{ page.date }}">{{ page.date | date(format = "%b %d, %Y") }}</time>
-          <span class="timeline-type timeline-type--{{ item_type }}">{{ item_type }}</span>
-        </div>
-        <div class="timeline-content">
-          <a href="{{ page.permalink | safe }}" property="url">
-            <span property="name">{% if page.title %}{{ page.title | markdown(inline = true) | safe }}{% else %}{{ page.content | striptags | truncate(length=80) }}{% endif %}</span>
-          </a>
-          {% if item_type == "series" and page.ancestors | length > 0 -%}
-          {% set series_path = page.ancestors | last -%}
-          {% set series_section = get_section(path = series_path) -%}
-          <span class="timeline-series">{{ series_section.title }}</span>
-          {% endif -%}
+          · {{ item_type }}{% if item_type == "series" and page.ancestors | length > 0 %}{% set series_path = page.ancestors | last %}{% set series_section = get_section(path = series_path) %} · {{ series_section.title }}{% endif %}
         </div>
       </div>
     {% endfor %}
