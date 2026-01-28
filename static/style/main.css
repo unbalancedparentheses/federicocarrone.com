@@ -1096,6 +1096,94 @@ article {
   }
 }
 
+/* Timeline */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+}
+
+.timeline-item {
+  display: flex;
+  gap: var(--space);
+  padding: var(--space);
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-lighter);
+
+  .timeline-meta {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-very-small);
+    width: 100px;
+
+    time {
+      color: var(--color-light-darker);
+      font-size: 0.85em;
+    }
+  }
+
+  .timeline-type {
+    display: inline-block;
+    width: fit-content;
+    padding: var(--space-very-very-small) var(--space-small);
+    font-size: 0.7em;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: var(--space-very-small);
+    color: var(--color-white);
+    background: var(--color-light-darker);
+
+    &.timeline-type--article {
+      background: var(--color-accent);
+    }
+
+    &.timeline-type--series {
+      background: #2563eb;
+    }
+
+    &.timeline-type--log {
+      background: #7c3aed;
+    }
+  }
+
+  .timeline-content {
+    flex: 1;
+    min-width: 0;
+
+    > a {
+      display: block;
+      font-size: 1.1em;
+    }
+  }
+
+  .timeline-series {
+    display: block;
+    margin-block-start: var(--space-very-small);
+    font-size: 0.85em;
+    color: var(--color-light-darker);
+
+    &::before {
+      content: "in ";
+      font-style: italic;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .timeline-item {
+    flex-direction: column;
+    gap: var(--space-small);
+
+    .timeline-meta {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--space-small);
+      width: auto;
+    }
+  }
+}
+
 /* Mobile adjustments */
 @media (max-width: 600px) {
   .content-grid {
@@ -1351,4 +1439,21 @@ article {
 
 [data-theme="ghost"] .log-single .log-nav {
   border-top-color: rgba(74, 222, 128, 0.2);
+}
+
+[data-theme="ghost"] .timeline-item {
+  border-left-color: #4ade80;
+  background: var(--color-lighter);
+}
+
+[data-theme="ghost"] .timeline-type--article {
+  background: #22c55e !important;
+}
+
+[data-theme="ghost"] .timeline-type--series {
+  background: #3b82f6 !important;
+}
+
+[data-theme="ghost"] .timeline-type--log {
+  background: #a855f7 !important;
 }

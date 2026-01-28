@@ -16,27 +16,60 @@
 
 <p>I am Federico Carrone, an entrepreneur working at the intersection of technology, finance, and culture. I created <a href="https://ergodicgroup.com">Ergodic Group</a>, a privately held holding company through which I build and hold companies in distributed systems, cryptography, AI, gaming, and real assets. I operate with the conviction that digital infrastructure, capital markets, and cultural production are converging into a single strategic domain, and I focus on long horizon structures where time acts as a filter for quality, judgment, and durability rather than a constraint.</p>
 
-  <section typeof="ItemList">
-    <h2 property="name">Latest series</h2>
-
-    <div role="list">
-    {% set section = get_section(path = "series/_index.md") -%}
-    {% for section_path in section.subsections | reverse | slice(end = 5) -%}
-      <div role="listitem" class="series-poster" property="itemListElement" typeof="CreativeWorkSeries">
-        {{- series::poster(section = get_section(path = section_path)) -}}
-      </div>
-    {% endfor %}
-    </div>
-  </section>
-
   <section vocab="https://schema.org" typeof="ItemList">
-    <h2 property="name">Pinned articles</h2>
+    <h2 property="name">Latest</h2>
 
-    <div role="list">
-    {% set section = get_section(path = "articles/_index.md") -%}
-    {% for page in section.pages | filter(attribute = "extra.pinned", value = true) -%}
-      <div role="listitem" class="article-poster" property="itemListElement" typeof="Article">
-        {{- article::poster(page = page) -}}
+    <div class="timeline" role="list">
+    {# Collect all pages from articles, series, and log #}
+    {% set_global all_items = [] -%}
+
+    {# Articles #}
+    {% set articles_section = get_section(path = "articles/_index.md") -%}
+    {% for page in articles_section.pages -%}
+      {% set_global all_items = all_items | concat(with=[page]) -%}
+    {% endfor -%}
+
+    {# Series episodes #}
+    {% set series_section = get_section(path = "series/_index.md") -%}
+    {% for section_path in series_section.subsections -%}
+      {% set subsection = get_section(path = section_path) -%}
+      {% for page in subsection.pages -%}
+        {% set_global all_items = all_items | concat(with=[page]) -%}
+      {% endfor -%}
+    {% endfor -%}
+
+    {# Log entries #}
+    {% set log_section = get_section(path = "log/_index.md") -%}
+    {% for page in log_section.pages -%}
+      {% set_global all_items = all_items | concat(with=[page]) -%}
+    {% endfor -%}
+
+    {# Sort by date descending and limit to 15 #}
+    {% for page in all_items | sort(attribute = "date") | reverse | slice(end = 15) -%}
+      {# Detect type from path #}
+      {% if page.path is starting_with("/articles/") -%}
+        {% set item_type = "article" -%}
+      {% elif page.path is starting_with("/log/") -%}
+        {% set item_type = "log" -%}
+      {% else -%}
+        {% set item_type = "series" -%}
+      {% endif -%}
+
+      <div role="listitem" class="timeline-item" property="itemListElement" typeof="Article">
+        <div class="timeline-meta">
+          <time datetime="{{ page.date }}">{{ page.date | date(format = "%b %d, %Y") }}</time>
+          <span class="timeline-type timeline-type--{{ item_type }}">{{ item_type }}</span>
+        </div>
+        <div class="timeline-content">
+          <a href="{{ page.permalink | safe }}" property="url">
+            <span property="name">{% if page.title %}{{ page.title | markdown(inline = true) | safe }}{% else %}{{ page.content | striptags | truncate(length=80) }}{% endif %}</span>
+          </a>
+          {% if item_type == "series" and page.ancestors | length > 0 -%}
+          {% set series_path = page.ancestors | last -%}
+          {% set series_section = get_section(path = series_path) -%}
+          <span class="timeline-series">{{ series_section.title }}</span>
+          {% endif -%}
+        </div>
       </div>
     {% endfor %}
     </div>
