@@ -1,5 +1,5 @@
 +++
-title = "Consciousness as Network Effect"
+title = "Is Consciousness a Network Effect?"
 date = "2026-01-30"
 description = "If consciousness emerged in humans when external dialogue internalized, then multi-agent AI is building the precondition."
 [taxonomies]
