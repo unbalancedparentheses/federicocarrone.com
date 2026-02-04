@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title -%}
+  Watching — federicocarrone.com
+{%- endblock title %}
+
+{% block long_title -%}
+  Watching — federicocarrone.com
+{%- endblock long_title %}
+
+{% block body %}
+<article class="watching">
+  <header>
+    <h1>Watching</h1>
+  </header>
+
+  {{ section.content | safe }}
+</article>
+{% endblock body %}

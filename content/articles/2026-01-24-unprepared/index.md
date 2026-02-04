@@ -1,6 +1,11 @@
 +++
-date = 2026-01-24T18:00:00
-slug = "2026-01-24-unprepared"
+title = "Unprepared"
+date = "2026-01-24"
+description = "Humanity is completely unprepared for what's coming. The pace of AI advancement might give people months to adapt, not decades."
+[taxonomies]
+keywords=["ai", "technology", "disruption"]
+[extra]
+author = "Federico Carrone"
 +++
 
 Humanity is completely unprepared for what's coming.

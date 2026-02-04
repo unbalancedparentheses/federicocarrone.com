@@ -1400,3 +1400,26 @@ article {
   border-top-color: rgba(74, 222, 128, 0.2);
 }
 
+/* Watching gallery */
+.watching-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space);
+}
+
+.watching-item {
+  text-align: center;
+}
+
+.watching-item img {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.watching-item a {
+  display: block;
+  margin-top: var(--space-small);
+}
+
