@@ -64,6 +64,15 @@ Visual stories that have left a lasting impression. A curated selection of anime
   </div>
 </div>
 
+## Series
+
+<div class="watching-gallery">
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Homeland_(TV_series)"><img src="/images/watching/homeland.jpg" alt="Homeland"></a>
+    <a href="https://en.wikipedia.org/wiki/Homeland_(TV_series)">Homeland</a>
+  </div>
+</div>
+
 ## Movies: Top-Tier Masterpieces
 
 <div class="watching-gallery">
