@@ -144,7 +144,7 @@ A short essay that explains why decentralized coordination through prices often 
 
 ### Seeing Like a State by James C. Scott
 
-How large-scale schemes to improve the human condition fail when they ignore local knowledge and complexity. The concept of legibility—making society readable to administrators—explains many pathologies of modern institutions.
+How large-scale schemes to improve the human condition fail when they ignore local knowledge and complexity. The concept of legibility, making society readable to administrators, explains many pathologies of modern institutions.
 
 </div>
 </div>
@@ -216,7 +216,7 @@ A fresh perspective on financial bubbles as engines of progress rather than pure
 
 ### The Age of Revolution, The Age of Capital, and The Age of Empire by Eric Hobsbawm
 
-A trilogy covering 1789-1914 that provides the historical framework to understand how the modern world took shape. Hobsbawm traces how the dual revolutions—French and Industrial—transformed everything from politics to daily life. Essential context for understanding current changes.
+A trilogy covering 1789-1914 that provides the historical framework to understand how the modern world took shape. Hobsbawm traces how the dual revolutions (French and Industrial) transformed everything from politics to daily life. Essential context for understanding current changes.
 
 </div>
 </div>
@@ -233,7 +233,7 @@ A trilogy covering 1789-1914 that provides the historical framework to understan
 
 ### Only the Paranoid Survive by Andrew S. Grove
 
-Grove's framework for detecting strategic inflection points—moments when the fundamentals of a business change. Learning to recognize these transitions early is essential for building organizations that survive and adapt over time.
+Grove's framework for detecting strategic inflection points, moments when the fundamentals of a business change. Learning to recognize these transitions early is essential for building organizations that survive and adapt over time.
 
 </div>
 </div>
@@ -288,7 +288,7 @@ The most important book for the Ethereum community and anyone building products.
 
 ### The Luxury Strategy by Jean-Noël Kapferer and Vincent Bastien
 
-An amazing book on the difference between premium and luxury. The authors argue that luxury brands follow different rules than traditional marketing—anti-laws that seem counterintuitive but explain why certain brands maintain their power across generations.
+An amazing book on the difference between premium and luxury. The authors argue that luxury brands follow different rules than traditional marketing, anti-laws that seem counterintuitive but explain why certain brands maintain their power across generations.
 
 </div>
 </div>
