@@ -38,12 +38,6 @@
       {% endfor -%}
     {% endfor -%}
 
-    {# Log entries #}
-    {% set log_section = get_section(path = "log/_index.md") -%}
-    {% for page in log_section.pages -%}
-      {% set_global all_items = all_items | concat(with=[page]) -%}
-    {% endfor -%}
-
     {# Talks #}
     {% set talks_section = get_section(path = "talks/_index.md") -%}
     {% for page in talks_section.pages -%}
@@ -56,8 +50,6 @@
       {# Detect type from path #}
       {% if page.path is starting_with("/articles/") -%}
         {% set item_type = "article" -%}
-      {% elif page.path is starting_with("/log/") -%}
-        {% set item_type = "log" -%}
       {% elif page.path is starting_with("/talks/") -%}
         {% set item_type = "talk" -%}
       {% else -%}
