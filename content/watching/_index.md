@@ -157,10 +157,6 @@ Visual stories that have left a lasting impression. A curated selection of anime
     <a href="https://en.wikipedia.org/wiki/Drive_(2011_film)">Drive</a>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Fargo_(1996_film)"><img src="/images/watching/fargo.jpg" alt="Fargo"></a>
-    <a href="https://en.wikipedia.org/wiki/Fargo_(1996_film)">Fargo</a>
-  </div>
-  <div class="watching-item">
     <a href="https://en.wikipedia.org/wiki/Reservoir_Dogs"><img src="/images/watching/reservoir-dogs.jpg" alt="Reservoir Dogs"></a>
     <a href="https://en.wikipedia.org/wiki/Reservoir_Dogs">Reservoir Dogs</a>
   </div>
