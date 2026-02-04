@@ -1,5 +1,5 @@
 +++
-title = "Unprepared"
+title = "Unprepared for What's Coming"
 date = "2026-01-24"
 description = "Humanity is completely unprepared for what's coming. The pace of AI advancement might give people months to adapt, not decades."
 [taxonomies]
