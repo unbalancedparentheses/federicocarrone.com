@@ -1,0 +1,162 @@
+* {
+  margin: 0;
+  padding: 0;
+  outline-style: none;
+}
+
+::selection {
+  background: #fff9d6;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: Helvetica Neue, Helvetica, sans-serif;
+}
+
+a {
+  color: #b30a0a;
+  text-decoration: underline;
+  transition: color .4s;
+}
+
+a:hover {
+  color: #999999;
+}
+
+body {
+  background-color: #eaeaea;
+  padding: 50px 8px 42px;
+}
+
+main {
+  background-color: #FFFFFF;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  display: block;
+  box-shadow: 0 1px 3px hsla(0, 0%, 39%, .15);
+}
+
+main #main-wrapper {
+  padding: 38px 50px;
+  display: flex;
+}
+
+main #picture {
+  margin-right: 48px;
+}
+
+main #picture img {
+  background-color: #FAFAF9;
+  border: 0 none;
+  width: 256px;
+  height: 256px;
+}
+
+main #content {
+  flex: 1;
+}
+
+main #content h1 {
+  font-size: 34px;
+  color: #111111;
+  letter-spacing: 0px;
+  line-height: 32px;
+  margin-top: -4px;
+}
+
+main #content p {
+  font-size: 15px;
+  color: #222222;
+  letter-spacing: 0px;
+  line-height: 24px;
+  margin-top: 15px;
+}
+
+main #content p:first-of-type {
+  margin-top: 24px;
+}
+
+main #content ul {
+  margin-top: 24px;
+}
+
+main #content li {
+  display: inline-block;
+  margin: 6px 8px 0 0;
+}
+
+main #content li:last-of-type {
+  margin-right: 0;
+}
+
+main #content li a {
+  background-color: #444444;
+  font-size: 14px;
+  font-weight: bold;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  text-decoration: none;
+  letter-spacing: 0.25px;
+  line-height: 44px;
+  padding: 0 34px;
+  height: 46px;
+  display: inline-block;
+  transition: background-color .4s;
+}
+
+main #content li a:hover {
+  background-color: #333333;
+}
+
+nav {
+  text-align: center;
+}
+
+nav #nav-wrapper {
+  padding: 48px 0 54px;
+}
+
+nav ul li {
+  display: inline-block;
+}
+
+nav ul li a {
+  font-size: 15px;
+  font-weight: bold;
+  color: #222222;
+  letter-spacing: 0px;
+  line-height: 24px;
+  margin: 0 9px;
+}
+
+@media screen and (max-width: 979px) {
+  main #main-wrapper {
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+}
+
+@media screen and (max-width: 719px) {
+  body {
+    padding-top: 38px;
+  }
+
+  main {
+    text-align: center;
+  }
+
+  main #main-wrapper {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  main #picture {
+    display: none;
+  }
+}
