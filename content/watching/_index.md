@@ -4,7 +4,7 @@ template = "watching.html"
 description = "Series, movies, anime, and animation recommendations from Federico Carrone"
 +++
 
-Visual stories that have left a lasting impression. A curated selection of series, films, anime, and animation worth your time.
+Series, films, anime, and animation I recommend.
 
 ## Series
 
