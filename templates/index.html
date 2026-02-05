@@ -68,7 +68,7 @@
     {% endfor %}
     </div>
     {% if sorted_items | length > 15 %}
-    <button class="timeline-show-more" onclick="document.querySelector('.timeline').classList.add('timeline--expanded'); this.style.display='none';">Show all ({{ sorted_items | length }} items)</button>
+    <button class="timeline-show-more">Show all ({{ sorted_items | length }} items)</button>
     {% endif %}
   </section>
 {% endblock body %}

@@ -31,7 +31,7 @@ p, h1, h2, h3, h4, h5, h6 {
   --color-white: #ffffff;
   --color-light: #faf8f4;          /* page background */
   --color-lighter: #ffffff;        /* cards, figures */
-  --color-light-darker: #8f8777;   /* metadata, secondary text */
+  --color-light-darker: #706559;   /* metadata, secondary text - WCAG AA compliant */
 
   --color-dark: #333333;           /* main text (softened for screen readability) */
   --color-dark-lighter: #cfc6b6;   /* borders, subtle accents */

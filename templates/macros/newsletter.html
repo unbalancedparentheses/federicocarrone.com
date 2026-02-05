@@ -1,7 +1,7 @@
 {% macro form() %}
 <aside class="newsletter">
   <p class="newsletter-cta">Enjoyed this? Subscribe to get new essays by email.</p>
-  <form action="https://buttondown.com/api/emails/embed-subscribe/federicocarrone" method="post" class="newsletter-form" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Subscribing...'">
+  <form action="https://buttondown.com/api/emails/embed-subscribe/federicocarrone" method="post" class="newsletter-form">
     <input type="hidden" name="tag" value="federicocarrone.com" />
     <input type="email" name="email" placeholder="your@email.com" required aria-label="Email address" autocomplete="email" />
     <button type="submit">Subscribe</button>
