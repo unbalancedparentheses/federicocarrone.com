@@ -5,6 +5,5 @@ description = "Discussion about Ethereum's native rollup roadmap"
 [extra]
 event = "Podcast"
 youtube_id = "lutSYwknNjQ"
+thumbnail = "ethereum-native-rollup-roadmap.jpg"
 +++
-
-{{ youtube(id="lutSYwknNjQ", title="Ethereum's Native Rollup Roadmap with Justin Drake", caption="") }}
