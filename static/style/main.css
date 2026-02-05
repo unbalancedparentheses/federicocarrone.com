@@ -1569,3 +1569,31 @@ article {
   border-left-color: var(--color-accent);
 }
 
+/* Series intro structure */
+.series-intro {
+  margin-block: var(--space-very-large);
+  display: grid;
+  gap: var(--space-large);
+}
+
+.series-intro-section {
+  padding: var(--space);
+  background: var(--color-lighter);
+  border-left: 3px solid var(--color-accent);
+}
+
+.series-intro-section h3 {
+  margin-block: 0 var(--space-small);
+  font-size: 1em;
+  color: var(--color-accent);
+}
+
+.series-intro-section p {
+  margin: 0;
+}
+
+[data-theme="ghost"] .series-intro-section {
+  background: var(--color-lighter);
+  border-left-color: var(--color-accent);
+}
+
