@@ -1,4 +1,4 @@
-.PHONY: all build build-css watch
+.PHONY: all build build-css watch add-video fetch-posters
 
 NIX_RUN = nix develop --extra-experimental-features 'nix-command flakes' --command
 
@@ -12,3 +12,9 @@ build-css:
 
 watch: build-css
 	$(NIX_RUN) zola serve
+
+add-video:
+	@python3 scripts/add-video.py "$(URL)"
+
+fetch-posters:
+	@python3 scripts/fetch_posters.py
