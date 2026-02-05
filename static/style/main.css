@@ -1597,3 +1597,39 @@ article {
   border-left-color: var(--color-accent);
 }
 
+/* Pullquote shortcode */
+.pullquote {
+  margin-block: var(--space-very-large);
+  padding: var(--space-large);
+  font-size: 1.25em;
+  font-style: italic;
+  text-align: center;
+  color: var(--color-accent);
+  border-block: 2px solid var(--color-accent);
+}
+
+.pullquote p {
+  margin: 0;
+  text-align: center;
+}
+
+/* Section break shortcode */
+.section-break {
+  margin-block: var(--space-very-large);
+  border: none;
+  text-align: center;
+}
+
+.section-break::before {
+  content: "* * *";
+  display: block;
+  color: var(--color-light-darker);
+  letter-spacing: 1em;
+}
+
+[data-theme="ghost"] .pullquote {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  text-shadow: 0 0 20px var(--glow-accent-subtle);
+}
+
