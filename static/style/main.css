@@ -1695,3 +1695,40 @@ article {
   border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
 
+/* Keywords list page */
+.keywords-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-small);
+  margin-block: var(--space-large);
+}
+
+.keyword-pill {
+  display: inline-block;
+  padding: var(--space-small) var(--space);
+  background: var(--color-dark-blue);
+  border: 1px solid var(--color-dark-lighter);
+  border-radius: var(--space-very-small);
+  font-size: 0.95em;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.keyword-pill:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+[data-theme="ghost"] .keyword-pill {
+  background: var(--color-lighter);
+  border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+[data-theme="ghost"] .keyword-pill:hover {
+  background: var(--glow-accent-faint);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  box-shadow: 0 0 10px var(--glow-accent-subtle);
+}
+
