@@ -72,7 +72,7 @@ Series, films, anime, and animation I recommend.
   <div class="watching-item">
     <a href="https://en.wikipedia.org/wiki/Pulp_Fiction"><img src="/images/watching/pulp-fiction.jpg" alt="Pulp Fiction"></a>
     <a href="https://en.wikipedia.org/wiki/Pulp_Fiction">Pulp Fiction</a>
-    <span class="rating">8.9</span>
+    <span class="rating">8.8</span>
   </div>
   <div class="watching-item">
     <a href="https://en.wikipedia.org/wiki/City_of_God_(2002_film)"><img src="/images/watching/city-of-god.jpg" alt="City of God"></a>
@@ -157,7 +157,7 @@ Series, films, anime, and animation I recommend.
   <div class="watching-item">
     <a href="https://en.wikipedia.org/wiki/The_Dark_Knight"><img src="/images/watching/the-dark-knight.jpg" alt="The Dark Knight"></a>
     <a href="https://en.wikipedia.org/wiki/The_Dark_Knight">The Dark Knight</a>
-    <span class="rating">9.0</span>
+    <span class="rating">9.1</span>
   </div>
   <div class="watching-item">
     <a href="https://en.wikipedia.org/wiki/Inception"><img src="/images/watching/inception.jpg" alt="Inception"></a>
