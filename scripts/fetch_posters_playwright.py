@@ -8,40 +8,10 @@ from playwright.sync_api import sync_playwright
 
 DEST_DIR = "/Users/unbalancedparen/federicocarrone.com/static/images/watching"
 
-# Low-res images that need better versions (under 500px width)
+# Posters to fetch
 SHOWS = [
-    # Movies - 220px wide
-    ("Inglourious Basterds", "inglourious-basterds.jpg", "movie"),
-    ("Little Miss Sunshine", "little-miss-sunshine.jpg", "movie"),
-    ("Midnight in Paris", "midnight-in-paris.jpg", "movie"),
-    ("The Departed", "the-departed.jpg", "movie"),
-    ("Blue Jasmine", "blue-jasmine.jpg", "movie"),
-    ("Django Unchained", "django-unchained.jpg", "movie"),
-    ("Drive 2011", "drive.jpg", "movie"),
-    ("Inception", "inception.jpg", "movie"),
-    ("Shutter Island", "shutter-island.jpg", "movie"),
-    ("Fight Club", "fight-club.jpg", "movie"),
-    ("Gangs of New York", "gangs-of-new-york.jpg", "movie"),
-    ("Apocalypse Now", "apocalypse-now.jpg", "movie"),
-    ("The Girl with the Dragon Tattoo 2011", "the-girl-with-the-dragon-tattoo.jpg", "movie"),
-    ("The Grand Budapest Hotel", "the-grand-budapest-hotel.jpg", "movie"),
-    ("Reservoir Dogs", "reservoir-dogs.jpg", "movie"),
-    ("The Big Lebowski", "the-big-lebowski.jpg", "movie"),
-    ("There Will Be Blood", "there-will-be-blood.jpg", "movie"),
-    ("The Dark Knight", "the-dark-knight.jpg", "movie"),
-    ("Dune 2021", "dune-part-one.jpg", "movie"),
-    ("Dune Part Two", "dune-part-two.jpg", "movie"),
-    ("Once Upon a Time in Hollywood", "once-upon-a-time-in-hollywood.jpg", "movie"),
-    ("Gladiator 2000", "gladiator.jpg", "movie"),
-    ("Pulp Fiction", "pulp-fiction.jpg", "movie"),
-    ("The Wolf of Wall Street", "the-wolf-of-wall-street.jpg", "movie"),
-    ("The Good the Bad and the Ugly", "the-good-the-bad-and-the-ugly.jpg", "movie"),
-    # Anime
-    ("Ghost in the Shell 1995", "ghost-in-the-shell.jpg", "movie"),
-    ("Akira 1988", "akira.jpg", "movie"),
-    ("Cowboy Bebop", "cowboy-bebop.jpg", "tv"),
-    # TV
-    ("Rick and Morty", "rick-and-morty.jpg", "tv"),
+    # Oldboy 2003 Korean original
+    ("올드보이", "oldboy.jpg", "movie"),
 ]
 
 def fetch_poster(page, search_term, filename, media_type):
