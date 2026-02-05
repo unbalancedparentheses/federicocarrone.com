@@ -3,7 +3,7 @@ title = "Building a SaaS with Elixir/Phoenix and React"
 date = "2026-01-25"
 description = "Our stack and practices for building SaaS applications: Elixir on the backend, React on the frontend, Nix for everything else. No Docker. No Kubernetes."
 [taxonomies]
-keywords=["elixir", "phoenix", "react", "saas", "nix"]
+keywords=["elixir", "phoenix", "react", "SaaS", "nix"]
 [extra]
 author = "Federico Carrone"
 pinned = false
