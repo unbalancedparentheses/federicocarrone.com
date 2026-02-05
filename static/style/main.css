@@ -579,17 +579,22 @@ main {
 
   > ul {
     display: grid;
-    grid-template-columns: repeat(8, auto);
+    grid-template-columns: repeat(9, auto);
     justify-content: center;
     gap: var(--space-large);
     padding: 0;
     height: var(--space-very-large);
     align-items: center;
 
-    @media (max-width: 700px) {
-      grid-template-columns: repeat(7, auto);
+    @media (max-width: 900px) {
+      grid-template-columns: repeat(8, auto);
       gap: var(--space);
       font-size: 0.9em;
+    }
+
+    @media (max-width: 700px) {
+      gap: var(--space-small);
+      font-size: 0.85em;
     }
   }
 
@@ -1166,6 +1171,8 @@ article {
     height: auto;
     padding-block: var(--space-small);
     row-gap: var(--space-small);
+    gap: var(--space-very-small) var(--space-small);
+    font-size: 0.85em;
   }
 
   #reading-progress {
