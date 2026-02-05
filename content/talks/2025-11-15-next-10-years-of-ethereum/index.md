@@ -1,6 +1,6 @@
 +++
 title = "Next 10 Years of Ethereum"
-date = "2023-11-15"
+date = "2025-11-15"
 description = "Talk at Devconnect about the next 10 years of Ethereum"
 [extra]
 event = "Devconnect"
