@@ -2,18 +2,16 @@
 
 {% extends "base.html" %}
 
-{% set display_name = config.extra.keyword_display[term.name] | default(value=term.name | capitalize) %}
-
 {% block title -%}
-  The {{ display_name }} Keyword
+  {{ term.name | upper }} — Keywords
 {%- endblock title %}
 
 {% block long_title -%}
-  The {{ display_name }} Keyword
+  {{ term.name | upper }} — Keywords
 {%- endblock long_title %}
 
 {% block body %}
-  <h1>The {{ display_name }} Keyword</h1>
+  <h1>{{ term.name | upper }}</h1>
 
   <p>Not the keyword you're looking for? <a href="{{ get_url(path = "/keywords") }}"">See all keywords</a>.</p>
 
