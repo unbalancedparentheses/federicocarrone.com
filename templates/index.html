@@ -1,5 +1,6 @@
 {% import "macros/article.html" as article %}
 {% import "macros/series.html" as series %}
+{% import "macros/newsletter.html" as newsletter %}
 
 {% extends "base.html" %}
 
@@ -14,7 +15,32 @@
 {% block body %}
 <h1 class="visually-hidden">Federico Carrone's Blog</h1>
 
-<p>I am Federico Carrone, an entrepreneur working at the intersection of technology, finance, and culture. I created <a href="https://ergodicgroup.com">Ergodic Group</a>, a privately held holding company through which I build and hold companies in distributed systems, cryptography, AI, gaming, and real assets. I operate with the conviction that digital infrastructure, capital markets, and cultural production are converging into a single strategic domain, and I focus on long horizon structures where time acts as a filter for quality, judgment, and durability rather than a constraint.</p>
+<section class="positioning">
+  <p>I am Federico Carrone, an entrepreneur at the intersection of technology, finance, and culture. Through <a href="https://ergodicgroup.com">Ergodic Group</a>, I build and hold companies in distributed systems, cryptography, AI, gaming, and real assets.</p>
+
+  <p>This site is where I write about the systems that shape the future: cryptographic infrastructure, institutional design, and the culture that emerges from both. I focus on what compounds over time rather than what trends today.</p>
+</section>
+
+<section class="start-here">
+  <h2>Start here</h2>
+  <ul>
+    <li><a href="/articles/notes-on-culture-infrastructure-time-and-ergodicity/">Notes on permanence, time, and ergodicity</a></li>
+    <li><a href="/series/ethereum/the-missing-institution-of-the-internet/">The missing institution of the Internet</a> (Ethereum series)</li>
+    <li><a href="/articles/crypto-doctrine/">Crypto doctrine</a></li>
+    <li><a href="/articles/transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms/">Transforming the Future with ZKPs</a></li>
+  </ul>
+</section>
+
+<section class="topic-list">
+  <h2>What I write about</h2>
+  <div class="topic-pills">
+    <a href="/keywords/crypto/" class="topic-pill">Crypto</a>
+    <a href="/keywords/ethereum/" class="topic-pill">Ethereum</a>
+    <a href="/keywords/ai/" class="topic-pill">AI</a>
+    <a href="/keywords/programming-languages/" class="topic-pill">Programming Languages</a>
+    <a href="/keywords/philosophy/" class="topic-pill">Philosophy</a>
+  </div>
+</section>
 
   <section vocab="https://schema.org" typeof="ItemList">
     <h2 property="name">Latest</h2>
@@ -71,6 +97,8 @@
     <button class="timeline-show-more">Show all ({{ sorted_items | length }} items)</button>
     {% endif %}
   </section>
+
+{{ newsletter::form() }}
 
 <script type="application/ld+json">
 {
