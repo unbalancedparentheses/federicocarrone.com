@@ -8,31 +8,48 @@ from playwright.sync_api import sync_playwright
 
 DEST_DIR = "/Users/unbalancedparen/federicocarrone.com/static/images/watching"
 
-# Items to fetch - (search_term, filename, type: tv/movie)
+# Low-res images that need better versions (under 500px width)
 SHOWS = [
-    # Small images that need better versions (under 50KB)
-    ("The Irishman", "the-irishman.jpg", "movie"),
-    ("Full Metal Jacket", "full-metal-jacket.jpg", "movie"),
-    ("Snatch", "snatch.jpg", "movie"),
-    ("Zodiac", "zodiac.jpg", "movie"),
-    ("City of God", "city-of-god.jpg", "movie"),
-    ("Love Death Robots", "love-death-robots.jpg", "tv"),
-    ("The Godfather", "the-godfather.jpg", "movie"),
-    ("Sin City", "sin-city.jpg", "movie"),
-    ("The Darjeeling Limited", "the-darjeeling-limited.jpg", "movie"),
-    ("Oldboy", "oldboy.jpg", "movie"),
-    ("BoJack Horseman", "bojack-horseman.jpg", "tv"),
-    ("Gravity Falls", "gravity-falls.jpg", "tv"),
+    # Movies - 220px wide
+    ("Inglourious Basterds", "inglourious-basterds.jpg", "movie"),
+    ("Little Miss Sunshine", "little-miss-sunshine.jpg", "movie"),
+    ("Midnight in Paris", "midnight-in-paris.jpg", "movie"),
+    ("The Departed", "the-departed.jpg", "movie"),
+    ("Blue Jasmine", "blue-jasmine.jpg", "movie"),
+    ("Django Unchained", "django-unchained.jpg", "movie"),
+    ("Drive 2011", "drive.jpg", "movie"),
+    ("Inception", "inception.jpg", "movie"),
+    ("Shutter Island", "shutter-island.jpg", "movie"),
+    ("Fight Club", "fight-club.jpg", "movie"),
+    ("Gangs of New York", "gangs-of-new-york.jpg", "movie"),
+    ("Apocalypse Now", "apocalypse-now.jpg", "movie"),
+    ("The Girl with the Dragon Tattoo 2011", "the-girl-with-the-dragon-tattoo.jpg", "movie"),
+    ("The Grand Budapest Hotel", "the-grand-budapest-hotel.jpg", "movie"),
+    ("Reservoir Dogs", "reservoir-dogs.jpg", "movie"),
+    ("The Big Lebowski", "the-big-lebowski.jpg", "movie"),
+    ("There Will Be Blood", "there-will-be-blood.jpg", "movie"),
+    ("The Dark Knight", "the-dark-knight.jpg", "movie"),
+    ("Dune 2021", "dune-part-one.jpg", "movie"),
+    ("Dune Part Two", "dune-part-two.jpg", "movie"),
+    ("Once Upon a Time in Hollywood", "once-upon-a-time-in-hollywood.jpg", "movie"),
+    ("Gladiator 2000", "gladiator.jpg", "movie"),
+    ("Pulp Fiction", "pulp-fiction.jpg", "movie"),
+    ("The Wolf of Wall Street", "the-wolf-of-wall-street.jpg", "movie"),
+    ("The Good the Bad and the Ugly", "the-good-the-bad-and-the-ugly.jpg", "movie"),
+    # Anime
+    ("Ghost in the Shell 1995", "ghost-in-the-shell.jpg", "movie"),
+    ("Akira 1988", "akira.jpg", "movie"),
+    ("Cowboy Bebop", "cowboy-bebop.jpg", "tv"),
+    # TV
+    ("Rick and Morty", "rick-and-morty.jpg", "tv"),
 ]
 
 def fetch_poster(page, search_term, filename, media_type):
     print(f"Fetching: {search_term} -> {filename}")
 
-    # Go to TMDB search
     search_url = f"https://www.themoviedb.org/search/{media_type}?query={search_term.replace(' ', '+')}"
     page.goto(search_url, wait_until="networkidle")
 
-    # Find the first poster image
     try:
         img = page.locator("img.poster").first
         img.wait_for(timeout=5000)
@@ -46,33 +63,23 @@ def fetch_poster(page, search_term, filename, media_type):
             if not full_url.startswith("http"):
                 full_url = "https://image.tmdb.org" + full_url
 
-            print(f"  Found: {full_url}")
-
-            # Download the image
             dest = os.path.join(DEST_DIR, filename)
             req = urllib.request.Request(full_url, headers={
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
             })
             with urllib.request.urlopen(req, timeout=30) as response:
                 data = response.read()
-
-                # Only save if larger than existing
-                existing_size = os.path.getsize(dest) if os.path.exists(dest) else 0
-                if len(data) > existing_size:
-                    with open(dest, 'wb') as f:
-                        f.write(data)
-                    print(f"  ✓ Saved ({len(data)//1024}KB, was {existing_size//1024}KB)")
-                    return True
-                else:
-                    print(f"  - Skipped (new {len(data)//1024}KB <= existing {existing_size//1024}KB)")
-                    return False
+                with open(dest, 'wb') as f:
+                    f.write(data)
+                print(f"  ✓ Saved ({len(data)//1024}KB)")
+                return True
     except Exception as e:
         print(f"  ✗ Error: {e}")
 
     return False
 
 def main():
-    print(f"Saving to: {DEST_DIR}\n")
+    print(f"Fetching {len(SHOWS)} posters...\n")
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -85,7 +92,7 @@ def main():
 
         browser.close()
 
-    print(f"\nDone! {success}/{len(SHOWS)} posters updated.")
+    print(f"\nDone! {success}/{len(SHOWS)} posters fetched.")
 
 if __name__ == "__main__":
     main()
