@@ -34,4 +34,8 @@ Podcasts and videos I recommend.
     <a href="https://youtube.com/watch?v=k8kjPxrXuFU"><img src="https://img.youtube.com/vi/k8kjPxrXuFU/hqdefault.jpg" alt="This Painting Is Beyond Insane"></a>
     <a href="https://youtube.com/watch?v=k8kjPxrXuFU">This Painting Is Beyond Insane</a>
   </div>
+  <div class="listening-item">
+    <a href="https://youtube.com/watch?v=tWYxrowovts"><img src="https://img.youtube.com/vi/tWYxrowovts/hqdefault.jpg" alt="How Did The World Get So Ugly?"></a>
+    <a href="https://youtube.com/watch?v=tWYxrowovts">How Did The World Get So Ugly?</a>
+  </div>
 </div>
