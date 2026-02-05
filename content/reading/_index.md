@@ -4,7 +4,7 @@ template = "reading.html"
 description = "Book recommendations from Federico Carrone"
 +++
 
-Books that have shaped my thinking. Each recommendation includes why it matters and what you might take from it.
+Books I recommend.
 
 ## Philosophy
 
