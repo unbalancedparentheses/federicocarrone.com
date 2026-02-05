@@ -2,17 +2,27 @@
 """Fetch TV/Movie posters using Playwright to scrape TMDB"""
 
 import os
+import re
 import urllib.request
 from playwright.sync_api import sync_playwright
 
 DEST_DIR = "/Users/unbalancedparen/federicocarrone.com/static/images/watching"
 
+# Items to fetch - (search_term, filename, type: tv/movie)
 SHOWS = [
-    # (search_term, filename, type: tv/movie)
-    ("The Killing", "the-killing.jpg", "tv"),
-    ("Boardwalk Empire", "boardwalk-empire.jpg", "tv"),
-    ("Band of Brothers", "band-of-brothers.jpg", "tv"),
-    ("Watchmen", "watchmen.jpg", "movie"),
+    # Small images that need better versions (under 50KB)
+    ("The Irishman", "the-irishman.jpg", "movie"),
+    ("Full Metal Jacket", "full-metal-jacket.jpg", "movie"),
+    ("Snatch", "snatch.jpg", "movie"),
+    ("Zodiac", "zodiac.jpg", "movie"),
+    ("City of God", "city-of-god.jpg", "movie"),
+    ("Love Death Robots", "love-death-robots.jpg", "tv"),
+    ("The Godfather", "the-godfather.jpg", "movie"),
+    ("Sin City", "sin-city.jpg", "movie"),
+    ("The Darjeeling Limited", "the-darjeeling-limited.jpg", "movie"),
+    ("Oldboy", "oldboy.jpg", "movie"),
+    ("BoJack Horseman", "bojack-horseman.jpg", "tv"),
+    ("Gravity Falls", "gravity-falls.jpg", "tv"),
 ]
 
 def fetch_poster(page, search_term, filename, media_type):
@@ -29,8 +39,7 @@ def fetch_poster(page, search_term, filename, media_type):
         src = img.get_attribute("src")
 
         if src:
-            # Convert to full size URL
-            import re
+            # Convert to full size URL (w500)
             full_url = re.sub(r'/t/p/w\d+_and_h\d+_\w+/', '/t/p/w500/', src)
             full_url = re.sub(r'/t/p/w\d+/', '/t/p/w500/', full_url)
 
@@ -46,10 +55,17 @@ def fetch_poster(page, search_term, filename, media_type):
             })
             with urllib.request.urlopen(req, timeout=30) as response:
                 data = response.read()
-                with open(dest, 'wb') as f:
-                    f.write(data)
-                print(f"  ✓ Saved ({len(data)//1024}KB)")
-                return True
+
+                # Only save if larger than existing
+                existing_size = os.path.getsize(dest) if os.path.exists(dest) else 0
+                if len(data) > existing_size:
+                    with open(dest, 'wb') as f:
+                        f.write(data)
+                    print(f"  ✓ Saved ({len(data)//1024}KB, was {existing_size//1024}KB)")
+                    return True
+                else:
+                    print(f"  - Skipped (new {len(data)//1024}KB <= existing {existing_size//1024}KB)")
+                    return False
     except Exception as e:
         print(f"  ✗ Error: {e}")
 
@@ -69,7 +85,7 @@ def main():
 
         browser.close()
 
-    print(f"\nDone! {success}/{len(SHOWS)} posters downloaded.")
+    print(f"\nDone! {success}/{len(SHOWS)} posters updated.")
 
 if __name__ == "__main__":
     main()
