@@ -29,12 +29,13 @@
   <link rel="dns-prefetch" href="https://cloud.umami.is" />
 
   <meta name="author" content="Federico Carrone" />
+  <meta name="robots" content="index, follow" />
   {%- if page.description %}
   <meta name="description" content="{{ page.description }}" />
   {%- elif section.description %}
   <meta name="description" content="{{ section.description }}" />
   {%- else %}
-  <meta name="description" content="Federico Carrone's personal website on technology, finance, and culture" />
+  <meta name="description" content="Writing on cryptographic infrastructure, institutional design, distributed systems, and the culture that emerges from technology." />
   {%- endif %}
   {%- if page.taxonomies.keywords %}
   <meta name="keywords" content="{{ page.taxonomies.keywords | join(sep=", ") }}" />
@@ -45,9 +46,16 @@
   {%- elif section.description %}
   <meta property="og:description" content="{{ section.description }}" />
   {%- else %}
-  <meta property="og:description" content="Federico Carrone's personal website on technology, finance, and culture" />
+  <meta property="og:description" content="Writing on cryptographic infrastructure, institutional design, distributed systems, and the culture that emerges from technology." />
   {%- endif %}
   <meta property="og:site_name" content="federicocarrone.com" />
+  {%- if page.date %}
+  <meta property="article:published_time" content="{{ page.date | date(format="%Y-%m-%dT%H:%M:%SZ") }}" />
+  {%- endif %}
+  {%- if page.updated %}
+  <meta property="article:modified_time" content="{{ page.updated | date(format="%Y-%m-%dT%H:%M:%SZ") }}" />
+  {%- endif %}
+  <meta property="article:author" content="https://federicocarrone.com/about/" />
   <meta property="og:locale" content="en_US" />
   {% set first_component = page.components | default(value = []) | first -%}
   <meta property="og:type" content="{% if first_component == "series" or first_component == "articles" -%}article{% else %}website{% endif %}" />
@@ -60,6 +68,14 @@
   {%- endif %}
   <meta property="og:image" content="https://federicocarrone.com/images/twitter-card.png" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{%- if page.title %}{{ page.title }}{% elif section.title %}{{ section.title }}{% else %}federicocarrone.com{% endif -%}" />
+  {%- if page.description %}
+  <meta name="twitter:description" content="{{ page.description }}" />
+  {%- elif section.description %}
+  <meta name="twitter:description" content="{{ section.description }}" />
+  {%- else %}
+  <meta name="twitter:description" content="Writing on cryptographic infrastructure, institutional design, distributed systems, and the culture that emerges from technology." />
+  {%- endif %}
   <meta name="twitter:image" content="https://federicocarrone.com/images/twitter-card.png" />
   <meta name="twitter:site" content="@federicocarrone" />
   <meta name="twitter:creator" content="@federicocarrone" />
