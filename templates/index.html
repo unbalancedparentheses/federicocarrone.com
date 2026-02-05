@@ -1,6 +1,5 @@
 {% import "macros/article.html" as article %}
 {% import "macros/series.html" as series %}
-{% import "macros/newsletter.html" as newsletter %}
 
 {% extends "base.html" %}
 
@@ -29,17 +28,6 @@
     <li><a href="/articles/crypto-doctrine/">Crypto doctrine</a></li>
     <li><a href="/articles/transforming-the-future-with-zero-knowledge-proofs-fully-homomorphic-encryption-and-new-distributed-systems-algorithms/">Transforming the Future with ZKPs</a></li>
   </ul>
-</section>
-
-<section class="topic-list">
-  <h2>What I write about</h2>
-  <div class="topic-pills">
-    <a href="/keywords/crypto/" class="topic-pill">Crypto</a>
-    <a href="/keywords/ethereum/" class="topic-pill">Ethereum</a>
-    <a href="/keywords/ai/" class="topic-pill">AI</a>
-    <a href="/keywords/programming-languages/" class="topic-pill">Programming Languages</a>
-    <a href="/keywords/philosophy/" class="topic-pill">Philosophy</a>
-  </div>
 </section>
 
   <section vocab="https://schema.org" typeof="ItemList">
@@ -97,8 +85,6 @@
     <button class="timeline-show-more">Show all ({{ sorted_items | length }} items)</button>
     {% endif %}
   </section>
-
-{{ newsletter::form() }}
 
 <script type="application/ld+json">
 {

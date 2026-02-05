@@ -165,7 +165,7 @@ h1 {
 }
 
 /* Heading anchor links */
-:is(h2, h3, h4, h5, h6) {
+:is(h1, h2, h3, h4, h5, h6) {
   position: relative;
 
   > a.zola-anchor {
@@ -1443,6 +1443,29 @@ article {
 
 .watching-item .rating::before {
   content: "IMDb ";
+}
+
+/* Listening gallery */
+.listening-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space);
+}
+
+.listening-item {
+  text-align: center;
+}
+
+.listening-item img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.listening-item a {
+  display: block;
+  margin-top: var(--space-small);
 }
 
 /* Reading gallery */
