@@ -25,6 +25,10 @@ Visual stories that have left a lasting impression. A curated selection of anime
     <a href="https://en.wikipedia.org/wiki/Akira_(1988_film)"><img src="/images/watching/akira.jpg" alt="Akira"></a>
     <a href="https://en.wikipedia.org/wiki/Akira_(1988_film)">Akira</a>
   </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Attack_on_Titan"><img src="/images/watching/attack-on-titan.jpg" alt="Attack on Titan"></a>
+    <a href="https://en.wikipedia.org/wiki/Attack_on_Titan">Attack on Titan</a>
+  </div>
 </div>
 
 ## Animation
@@ -68,8 +72,44 @@ Visual stories that have left a lasting impression. A curated selection of anime
 
 <div class="watching-gallery">
   <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/The_Sopranos"><img src="/images/watching/the-sopranos.jpg" alt="The Sopranos"></a>
+    <a href="https://en.wikipedia.org/wiki/The_Sopranos">The Sopranos</a>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/The_Wire"><img src="/images/watching/the-wire.jpg" alt="The Wire"></a>
+    <a href="https://en.wikipedia.org/wiki/The_Wire">The Wire</a>
+  </div>
+  <div class="watching-item">
     <a href="https://en.wikipedia.org/wiki/Homeland_(TV_series)"><img src="/images/watching/homeland.jpg" alt="Homeland"></a>
     <a href="https://en.wikipedia.org/wiki/Homeland_(TV_series)">Homeland</a>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/The_Killing_(American_TV_series)"><img src="/images/watching/the-killing.jpg" alt="The Killing"></a>
+    <a href="https://en.wikipedia.org/wiki/The_Killing_(American_TV_series)">The Killing</a>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Boardwalk_Empire"><img src="/images/watching/boardwalk-empire.jpg" alt="Boardwalk Empire"></a>
+    <a href="https://en.wikipedia.org/wiki/Boardwalk_Empire">Boardwalk Empire</a>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Sherlock_(TV_series)"><img src="/images/watching/sherlock.jpg" alt="Sherlock"></a>
+    <a href="https://en.wikipedia.org/wiki/Sherlock_(TV_series)">Sherlock</a>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Band_of_Brothers_(miniseries)"><img src="/images/watching/band-of-brothers.jpg" alt="Band of Brothers"></a>
+    <a href="https://en.wikipedia.org/wiki/Band_of_Brothers_(miniseries)">Band of Brothers</a>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Game_of_Thrones"><img src="/images/watching/game-of-thrones.jpg" alt="Game of Thrones"></a>
+    <a href="https://en.wikipedia.org/wiki/Game_of_Thrones">Game of Thrones</a>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/The_Office_(American_TV_series)"><img src="/images/watching/the-office.jpg" alt="The Office"></a>
+    <a href="https://en.wikipedia.org/wiki/The_Office_(American_TV_series)">The Office</a>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Succession_(TV_series)"><img src="/images/watching/succession.jpg" alt="Succession"></a>
+    <a href="https://en.wikipedia.org/wiki/Succession_(TV_series)">Succession</a>
   </div>
 </div>
 
@@ -135,6 +175,10 @@ Visual stories that have left a lasting impression. A curated selection of anime
   <div class="watching-item">
     <a href="https://en.wikipedia.org/wiki/Oldboy_(2003_film)"><img src="/images/watching/oldboy.jpg" alt="Oldboy"></a>
     <a href="https://en.wikipedia.org/wiki/Oldboy_(2003_film)">Oldboy</a>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Watchmen_(film)"><img src="/images/watching/watchmen.jpg" alt="Watchmen"></a>
+    <a href="https://en.wikipedia.org/wiki/Watchmen_(film)">Watchmen</a>
   </div>
 </div>
 
