@@ -15,8 +15,7 @@
 
   <div class="keywords-list">
     {% for term in terms -%}
-      {% set display_name = config.extra.keyword_display[term.name] | default(value=term.name | capitalize) %}
-      <a href="/keywords/{{ term.name | slugify }}/" class="keyword-pill">{{ display_name }}</a>
+      <a href="/keywords/{{ term.name | slugify }}/" class="keyword-pill">{{ term.name | capitalize }}</a>
     {% endfor %}
   </div>
 {% endblock %}
