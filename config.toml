@@ -29,3 +29,9 @@ taxonomies = "on"
 anchors = "on"
 
 [extra]
+
+[extra.keyword_display]
+saas = "SaaS"
+ai = "AI"
+zkp = "ZKP"
+fhe = "FHE"
