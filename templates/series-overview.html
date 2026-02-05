@@ -16,6 +16,29 @@
 
     {{ section.content | safe }}
 
+    {% if section.extra.core_problem or section.extra.existing_failures or section.extra.our_approach %}
+    <div class="series-intro">
+      {% if section.extra.core_problem %}
+      <div class="series-intro-section">
+        <h3>The Problem</h3>
+        <p>{{ section.extra.core_problem }}</p>
+      </div>
+      {% endif %}
+      {% if section.extra.existing_failures %}
+      <div class="series-intro-section">
+        <h3>Why Existing Approaches Fail</h3>
+        <p>{{ section.extra.existing_failures }}</p>
+      </div>
+      {% endif %}
+      {% if section.extra.our_approach %}
+      <div class="series-intro-section">
+        <h3>Our Approach</h3>
+        <p>{{ section.extra.our_approach }}</p>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
     <h2>Episodes</h2>
 
     <div role="list">
