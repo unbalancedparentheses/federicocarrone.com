@@ -1555,3 +1555,17 @@ article {
   box-shadow: 0 0 10px var(--glow-accent-subtle);
 }
 
+/* Article entry point */
+.entry-point {
+  margin-block: var(--space-large);
+  padding: var(--space);
+  background: var(--color-dark-blue);
+  border-left: 3px solid var(--color-accent);
+  color: var(--color-light-darker);
+}
+
+[data-theme="ghost"] .entry-point {
+  background: var(--color-lighter);
+  border-left-color: var(--color-accent);
+}
+

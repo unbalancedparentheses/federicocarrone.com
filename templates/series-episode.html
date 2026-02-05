@@ -67,6 +67,10 @@
       {{ article::metadata(page = page, full = true) }}
     </header>
 
+    {% if page.extra.entry_point %}
+    <p class="entry-point"><em>{{ page.extra.entry_point }}</em></p>
+    {% endif %}
+
     {{ article::table_of_content(page = page) }}
 
     {{ page.content | safe }}

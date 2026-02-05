@@ -7,6 +7,7 @@ keywords=["elixir", "phoenix", "react", "SaaS", "nix"]
 [extra]
 author = "Federico Carrone"
 pinned = false
+entry_point = "For technical leaders evaluating stack choices. Answers: how do you build SaaS without Docker/Kubernetes complexity?"
 +++
 
 Most SaaS codebases I've seen share the same problems. Authentication that sort of works until someone finds an edge case. Caching layers that nobody fully understands. Deployment scripts held together with hope. The team moves fast early on, then spends years paying down the debt.
