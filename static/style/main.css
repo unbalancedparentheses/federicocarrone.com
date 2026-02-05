@@ -1434,6 +1434,17 @@ article {
   margin-top: var(--space-small);
 }
 
+.watching-item .rating {
+  display: block;
+  font-size: 0.8em;
+  color: var(--color-light-darker);
+  margin-top: var(--space-very-small);
+}
+
+.watching-item .rating::before {
+  content: "IMDb ";
+}
+
 /* Reading gallery */
 .reading-gallery {
   display: flex;
