@@ -1,10 +1,10 @@
 +++
-title = "Podcast with Justin Drake"
+title = "Ethereum's Native Rollup Roadmap with Justin Drake"
 date = "2025-10-01"
-description = "Conversation with Justin Drake about Ethereum and cryptography"
+description = "Discussion about Ethereum's native rollup roadmap"
 [extra]
 event = "Podcast"
 youtube_id = "lutSYwknNjQ"
 +++
 
-{{ youtube(id="lutSYwknNjQ", title="Podcast with Justin Drake", caption="") }}
+{{ youtube(id="lutSYwknNjQ", title="Ethereum's Native Rollup Roadmap with Justin Drake", caption="") }}
