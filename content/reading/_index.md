@@ -6,14 +6,6 @@ description = "Book recommendations from Federico Carrone"
 
 Books I recommend.
 
-## Quickpicks
-
-| If you want... | Read these |
-|----------------|------------|
-| **Start here** | Antifragile, Working Backwards, Scale, The Sovereign Individual, Zero to One |
-| **If you like Taleb** | Seeing Like a State, The Sovereign Individual, Principles for Changing World Order |
-| **For crypto founders** | Fooled by Randomness, Broken Money, Our Dollar Your Problem |
-
 ## Browse by theme
 
 [Philosophy](#philosophy) | [Science & Mathematics](#science-mathematics) | [Engineering](#engineering) | [Economics & Money](#economics-money) | [History](#history) | [Business & Strategy](#business-strategy)

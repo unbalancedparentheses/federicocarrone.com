@@ -1495,6 +1495,49 @@ article {
   }
 }
 
+/* Talks gallery */
+.talks-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-very-large);
+}
+
+.talks-item {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-large);
+  align-items: start;
+}
+
+.talks-item img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.talks-item .content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-small);
+}
+
+.talks-item .title {
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+.talks-item .date {
+  font-size: 0.85em;
+  color: var(--color-light-darker);
+}
+
+@media (max-width: 600px) {
+  .talks-item {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Reading gallery */
 .reading-gallery {
   display: flex;

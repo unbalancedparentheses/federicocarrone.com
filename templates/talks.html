@@ -15,13 +15,13 @@
     <p>Talks and podcasts I've participated in.</p>
   </header>
 
-  <div class="timeline">
+  <div class="talks-gallery">
   {% for page in section.pages %}
-    <div class="timeline-item">
-      <a href="{{ page.permalink | safe }}">{{ page.title }}</a>
-      <div class="timeline-meta">
-        <time datetime="{{ page.date }}">{{ page.date | date(format = "%b %d, %Y") }}</time>
-        {% if page.extra.event %} · {{ page.extra.event }}{% endif %}
+    <div class="talks-item">
+      <a href="https://youtube.com/watch?v={{ page.extra.youtube_id }}"><img src="/images/talks/{{ page.extra.thumbnail }}" alt="{{ page.title }}"></a>
+      <div class="content">
+        <a class="title" href="https://youtube.com/watch?v={{ page.extra.youtube_id }}">{{ page.title }}</a>
+        <span class="date">{{ page.date | date(format = "%b %Y") }}{% if page.extra.event %} · {{ page.extra.event }}{% endif %}</span>
       </div>
     </div>
   {% endfor %}
