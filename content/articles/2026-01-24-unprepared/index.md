@@ -16,7 +16,7 @@ We will experience one of the biggest deflationary shocks in history. Only robot
 
 I find it almost absurd to watch so many YouTube channels and X accounts showing you how to create your own simple app or SaaS. If anybody can build things fast, what do you think will happen? Is there demand for thousands of applications of every kind? During the last 20 years some of the smartest people alive battled for attention of people by building software and the limitation was execution costs, speed and distribution.
 
-Right, but I'm forgeting that people say it's not the time of implementation anymore. In theory, we're now in the time of ideas. So what happens when someone has a good idea and anyone can copy it in days?
+Right, but I'm forgetting that people say it's not the time of implementation anymore. In theory, we're now in the time of ideas. So what happens when someone has a good idea and anyone can copy it in days?
 
 If implementation becomes worthless, what remains? Perhaps taste, distribution, or maybe in some cases deep domain expertise. But even those moats are eroding fast.
 
