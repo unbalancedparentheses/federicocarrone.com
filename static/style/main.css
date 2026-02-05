@@ -1162,7 +1162,10 @@ article {
   }
 
   #menu > ul {
-    height: 3.5rem;
+    grid-template-columns: repeat(4, 1fr);
+    height: auto;
+    padding-block: var(--space-small);
+    row-gap: var(--space-small);
   }
 
   #reading-progress {
