@@ -1455,12 +1455,13 @@ article {
 /* Listening gallery */
 .listening-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: var(--space);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-large);
 }
 
 .listening-item {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
 }
 
 .listening-item img {
@@ -1473,6 +1474,12 @@ article {
 .listening-item a {
   display: block;
   margin-top: var(--space-small);
+}
+
+.listening-item .date {
+  font-size: 0.85em;
+  color: var(--color-light-darker);
+  margin-top: var(--space-very-small);
 }
 
 /* Reading gallery */

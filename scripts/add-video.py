@@ -5,6 +5,7 @@ import re
 import sys
 import urllib.request
 import html
+from datetime import datetime
 
 def extract_video_id(url):
     """Extract video ID from various YouTube URL formats."""
@@ -53,11 +54,13 @@ def main():
     print(f"Title: {title}")
     print(f"Video ID: {video_id}")
     print()
+    date_str = datetime.now().strftime("%b %Y")
     print("HTML snippet:")
     print()
     snippet = f'''  <div class="listening-item">
     <a href="https://youtube.com/watch?v={video_id}"><img src="https://img.youtube.com/vi/{video_id}/hqdefault.jpg" alt="{html.escape(title)}"></a>
     <a href="https://youtube.com/watch?v={video_id}">{html.escape(title)}</a>
+    <span class="date">{date_str}</span>
   </div>'''
     print(snippet)
 
