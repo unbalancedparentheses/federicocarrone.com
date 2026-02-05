@@ -186,7 +186,7 @@ A clear explanation of how money systems have become dysfunctional and what pote
 <img src="/images/reading/our-dollar-your-problem.jpg" alt="Our Dollar, Your Problem">
 <div class="reading-content">
 
-### Our Dollar, Your Problem by Benn Steil
+### Our Dollar, Your Problem by Kenneth Rogoff
 
 An examination of the US dollar's global dominance and its implications. Essential reading for understanding discussions around Tether and dollar hegemony in the crypto space.
 
