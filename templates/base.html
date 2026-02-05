@@ -34,12 +34,19 @@
   {%- elif section.description %}
   <meta name="description" content="{{ section.description }}" />
   {%- else %}
-  <meta name="description" content="federicocarrone.com" />
+  <meta name="description" content="Federico Carrone's personal website on technology, finance, and culture" />
   {%- endif %}
   {%- if page.taxonomies.keywords %}
   <meta name="keywords" content="{{ page.taxonomies.keywords | join(sep=", ") }}" />
   {%- endif %}
   <meta property="og:title" content="{%- block long_title -%}federicocarrone.com{%- endblock long_title -%}" />
+  {%- if page.description %}
+  <meta property="og:description" content="{{ page.description }}" />
+  {%- elif section.description %}
+  <meta property="og:description" content="{{ section.description }}" />
+  {%- else %}
+  <meta property="og:description" content="Federico Carrone's personal website on technology, finance, and culture" />
+  {%- endif %}
   <meta property="og:site_name" content="federicocarrone.com" />
   <meta property="og:locale" content="en_US" />
   {% set first_component = page.components | default(value = []) | first -%}

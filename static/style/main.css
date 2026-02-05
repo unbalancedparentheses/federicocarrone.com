@@ -1256,151 +1256,159 @@ article {
   --color-dark-lighter: #142014;
   --color-dark-blue: #0a100a;
   --color-accent: #4ade80;
+  --color-accent-lighter: #86efac;
   --color-accent-darker: #22c55e;
   --color-accent2: #fbbf24;
+
+  /* Glow effects using color-mix for transparency */
+  --glow-accent: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  --glow-accent-subtle: color-mix(in srgb, var(--color-accent) 25%, transparent);
+  --glow-accent-faint: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  --glow-accent2: color-mix(in srgb, var(--color-accent2) 25%, transparent);
+  --glow-accent2-faint: color-mix(in srgb, var(--color-accent2) 10%, transparent);
 }
 
 [data-theme="ghost"] body {
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(74, 222, 128, 0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 100%, rgba(251, 191, 36, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 0%, var(--glow-accent-faint) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--color-accent2) 3%, transparent) 0%, transparent 50%),
     var(--color-light);
 }
 
 [data-theme="ghost"] #menu {
-  background: rgba(8, 12, 8, 0.95);
-  border-bottom: 1px solid rgba(74, 222, 128, 0.25);
+  background: color-mix(in srgb, var(--color-light) 95%, transparent);
+  border-bottom: 1px solid var(--glow-accent-subtle);
   backdrop-filter: blur(10px);
 }
 
 [data-theme="ghost"] #menu a[aria-current="page"] {
-  color: #4ade80;
+  color: var(--color-accent);
 }
 
 [data-theme="ghost"] a {
-  color: #4ade80;
+  color: var(--color-accent);
   transition: all 0.15s;
 }
 
 [data-theme="ghost"] a:hover {
-  color: #86efac;
-  text-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+  color: var(--color-accent-lighter);
+  text-shadow: 0 0 10px var(--glow-accent);
 }
 
 [data-theme="ghost"] h1,
 [data-theme="ghost"] h2,
 [data-theme="ghost"] h3 {
-  color: #4ade80;
+  color: var(--color-accent);
 }
 
 [data-theme="ghost"] article > header h1 {
-  color: #86efac;
-  text-shadow: 0 0 25px rgba(74, 222, 128, 0.3);
+  color: var(--color-accent-lighter);
+  text-shadow: 0 0 25px color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
 
 [data-theme="ghost"] .button {
   background: transparent;
-  border: 1px solid #4ade80;
-  color: #4ade80;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
   transition: all 0.2s;
 }
 
 [data-theme="ghost"] .button:hover {
-  background: rgba(74, 222, 128, 0.1);
-  box-shadow: 0 0 15px rgba(74, 222, 128, 0.25);
+  background: var(--glow-accent-faint);
+  box-shadow: 0 0 15px var(--glow-accent-subtle);
 }
 
 [data-theme="ghost"] #reading-progress {
-  background: linear-gradient(90deg, #22c55e, #4ade80);
-  box-shadow: 0 0 12px rgba(74, 222, 128, 0.4);
+  background: linear-gradient(90deg, var(--color-accent-darker), var(--color-accent));
+  box-shadow: 0 0 12px var(--glow-accent);
 }
 
 [data-theme="ghost"] pre {
-  border: 1px solid rgba(74, 222, 128, 0.12);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 12%, transparent);
 }
 
 [data-theme="ghost"] :not(pre) > code {
-  color: #fbbf24;
-  background: rgba(251, 191, 36, 0.1);
+  color: var(--color-accent2);
+  background: var(--glow-accent2-faint);
 }
 
 [data-theme="ghost"] blockquote {
-  border-left-color: #fbbf24;
-  background: rgba(251, 191, 36, 0.04);
+  border-left-color: var(--color-accent2);
+  background: color-mix(in srgb, var(--color-accent2) 4%, transparent);
 }
 
 [data-theme="ghost"] .label {
-  background: #22c55e;
+  background: var(--color-accent-darker);
 }
 
 [data-theme="ghost"] .reading-time {
-  background: rgba(74, 222, 128, 0.1);
-  border: 1px solid rgba(74, 222, 128, 0.2);
-  color: #4ade80;
+  background: var(--glow-accent-faint);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+  color: var(--color-accent);
 }
 
 [data-theme="ghost"] footer {
-  border-top-color: rgba(74, 222, 128, 0.2);
+  border-top-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
 [data-theme="ghost"] .article-poster,
 [data-theme="ghost"] .series-poster {
-  border-color: #142014;
+  border-color: var(--color-dark-lighter);
   transition: all 0.2s;
 }
 
 [data-theme="ghost"] .article-poster:hover,
 [data-theme="ghost"] .series-poster:hover {
-  border-color: #4ade80;
-  box-shadow: 0 0 20px rgba(74, 222, 128, 0.1);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 20px var(--glow-accent-faint);
 }
 
 [data-theme="ghost"] .toc {
-  border-left-color: #4ade80;
+  border-left-color: var(--color-accent);
 }
 
 [data-theme="ghost"] .newsletter {
-  border-color: #fbbf24;
-  background: linear-gradient(180deg, rgba(74, 222, 128, 0.02) 0%, rgba(251, 191, 36, 0.02) 100%);
+  border-color: var(--color-accent2);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 2%, transparent) 0%, color-mix(in srgb, var(--color-accent2) 2%, transparent) 100%);
 }
 
 [data-theme="ghost"] .newsletter-form input[type="email"] {
   background: var(--color-lighter);
-  border-color: #4ade80;
+  border-color: var(--color-accent);
   color: var(--color-dark);
 }
 
 [data-theme="ghost"] .newsletter-form input[type="email"]:focus {
-  box-shadow: 0 0 12px rgba(74, 222, 128, 0.25);
+  box-shadow: 0 0 12px var(--glow-accent-subtle);
 }
 
 [data-theme="ghost"] .newsletter-form button {
   background: transparent;
-  border-color: #fbbf24;
-  color: #fbbf24;
+  border-color: var(--color-accent2);
+  color: var(--color-accent2);
 }
 
 [data-theme="ghost"] .newsletter-form button:hover {
-  background: rgba(251, 191, 36, 0.1);
-  box-shadow: 0 0 12px rgba(251, 191, 36, 0.25);
+  background: var(--glow-accent2-faint);
+  box-shadow: 0 0 12px var(--glow-accent2);
 }
 
 [data-theme="ghost"] .theme-toggle:hover {
-  text-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 60%, transparent);
 }
 
 [data-theme="ghost"] ::selection {
-  background: rgba(74, 222, 128, 0.3);
+  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
   color: #fff;
 }
 
 [data-theme="ghost"] .log-entry {
-  border-left-color: #4ade80;
+  border-left-color: var(--color-accent);
   background: var(--color-lighter);
 }
 
 [data-theme="ghost"] .log-single .log-nav {
-  border-top-color: rgba(74, 222, 128, 0.2);
+  border-top-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
 /* Watching gallery */
