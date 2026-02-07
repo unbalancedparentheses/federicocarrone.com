@@ -6,7 +6,7 @@ import urllib.parse
 import json
 import os
 
-DEST_DIR = "/Users/unbalancedparen/federicocarrone.com/static/images/watching"
+DEST_DIR = "/Users/federicocarrone/projects/federicocarrone.com/static/images/watching"
 TMDB_IMG_BASE = "https://image.tmdb.org/t/p/w500"
 
 # Known TMDB poster paths (looked up manually - these are stable)
@@ -23,6 +23,7 @@ POSTERS = {
     "succession.jpg": "/7HW47XbkNQ5fiwQFYGWdw9gs144.jpg",
     # Anime
     "attack-on-titan.jpg": "/hTP1DtLGFamjfu8WqjnuQdP1n4i.jpg",
+    "peaky-blinders.jpg": "/vUUqzWa2LnHIVqkaKVlVGkVcZIW.jpg",
     # Movies
     "watchmen.jpg": "/zcKhFvSWvf0GIBcwqxHkMjLPqhE.jpg",
 }
