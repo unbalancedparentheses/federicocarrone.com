@@ -8,6 +8,34 @@ Podcasts and videos I recommend.
 
 <div class="listening-gallery">
   <div class="listening-item">
+    <a href="https://youtube.com/watch?v=zQThHCB_aec"><img src="/images/listening/we-have-900-days-left-emad-mostaque.jpg" alt="&quot;We have 900 days left.&quot; | Emad Mostaque"></a>
+    <div class="content">
+      <a class="title" href="https://youtube.com/watch?v=zQThHCB_aec">&quot;We have 900 days left.&quot; | Emad Mostaque</a>
+      <span class="date">Feb 2026</span>
+    </div>
+  </div>
+  <div class="listening-item">
+    <a href="https://youtube.com/watch?v=jLVgGGz5bvk"><img src="/images/listening/ben-horowitz-and-david-solomon-the-sweetest-macro-.jpg" alt="Ben Horowitz and David Solomon: The Sweetest Macro Spot in 40 Years"></a>
+    <div class="content">
+      <a class="title" href="https://youtube.com/watch?v=jLVgGGz5bvk">Ben Horowitz and David Solomon: The Sweetest Macro Spot in 40 Years</a>
+      <span class="date">Feb 2026</span>
+    </div>
+  </div>
+  <div class="listening-item">
+    <a href="https://youtube.com/watch?v=WRKsGogQYZo"><img src="/images/listening/what-the-keymaker-scene-in-the-matrix-actually-mea.jpg" alt="What The Keymaker Scene in The Matrix ACTUALLY Means"></a>
+    <div class="content">
+      <a class="title" href="https://youtube.com/watch?v=WRKsGogQYZo">What The Keymaker Scene in The Matrix ACTUALLY Means</a>
+      <span class="date">Feb 2026</span>
+    </div>
+  </div>
+  <div class="listening-item">
+    <a href="https://youtube.com/watch?v=QWaCsteIYig"><img src="/images/listening/how-one-artist-invented-modern-pop-culture-moebius.jpg" alt="How one artist invented modern pop culture (Moebius documentary)"></a>
+    <div class="content">
+      <a class="title" href="https://youtube.com/watch?v=QWaCsteIYig">How one artist invented modern pop culture (Moebius documentary)</a>
+      <span class="date">Feb 2026</span>
+    </div>
+  </div>
+  <div class="listening-item">
     <a href="https://youtube.com/watch?v=re5Ys6NYQKo"><img src="/images/listening/what-most-people-misunderstand-about-the-collapse-.jpg" alt="What most people Misunderstand about the Collapse of the Rules Based Order"></a>
     <div class="content">
       <a class="title" href="https://youtube.com/watch?v=re5Ys6NYQKo">What most people Misunderstand about the Collapse of the Rules Based Order: Featuring Michael Every</a>
