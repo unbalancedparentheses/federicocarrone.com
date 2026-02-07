@@ -8,6 +8,13 @@ Podcasts and videos I recommend.
 
 <div class="listening-gallery">
   <div class="listening-item">
+    <a href="https://youtube.com/watch?v=vfhszRuMA8Y"><img src="/images/listening/how-ai-wipes-out-capitalism-emad-mostaque.jpg" alt="How AI WIPES Out Capitalism Emad Mostaque"></a>
+    <div class="content">
+      <a class="title" href="https://youtube.com/watch?v=vfhszRuMA8Y">How AI WIPES Out Capitalism Emad Mostaque</a>
+      <span class="date">Feb 2026</span>
+    </div>
+  </div>
+  <div class="listening-item">
     <a href="https://youtube.com/watch?v=zQThHCB_aec"><img src="/images/listening/we-have-900-days-left-emad-mostaque.jpg" alt="&quot;We have 900 days left.&quot; | Emad Mostaque"></a>
     <div class="content">
       <a class="title" href="https://youtube.com/watch?v=zQThHCB_aec">&quot;We have 900 days left.&quot; | Emad Mostaque</a>
