@@ -45,6 +45,11 @@ Series, films, anime, and animation I recommend.
     <span class="rating">8.8</span>
   </div>
   <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Peaky_Blinders_(TV_series)"><img src="/images/watching/peaky-blinders.jpg" alt="Peaky Blinders"></a>
+    <a href="https://en.wikipedia.org/wiki/Peaky_Blinders_(TV_series)">Peaky Blinders</a>
+    <span class="rating">8.8</span>
+  </div>
+  <div class="watching-item">
     <a href="https://en.wikipedia.org/wiki/Boardwalk_Empire"><img src="/images/watching/boardwalk-empire.jpg" alt="Boardwalk Empire"></a>
     <a href="https://en.wikipedia.org/wiki/Boardwalk_Empire">Boardwalk Empire</a>
     <span class="rating">8.6</span>
