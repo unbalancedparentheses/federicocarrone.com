@@ -24,6 +24,7 @@ POSTERS = {
     # Anime
     "attack-on-titan.jpg": "/hTP1DtLGFamjfu8WqjnuQdP1n4i.jpg",
     "peaky-blinders.jpg": "/vUUqzWa2LnHIVqkaKVlVGkVcZIW.jpg",
+    "bron-broen.jpg": "/v8V9hLWArWhoIdmZ1ujmWrJZL6J.jpg",
     # Movies
     "watchmen.jpg": "/zcKhFvSWvf0GIBcwqxHkMjLPqhE.jpg",
 }
