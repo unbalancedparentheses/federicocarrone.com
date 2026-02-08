@@ -165,6 +165,17 @@ Written in 1997, this book predicted much of what the internet would do to the r
 </div>
 
 <div class="reading-item">
+<img src="/images/reading/the-network-state.jpg" alt="The Network State">
+<div class="reading-content">
+
+### The Network State by Balaji Srinivasan
+
+A blueprint for how online communities can organize and eventually become sovereign entities. Srinivasan connects technology, governance, and history to argue that the next form of political organization will emerge from the internet rather than from existing nation-states. A natural successor to The Sovereign Individual.
+
+</div>
+</div>
+
+<div class="reading-item">
 <img src="/images/reading/changing-world-order.jpg" alt="Principles for Changing World Order">
 <div class="reading-content">
 
