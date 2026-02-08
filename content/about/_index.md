@@ -3,6 +3,6 @@ title = "About"
 sort_by = "date"
 template = "about.html"
 page_template = "about.html"
-description = "All articles from federicocarrone.com where we explore various topics"
+description = "Federico Carrone — builder, writer, and founder working at the intersection of technology, finance, and culture"
 +++
 
