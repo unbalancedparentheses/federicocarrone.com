@@ -55,6 +55,11 @@ Series, films, anime, and animation I recommend.
     <span class="rating">8.6</span>
   </div>
   <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/The_Bridge_(Danish/Swedish_TV_series)"><img src="/images/watching/bron-broen.jpg" alt="Bron/Broen (The Bridge)"></a>
+    <a href="https://en.wikipedia.org/wiki/The_Bridge_(Danish/Swedish_TV_series)">Bron/Broen (The Bridge)</a>
+    <span class="rating">8.6</span>
+  </div>
+  <div class="watching-item">
     <a href="https://en.wikipedia.org/wiki/Homeland_(TV_series)"><img src="/images/watching/homeland.jpg" alt="Homeland"></a>
     <a href="https://en.wikipedia.org/wiki/Homeland_(TV_series)">Homeland</a>
     <span class="rating">8.3</span>
