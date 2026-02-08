@@ -6,6 +6,8 @@ description = "Podcasts and videos I recommend"
 
 Podcasts and videos I recommend.
 
+## 2026
+
 <div class="listening-gallery">
   <div class="listening-item">
     <a href="https://youtube.com/watch?v=vfhszRuMA8Y"><img src="/images/listening/how-ai-wipes-out-capitalism-emad-mostaque.jpg" alt="How AI WIPES Out Capitalism Emad Mostaque"></a>
