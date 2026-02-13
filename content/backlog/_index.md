@@ -56,3 +56,6 @@ Things I want to read or watch next.
 
 - *The Master and Margarita* by Mikhail Bulgakov
 - *Erta* by Andrea Ferrari
+- *Amp It Up* by Frank Slootman
+- *The Technological Republic* by Alexander Macgillivray
+- *The Age of AI* by Henry Kissinger, Eric Schmidt & Daniel Huttenlocher
