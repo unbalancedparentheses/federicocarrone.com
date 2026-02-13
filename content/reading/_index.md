@@ -152,6 +152,17 @@ An exploration of how spontaneous order emerges from chaos. Strogatz examines sy
 </div>
 </div>
 
+<div class="reading-item">
+<img src="/images/reading/information-theory-pierce.jpg" alt="An Introduction to Information Theory">
+<div class="reading-content">
+
+### An Introduction to Information Theory by John R. Pierce
+
+A clear introduction to Shannon's information theory without requiring advanced mathematics. Pierce explains entropy, channel capacity, and coding with remarkable clarity. Understanding information theory is fundamental for anyone working with data, communication systems, or trying to grasp the mathematical limits of what can be transmitted or compressed.
+
+</div>
+</div>
+
 </div>
 
 ## Engineering
