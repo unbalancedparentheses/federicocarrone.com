@@ -10,6 +10,13 @@ Podcasts and videos I recommend.
 
 <div class="listening-gallery">
   <div class="listening-item">
+    <a href="https://youtube.com/watch?v=dhyhR4Bzc0I"><img src="/images/listening/software-is-eating-labor.jpg" alt="Software is Eating Labor"></a>
+    <div class="content">
+      <a class="title" href="https://youtube.com/watch?v=dhyhR4Bzc0I">Software is Eating Labor</a>
+      <span class="date">Feb 2026</span>
+    </div>
+  </div>
+  <div class="listening-item">
     <a href="https://youtube.com/watch?v=ribrY5okACk"><img src="/images/listening/the-global-world-order-is-collapsing-and-its-much-.jpg" alt="The Global World Order Is Collapsing- And It&#x27;s Much Bigger Than Trump!"></a>
     <div class="content">
       <a class="title" href="https://youtube.com/watch?v=ribrY5okACk">The Global World Order Is Collapsing- And It&#x27;s Much Bigger Than Trump!</a>
