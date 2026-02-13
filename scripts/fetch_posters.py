@@ -25,6 +25,8 @@ POSTERS = {
     "attack-on-titan.jpg": "/hTP1DtLGFamjfu8WqjnuQdP1n4i.jpg",
     "peaky-blinders.jpg": "/vUUqzWa2LnHIVqkaKVlVGkVcZIW.jpg",
     "bron-broen.jpg": "/v8V9hLWArWhoIdmZ1ujmWrJZL6J.jpg",
+    "turn-washingtons-spies.jpg": "/AehTUycX0VSvCkOOkZzurLnjHsS.jpg",
+    "suits.jpg": "/vQiryp6LioFxQThywxbC6TuoDjy.jpg",
     # Movies
     "watchmen.jpg": "/zcKhFvSWvf0GIBcwqxHkMjLPqhE.jpg",
     # Animation
