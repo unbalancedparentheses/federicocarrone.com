@@ -163,6 +163,28 @@ A clear introduction to Shannon's information theory without requiring advanced 
 </div>
 </div>
 
+<div class="reading-item">
+<img src="/images/reading/joy-of-x.jpg" alt="The Joy of X">
+<div class="reading-content">
+
+### The Joy of X by Steven Strogatz
+
+A delightful tour through mathematics from basic arithmetic to calculus and beyond. Strogatz reveals the beauty hidden in everyday math, showing why negative numbers exist, how calculus explains Michael Jordan's hang time, and what infinity really means. Perfect for rediscovering why mathematics matters.
+
+</div>
+</div>
+
+<div class="reading-item">
+<img src="/images/reading/prime-number-conspiracy.jpg" alt="The Prime Number Conspiracy">
+<div class="reading-content">
+
+### The Prime Number Conspiracy edited by Thomas Lin
+
+A collection of the best mathematics writing from Quanta Magazine. The essays cover breakthroughs in prime numbers, topology, machine learning, and more, written by journalists who make cutting-edge research accessible. A window into how mathematicians actually think and work.
+
+</div>
+</div>
+
 </div>
 
 ## Engineering
