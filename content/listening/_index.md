@@ -10,6 +10,13 @@ Podcasts and videos I recommend.
 
 <div class="listening-gallery">
   <div class="listening-item">
+    <a href="https://youtube.com/watch?v=EV7WhVT270Q"><img src="/images/listening/state-of-ai-in-2026-llms-coding-scaling-laws-china.jpg" alt="State of AI in 2026: LLMs, Coding, Scaling Laws, China, Agents, GPUs, AGI | Lex Fridman Podcast #490"></a>
+    <div class="content">
+      <a class="title" href="https://youtube.com/watch?v=EV7WhVT270Q">State of AI in 2026: LLMs, Coding, Scaling Laws, China, Agents, GPUs, AGI | Lex Fridman Podcast #490</a>
+      <span class="date">Feb 2026</span>
+    </div>
+  </div>
+  <div class="listening-item">
     <a href="https://youtube.com/watch?v=dhyhR4Bzc0I"><img src="/images/listening/software-is-eating-labor.jpg" alt="Software is Eating Labor"></a>
     <div class="content">
       <a class="title" href="https://youtube.com/watch?v=dhyhR4Bzc0I">Software is Eating Labor</a>
