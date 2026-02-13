@@ -130,6 +130,28 @@ The best introduction to chaos theory and dynamical systems. Strogatz makes comp
 </div>
 </div>
 
+<div class="reading-item">
+<img src="/images/reading/infinite-powers.jpg" alt="Infinite Powers">
+<div class="reading-content">
+
+### Infinite Powers by Steven Strogatz
+
+A captivating history of calculus and why it matters. Strogatz shows how the language of infinity has shaped our understanding of everything from planetary motion to GPS satellites. The book reveals calculus not as abstract manipulation but as humanity's most powerful tool for decoding the universe.
+
+</div>
+</div>
+
+<div class="reading-item">
+<img src="/images/reading/sync.jpg" alt="Sync">
+<div class="reading-content">
+
+### Sync by Steven Strogatz
+
+An exploration of how spontaneous order emerges from chaos. Strogatz examines synchronization across nature: fireflies flashing in unison, cardiac pacemaker cells, circadian rhythms, and even the wobble of the Millennium Bridge. The patterns reveal deep mathematical principles governing self-organization in complex systems.
+
+</div>
+</div>
+
 </div>
 
 ## Engineering
