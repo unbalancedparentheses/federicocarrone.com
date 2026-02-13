@@ -62,3 +62,4 @@ Things I want to read or watch next.
 - *A Source Book in Chinese Philosophy* by Wing-Tsit Chan
 - *History of Western Philosophy* by Bertrand Russell
 - *The Greeks and the Irrational* by E.R. Dodds
+- *From Bacteria to Bach and Back: The Evolution of Minds* by Daniel Dennett
