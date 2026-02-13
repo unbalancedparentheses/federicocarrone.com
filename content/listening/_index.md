@@ -10,6 +10,13 @@ Podcasts and videos I recommend.
 
 <div class="listening-gallery">
   <div class="listening-item">
+    <a href="https://youtube.com/watch?v=VFZb42SsZWc"><img src="/images/listening/60-minute-business-masterclass-worth-more-than-you.jpg" alt="60 Minute Business Masterclass (worth more than your Stanford MBA)"></a>
+    <div class="content">
+      <a class="title" href="https://youtube.com/watch?v=VFZb42SsZWc">60 Minute Business Masterclass (worth more than your Stanford MBA)</a>
+      <span class="date">Feb 2026</span>
+    </div>
+  </div>
+  <div class="listening-item">
     <a href="https://youtube.com/watch?v=vfhszRuMA8Y"><img src="/images/listening/how-ai-wipes-out-capitalism-emad-mostaque.jpg" alt="How AI WIPES Out Capitalism Emad Mostaque"></a>
     <div class="content">
       <a class="title" href="https://youtube.com/watch?v=vfhszRuMA8Y">How AI WIPES Out Capitalism Emad Mostaque</a>
