@@ -119,6 +119,17 @@ A definitive explanation of evolutionary biology from one of its greatest practi
 </div>
 </div>
 
+<div class="reading-item">
+<img src="/images/reading/nonlinear-dynamics-chaos.jpg" alt="Nonlinear Dynamics and Chaos">
+<div class="reading-content">
+
+### Nonlinear Dynamics and Chaos by Steven Strogatz
+
+The best introduction to chaos theory and dynamical systems. Strogatz makes complex mathematical concepts accessible through intuition and examples drawn from physics, biology, and engineering. Understanding nonlinear dynamics changes how you see feedback loops, tipping points, and emergent behavior in any complex system.
+
+</div>
+</div>
+
 </div>
 
 ## Engineering
