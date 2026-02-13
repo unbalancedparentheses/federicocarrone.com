@@ -370,6 +370,11 @@ Anime, animation, films, and series I recommend.
     <span class="rating">8.6</span>
   </div>
   <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Suits_(American_TV_series)"><img src="/images/watching/suits.jpg" alt="Suits"></a>
+    <a href="https://en.wikipedia.org/wiki/Suits_(American_TV_series)">Suits</a>
+    <span class="rating">8.5</span>
+  </div>
+  <div class="watching-item">
     <a href="https://en.wikipedia.org/wiki/Homeland_(TV_series)"><img src="/images/watching/homeland.jpg" alt="Homeland"></a>
     <a href="https://en.wikipedia.org/wiki/Homeland_(TV_series)">Homeland</a>
     <span class="rating">8.3</span>
