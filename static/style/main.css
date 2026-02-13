@@ -579,9 +579,9 @@ main {
 
   > ul {
     display: grid;
-    grid-template-columns: repeat(9, auto);
+    grid-template-columns: repeat(10, auto);
     justify-content: center;
-    gap: var(--space-large);
+    gap: var(--space);
     padding: 0;
     height: var(--space-very-large);
     align-items: center;
