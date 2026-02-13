@@ -108,6 +108,17 @@ The best introduction to understanding the fundamental laws governing the physic
 </div>
 </div>
 
+<div class="reading-item">
+<img src="/images/reading/what-evolution-is.jpg" alt="What Evolution Is">
+<div class="reading-content">
+
+### What Evolution Is by Ernst Mayr
+
+A definitive explanation of evolutionary biology from one of its greatest practitioners. Mayr distills a lifetime of work into a clear account of how evolution operates, addressing common misconceptions along the way. Essential for understanding the process that shaped all life on Earth.
+
+</div>
+</div>
+
 </div>
 
 ## Engineering
