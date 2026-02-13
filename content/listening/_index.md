@@ -10,6 +10,13 @@ Podcasts and videos I recommend.
 
 <div class="listening-gallery">
   <div class="listening-item">
+    <a href="https://youtube.com/watch?v=CRw5CCq8Uf4"><img src="/images/listening/jiang-xueqin-humanitys-patterns-the-nature-of-real.jpg" alt="Jiang Xueqin: Humanity&#x27;s patterns, the nature of reality, and the battle for your mind."></a>
+    <div class="content">
+      <a class="title" href="https://youtube.com/watch?v=CRw5CCq8Uf4">Jiang Xueqin: Humanity&#x27;s patterns, the nature of reality, and the battle for your mind.</a>
+      <span class="date">Feb 2026</span>
+    </div>
+  </div>
+  <div class="listening-item">
     <a href="https://youtube.com/watch?v=EV7WhVT270Q"><img src="/images/listening/state-of-ai-in-2026-llms-coding-scaling-laws-china.jpg" alt="State of AI in 2026: LLMs, Coding, Scaling Laws, China, Agents, GPUs, AGI | Lex Fridman Podcast #490"></a>
     <div class="content">
       <a class="title" href="https://youtube.com/watch?v=EV7WhVT270Q">State of AI in 2026: LLMs, Coding, Scaling Laws, China, Agents, GPUs, AGI | Lex Fridman Podcast #490</a>

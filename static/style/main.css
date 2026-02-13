@@ -1584,6 +1584,29 @@ article {
   }
 }
 
+/* Backlog gallery */
+.backlog-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space);
+}
+
+.backlog-item {
+  text-align: center;
+}
+
+.backlog-item img {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.backlog-item a {
+  display: block;
+  margin-top: var(--space-small);
+}
+
 /* Homepage sections */
 .positioning {
   margin-block-end: var(--space-very-large);

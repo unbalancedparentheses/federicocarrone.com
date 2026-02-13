@@ -29,6 +29,8 @@ POSTERS = {
     "watchmen.jpg": "/zcKhFvSWvf0GIBcwqxHkMjLPqhE.jpg",
     # Animation
     "cyberpunk-edgerunners.jpg": "/7jSWOc6jWSw5hZ78HB8Hw3pJxuk.jpg",
+    # Backlog
+    "frieren.jpg": "/dqZENchTd7lp5zht7BdlqM7RBhD.jpg",
 }
 
 def download_poster(filename, poster_path):
