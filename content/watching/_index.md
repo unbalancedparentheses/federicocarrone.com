@@ -1,73 +1,88 @@
 +++
 title = "Watching"
 template = "watching.html"
-description = "Series, movies, anime, and animation recommendations from Federico Carrone"
+description = "Anime, animation, movies, and series recommendations from Federico Carrone"
 +++
 
-Series, films, anime, and animation I recommend.
+Anime, animation, films, and series I recommend.
 
-## Series
+## Anime
 
 <div class="watching-gallery">
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Band_of_Brothers_(miniseries)"><img src="/images/watching/band-of-brothers.jpg" alt="Band of Brothers"></a>
-    <a href="https://en.wikipedia.org/wiki/Band_of_Brothers_(miniseries)">Band of Brothers</a>
-    <span class="rating">9.4</span>
-  </div>
-  <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/The_Wire"><img src="/images/watching/the-wire.jpg" alt="The Wire"></a>
-    <a href="https://en.wikipedia.org/wiki/The_Wire">The Wire</a>
-    <span class="rating">9.3</span>
-  </div>
-  <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/The_Sopranos"><img src="/images/watching/the-sopranos.jpg" alt="The Sopranos"></a>
-    <a href="https://en.wikipedia.org/wiki/The_Sopranos">The Sopranos</a>
-    <span class="rating">9.2</span>
-  </div>
-  <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Game_of_Thrones"><img src="/images/watching/game-of-thrones.jpg" alt="Game of Thrones"></a>
-    <a href="https://en.wikipedia.org/wiki/Game_of_Thrones">Game of Thrones</a>
-    <span class="rating">9.2</span>
-  </div>
-  <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Sherlock_(TV_series)"><img src="/images/watching/sherlock.jpg" alt="Sherlock"></a>
-    <a href="https://en.wikipedia.org/wiki/Sherlock_(TV_series)">Sherlock</a>
+    <a href="https://en.wikipedia.org/wiki/Attack_on_Titan"><img src="/images/watching/attack-on-titan.jpg" alt="Attack on Titan"></a>
+    <a href="https://en.wikipedia.org/wiki/Attack_on_Titan">Attack on Titan</a>
     <span class="rating">9.1</span>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/The_Office_(American_TV_series)"><img src="/images/watching/the-office.jpg" alt="The Office"></a>
-    <a href="https://en.wikipedia.org/wiki/The_Office_(American_TV_series)">The Office</a>
+    <a href="https://en.wikipedia.org/wiki/Cowboy_Bebop"><img src="/images/watching/cowboy-bebop.jpg" alt="Cowboy Bebop"></a>
+    <a href="https://en.wikipedia.org/wiki/Cowboy_Bebop">Cowboy Bebop</a>
+    <span class="rating">8.9</span>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Berserk_(1997_TV_series)"><img src="/images/watching/berserk.jpg" alt="Berserk"></a>
+    <a href="https://en.wikipedia.org/wiki/Berserk_(1997_TV_series)">Berserk</a>
+    <span class="rating">8.7</span>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Ghost_in_the_Shell_(1995_film)"><img src="/images/watching/ghost-in-the-shell.jpg" alt="Ghost in the Shell"></a>
+    <a href="https://en.wikipedia.org/wiki/Ghost_in_the_Shell_(1995_film)">Ghost in the Shell</a>
+    <span class="rating">8.0</span>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Akira_(1988_film)"><img src="/images/watching/akira.jpg" alt="Akira"></a>
+    <a href="https://en.wikipedia.org/wiki/Akira_(1988_film)">Akira</a>
+    <span class="rating">8.0</span>
+  </div>
+</div>
+
+## Animation
+
+<div class="watching-gallery">
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Rick_and_Morty"><img src="/images/watching/rick-and-morty.jpg" alt="Rick and Morty"></a>
+    <a href="https://en.wikipedia.org/wiki/Rick_and_Morty">Rick and Morty</a>
+    <span class="rating">9.1</span>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Arcane_(TV_series)"><img src="/images/watching/arcane.jpg" alt="Arcane"></a>
+    <a href="https://en.wikipedia.org/wiki/Arcane_(TV_series)">Arcane</a>
     <span class="rating">9.0</span>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Succession_(TV_series)"><img src="/images/watching/succession.jpg" alt="Succession"></a>
-    <a href="https://en.wikipedia.org/wiki/Succession_(TV_series)">Succession</a>
+    <a href="https://en.wikipedia.org/wiki/Gravity_Falls"><img src="/images/watching/gravity-falls.jpg" alt="Gravity Falls"></a>
+    <a href="https://en.wikipedia.org/wiki/Gravity_Falls">Gravity Falls</a>
+    <span class="rating">8.9</span>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/BoJack_Horseman"><img src="/images/watching/bojack-horseman.jpg" alt="BoJack Horseman"></a>
+    <a href="https://en.wikipedia.org/wiki/BoJack_Horseman">BoJack Horseman</a>
     <span class="rating">8.8</span>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Peaky_Blinders_(TV_series)"><img src="/images/watching/peaky-blinders.jpg" alt="Peaky Blinders"></a>
-    <a href="https://en.wikipedia.org/wiki/Peaky_Blinders_(TV_series)">Peaky Blinders</a>
-    <span class="rating">8.8</span>
+    <a href="https://en.wikipedia.org/wiki/Samurai_Jack"><img src="/images/watching/samurai-jack.jpg" alt="Samurai Jack"></a>
+    <a href="https://en.wikipedia.org/wiki/Samurai_Jack">Samurai Jack</a>
+    <span class="rating">8.5</span>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Boardwalk_Empire"><img src="/images/watching/boardwalk-empire.jpg" alt="Boardwalk Empire"></a>
-    <a href="https://en.wikipedia.org/wiki/Boardwalk_Empire">Boardwalk Empire</a>
-    <span class="rating">8.6</span>
+    <a href="https://en.wikipedia.org/wiki/Love,_Death_%26_Robots"><img src="/images/watching/love-death-robots.jpg" alt="Love, Death & Robots"></a>
+    <a href="https://en.wikipedia.org/wiki/Love,_Death_%26_Robots">Love, Death & Robots</a>
+    <span class="rating">8.4</span>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/The_Bridge_(Danish/Swedish_TV_series)"><img src="/images/watching/bron-broen.jpg" alt="Bron/Broen (The Bridge)"></a>
-    <a href="https://en.wikipedia.org/wiki/The_Bridge_(Danish/Swedish_TV_series)">Bron/Broen (The Bridge)</a>
-    <span class="rating">8.6</span>
-  </div>
-  <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Homeland_(TV_series)"><img src="/images/watching/homeland.jpg" alt="Homeland"></a>
-    <a href="https://en.wikipedia.org/wiki/Homeland_(TV_series)">Homeland</a>
+    <a href="https://en.wikipedia.org/wiki/Cyberpunk:_Edgerunners"><img src="/images/watching/cyberpunk-edgerunners.jpg" alt="Cyberpunk: Edgerunners"></a>
+    <a href="https://en.wikipedia.org/wiki/Cyberpunk:_Edgerunners">Cyberpunk: Edgerunners</a>
     <span class="rating">8.3</span>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/The_Killing_(American_TV_series)"><img src="/images/watching/the-killing.jpg" alt="The Killing"></a>
-    <a href="https://en.wikipedia.org/wiki/The_Killing_(American_TV_series)">The Killing</a>
-    <span class="rating">8.3</span>
+    <a href="https://en.wikipedia.org/wiki/Final_Space"><img src="/images/watching/final-space.jpg" alt="Final Space"></a>
+    <a href="https://en.wikipedia.org/wiki/Final_Space">Final Space</a>
+    <span class="rating">8.2</span>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Daria"><img src="/images/watching/daria.jpg" alt="Daria"></a>
+    <a href="https://en.wikipedia.org/wiki/Daria">Daria</a>
+    <span class="rating">7.8</span>
   </div>
 </div>
 
@@ -296,82 +311,67 @@ Series, films, anime, and animation I recommend.
   </div>
 </div>
 
-## Anime
+## Series
 
 <div class="watching-gallery">
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Attack_on_Titan"><img src="/images/watching/attack-on-titan.jpg" alt="Attack on Titan"></a>
-    <a href="https://en.wikipedia.org/wiki/Attack_on_Titan">Attack on Titan</a>
+    <a href="https://en.wikipedia.org/wiki/Band_of_Brothers_(miniseries)"><img src="/images/watching/band-of-brothers.jpg" alt="Band of Brothers"></a>
+    <a href="https://en.wikipedia.org/wiki/Band_of_Brothers_(miniseries)">Band of Brothers</a>
+    <span class="rating">9.4</span>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/The_Wire"><img src="/images/watching/the-wire.jpg" alt="The Wire"></a>
+    <a href="https://en.wikipedia.org/wiki/The_Wire">The Wire</a>
+    <span class="rating">9.3</span>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/The_Sopranos"><img src="/images/watching/the-sopranos.jpg" alt="The Sopranos"></a>
+    <a href="https://en.wikipedia.org/wiki/The_Sopranos">The Sopranos</a>
+    <span class="rating">9.2</span>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Game_of_Thrones"><img src="/images/watching/game-of-thrones.jpg" alt="Game of Thrones"></a>
+    <a href="https://en.wikipedia.org/wiki/Game_of_Thrones">Game of Thrones</a>
+    <span class="rating">9.2</span>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Sherlock_(TV_series)"><img src="/images/watching/sherlock.jpg" alt="Sherlock"></a>
+    <a href="https://en.wikipedia.org/wiki/Sherlock_(TV_series)">Sherlock</a>
     <span class="rating">9.1</span>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Cowboy_Bebop"><img src="/images/watching/cowboy-bebop.jpg" alt="Cowboy Bebop"></a>
-    <a href="https://en.wikipedia.org/wiki/Cowboy_Bebop">Cowboy Bebop</a>
-    <span class="rating">8.9</span>
-  </div>
-  <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Berserk_(1997_TV_series)"><img src="/images/watching/berserk.jpg" alt="Berserk"></a>
-    <a href="https://en.wikipedia.org/wiki/Berserk_(1997_TV_series)">Berserk</a>
-    <span class="rating">8.7</span>
-  </div>
-  <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Ghost_in_the_Shell_(1995_film)"><img src="/images/watching/ghost-in-the-shell.jpg" alt="Ghost in the Shell"></a>
-    <a href="https://en.wikipedia.org/wiki/Ghost_in_the_Shell_(1995_film)">Ghost in the Shell</a>
-    <span class="rating">8.0</span>
-  </div>
-  <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Akira_(1988_film)"><img src="/images/watching/akira.jpg" alt="Akira"></a>
-    <a href="https://en.wikipedia.org/wiki/Akira_(1988_film)">Akira</a>
-    <span class="rating">8.0</span>
-  </div>
-</div>
-
-## Animation
-
-<div class="watching-gallery">
-  <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Rick_and_Morty"><img src="/images/watching/rick-and-morty.jpg" alt="Rick and Morty"></a>
-    <a href="https://en.wikipedia.org/wiki/Rick_and_Morty">Rick and Morty</a>
-    <span class="rating">9.1</span>
-  </div>
-  <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Arcane_(TV_series)"><img src="/images/watching/arcane.jpg" alt="Arcane"></a>
-    <a href="https://en.wikipedia.org/wiki/Arcane_(TV_series)">Arcane</a>
+    <a href="https://en.wikipedia.org/wiki/The_Office_(American_TV_series)"><img src="/images/watching/the-office.jpg" alt="The Office"></a>
+    <a href="https://en.wikipedia.org/wiki/The_Office_(American_TV_series)">The Office</a>
     <span class="rating">9.0</span>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Gravity_Falls"><img src="/images/watching/gravity-falls.jpg" alt="Gravity Falls"></a>
-    <a href="https://en.wikipedia.org/wiki/Gravity_Falls">Gravity Falls</a>
-    <span class="rating">8.9</span>
-  </div>
-  <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/BoJack_Horseman"><img src="/images/watching/bojack-horseman.jpg" alt="BoJack Horseman"></a>
-    <a href="https://en.wikipedia.org/wiki/BoJack_Horseman">BoJack Horseman</a>
+    <a href="https://en.wikipedia.org/wiki/Succession_(TV_series)"><img src="/images/watching/succession.jpg" alt="Succession"></a>
+    <a href="https://en.wikipedia.org/wiki/Succession_(TV_series)">Succession</a>
     <span class="rating">8.8</span>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Samurai_Jack"><img src="/images/watching/samurai-jack.jpg" alt="Samurai Jack"></a>
-    <a href="https://en.wikipedia.org/wiki/Samurai_Jack">Samurai Jack</a>
-    <span class="rating">8.5</span>
+    <a href="https://en.wikipedia.org/wiki/Peaky_Blinders_(TV_series)"><img src="/images/watching/peaky-blinders.jpg" alt="Peaky Blinders"></a>
+    <a href="https://en.wikipedia.org/wiki/Peaky_Blinders_(TV_series)">Peaky Blinders</a>
+    <span class="rating">8.8</span>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Love,_Death_%26_Robots"><img src="/images/watching/love-death-robots.jpg" alt="Love, Death & Robots"></a>
-    <a href="https://en.wikipedia.org/wiki/Love,_Death_%26_Robots">Love, Death & Robots</a>
-    <span class="rating">8.4</span>
+    <a href="https://en.wikipedia.org/wiki/Boardwalk_Empire"><img src="/images/watching/boardwalk-empire.jpg" alt="Boardwalk Empire"></a>
+    <a href="https://en.wikipedia.org/wiki/Boardwalk_Empire">Boardwalk Empire</a>
+    <span class="rating">8.6</span>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Cyberpunk:_Edgerunners"><img src="/images/watching/cyberpunk-edgerunners.jpg" alt="Cyberpunk: Edgerunners"></a>
-    <a href="https://en.wikipedia.org/wiki/Cyberpunk:_Edgerunners">Cyberpunk: Edgerunners</a>
+    <a href="https://en.wikipedia.org/wiki/The_Bridge_(Danish/Swedish_TV_series)"><img src="/images/watching/bron-broen.jpg" alt="Bron/Broen (The Bridge)"></a>
+    <a href="https://en.wikipedia.org/wiki/The_Bridge_(Danish/Swedish_TV_series)">Bron/Broen (The Bridge)</a>
+    <span class="rating">8.6</span>
+  </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Homeland_(TV_series)"><img src="/images/watching/homeland.jpg" alt="Homeland"></a>
+    <a href="https://en.wikipedia.org/wiki/Homeland_(TV_series)">Homeland</a>
     <span class="rating">8.3</span>
   </div>
   <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Final_Space"><img src="/images/watching/final-space.jpg" alt="Final Space"></a>
-    <a href="https://en.wikipedia.org/wiki/Final_Space">Final Space</a>
-    <span class="rating">8.2</span>
-  </div>
-  <div class="watching-item">
-    <a href="https://en.wikipedia.org/wiki/Daria"><img src="/images/watching/daria.jpg" alt="Daria"></a>
-    <a href="https://en.wikipedia.org/wiki/Daria">Daria</a>
-    <span class="rating">7.8</span>
+    <a href="https://en.wikipedia.org/wiki/The_Killing_(American_TV_series)"><img src="/images/watching/the-killing.jpg" alt="The Killing"></a>
+    <a href="https://en.wikipedia.org/wiki/The_Killing_(American_TV_series)">The Killing</a>
+    <span class="rating">8.3</span>
   </div>
 </div>
