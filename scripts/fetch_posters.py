@@ -27,6 +27,8 @@ POSTERS = {
     "bron-broen.jpg": "/v8V9hLWArWhoIdmZ1ujmWrJZL6J.jpg",
     # Movies
     "watchmen.jpg": "/zcKhFvSWvf0GIBcwqxHkMjLPqhE.jpg",
+    # Animation
+    "cyberpunk-edgerunners.jpg": "/7jSWOc6jWSw5hZ78HB8Hw3pJxuk.jpg",
 }
 
 def download_poster(filename, poster_path):

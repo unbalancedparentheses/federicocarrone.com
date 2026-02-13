@@ -360,6 +360,11 @@ Series, films, anime, and animation I recommend.
     <span class="rating">8.4</span>
   </div>
   <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Cyberpunk:_Edgerunners"><img src="/images/watching/cyberpunk-edgerunners.jpg" alt="Cyberpunk: Edgerunners"></a>
+    <a href="https://en.wikipedia.org/wiki/Cyberpunk:_Edgerunners">Cyberpunk: Edgerunners</a>
+    <span class="rating">8.3</span>
+  </div>
+  <div class="watching-item">
     <a href="https://en.wikipedia.org/wiki/Final_Space"><img src="/images/watching/final-space.jpg" alt="Final Space"></a>
     <a href="https://en.wikipedia.org/wiki/Final_Space">Final Space</a>
     <span class="rating">8.2</span>
