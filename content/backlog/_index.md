@@ -59,3 +59,6 @@ Things I want to read or watch next.
 - *Amp It Up* by Frank Slootman
 - *The Technological Republic* by Alexander Macgillivray
 - *The Age of AI* by Henry Kissinger, Eric Schmidt & Daniel Huttenlocher
+- *A Source Book in Chinese Philosophy* by Wing-Tsit Chan
+- *History of Western Philosophy* by Bertrand Russell
+- *The Greeks and the Irrational* by E.R. Dodds

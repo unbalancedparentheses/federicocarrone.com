@@ -219,6 +219,17 @@ A fresh perspective on financial bubbles as engines of progress rather than pure
 </div>
 </div>
 
+<div class="reading-item">
+<img src="/images/reading/the-last-economy.jpg" alt="The Last Economy">
+<div class="reading-content">
+
+### The Last Economy by Emad Mostaque
+
+A guide to understanding how AI will fundamentally transform economics. Mostaque argues that we are entering a new era where traditional economic models break down as intelligent systems reshape production, labor, and value creation. Essential reading for anyone trying to understand the economic implications of artificial intelligence.
+
+</div>
+</div>
+
 </div>
 
 ## History
