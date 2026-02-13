@@ -11,6 +11,7 @@ taxonomies = [
 
 generate_feeds = true
 feed_filenames = ["atom.xml", "rss.xml"]
+generate_sitemap = true
 
 [markdown]
 highlight_code = true

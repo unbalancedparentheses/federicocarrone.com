@@ -10,300 +10,424 @@
  * ```
  *
  * modified to fit the blog's theme
+ * refactored to use specificity instead of !important
  */
 
- /* Ensure syntax highlighting background works with all themes */
- pre.z-code,
- pre.z-code code {
-  background-color: #212733 !important;
- }
-
-
- /* extra */
-
- .language-sh * {
-  color: inherit !important;
- }
-
- .z-inherited-class {
-  text-decoration: none !important;
- }
-
- /* auto-generated and modified */
-
-.z-code {
- color: #ccc9c2 !important;
- background-color: #212733 !important;
+/* Base code block styling */
+pre.z-code,
+pre.z-code code {
+  background-color: #212733;
 }
 
-.z-comment, .z-punctuation.z-definition.z-comment {
- color: #909eac !important;
- font-style: italic;
-}
-.z-variable {
- color: #ccc9c2 !important;
-}
-.z-string, .z-constant.z-other.z-symbol {
- color: #bae67e !important;
-}
-.z-constant.z-numeric {
- color: #ffcc66 !important;
-}
-.z-string.z-regexp, .z-constant.z-character.z-escape {
- color: #95e6cb !important;
-}
-.z-constant.z-language {
- color: #ffcc66 !important;
-}
-.z-constant.z-character, .z-constant.z-other {
- color: #ffcc66 !important;
-}
-.z-variable.z-member {
- color: #ec5f67 !important;
-}
-.z-keyword, .z-keyword.z-operator.z-word {
- color: #ffa759 !important;
-}
-.z-keyword.z-operator {
- color: #f29e74 !important;
-}
-.z-punctuation.z-separator, .z-punctuation.z-terminator {
- color: #ccc9c2 !important;
-}
-.z-punctuation.z-section {
- color: #ccc9c2 !important;
-}
-.z-punctuation.z-accessor {
- color: #f29e74 !important;
-}
-.z-punctuation.z-definition.z-annotation {
- color: #ccc9c2 !important;
-}
-.z-variable.z-other.z-dollar.z-only.z-js, .z-variable.z-other.z-object.z-dollar.z-only.z-js, .z-variable.z-type.z-dollar.z-only.z-js, .z-support.z-class.z-dollar.z-only.z-js {
- color: #ffc44c !important;
-}
-.z-storage {
- color: #ffa759 !important;
-}
-.z-storage.z-type {
- color: #ffa759 !important;
-}
-.z-entity.z-name.z-function {
- color: #ffd580 !important;
-}
-.z-entity.z-name, .z-entity.z-name.z-tag, .z-entity.z-name.z-label {
- color: #73d0ff !important;
-}
-.z-entity.z-other.z-inherited-class {
- color: #73d0ff !important;
-text-decoration: underline;
-}
-.z-variable.z-parameter {
- color: #ffcc66 !important;
-}
-.z-variable.z-language {
- color: #5ccfe6 !important;
-font-style: italic;
-}
-.z-entity.z-name.z-tag, .z-meta.z-tag.z-sgml {
- color: #5ccfe6 !important;
-}
-.z-punctuation.z-definition.z-tag.z-end, .z-punctuation.z-definition.z-tag.z-begin, .z-punctuation.z-definition.z-tag {
- color: #5ccfe6 !important;
-}
-.z-entity.z-other.z-attribute-name {
- color: #ffd580 !important;
-}
-.z-variable.z-function, .z-variable.z-annotation {
- color: #ffd580 !important;
-}
-.z-support.z-function, .z-support.z-macro {
- color: #f28779 !important;
-}
-.z-support.z-constant {
- color: #f29e74 !important;
-font-style: italic;
-}
-.z-support.z-type, .z-support.z-class {
- color: #5ccfe6 !important;
-font-style: italic;
-}
-.z-invalid {
- color: #ff3333 !important;
-}
-.z-invalid.z-deprecated {
- color: #ffffff !important;
- background-color: #ffa759 !important;
-}
-.z-meta.z-diff, .z-meta.z-diff.z-header {
- color: #c594c5 !important;
-}
-.z-source.z-ruby .z-variable.z-other.z-readwrite {
- color: #ffd580 !important;
-}
-.z-source.z-css .z-entity.z-name.z-tag, .z-source.z-sass .z-entity.z-name.z-tag, .z-source.z-scss .z-entity.z-name.z-tag, .z-source.z-less .z-entity.z-name.z-tag, .z-source.z-stylus .z-entity.z-name.z-tag {
- color: #73d0ff !important;
-}
-.z-source.z-css .z-support.z-type, .z-source.z-sass .z-support.z-type, .z-source.z-scss .z-support.z-type, .z-source.z-less .z-support.z-type, .z-source.z-stylus .z-support.z-type {
- color: #5c6773 !important;
-}
-.z-support.z-type.z-property-name {
- color: #5ccfe6 !important;
-}
-.z-constant.z-numeric.z-line-number.z-find-in-files {
- color: #5c6773 !important;
-}
-.z-constant.z-numeric.z-line-number.z-match {
- color: #ffa759 !important;
-}
-.z-entity.z-name.z-filename.z-find-in-files {
- color: #bae67e !important;
-}
-.z-message.z-error {
- color: #ff3333 !important;
-}
-.z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json, .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
- color: #5ccfe6 !important;
-}
-.z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json, .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
- color: #5ccfe6 !important;
-}
-.z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json, .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
- color: #5ccfe6 !important;
-}
-.z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json, .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
- color: #5ccfe6 !important;
-}
-.z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json, .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
- color: #5ccfe6 !important;
-}
-.z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json, .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
- color: #5ccfe6 !important;
-}
-.z-source.z-json .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json, .z-source.z-json .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
- color: #5ccfe6 !important;
-}
-.z-source.z-json .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json, .z-source.z-json .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
- color: #5ccfe6 !important;
-}
-.z-source.z-json .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json, .z-source.z-json .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
- color: #5ccfe6 !important;
-}
-.z-markup.z-heading {
- color: #ffa759 !important;
-font-weight: bold;
-}
-.z-string.z-other.z-link, .z-markup.z-underline.z-link {
- color: #95e6cb !important;
-text-decoration: underline;
-font-style: italic;
-}
-.z-punctuation.z-definition.z-image {
- color: #ffd580 !important;
-}
-.z-markup.z-italic {
- color: #f28779 !important;
-font-style: italic;
-}
-.z-markup.z-bold {
- color: #f28779 !important;
-font-weight: bold;
-}
-.z-markup.z-italic .z-markup.z-bold, .z-markup.z-bold .z-markup.z-italic {
-font-weight: bold;
-font-style: italic;
-}
-.z-markup.z-raw {
- background-color: #ccc9c2 !important;
-}
-.z-markup.z-raw.z-inline {
- background-color: #ccc9c2 !important;
-}
-.z-meta.z-separator {
- color: #5c6773 !important;
- background-color: #ccc9c2 !important;
-font-weight: bold;
-}
-.z-markup.z-quote {
- color: #ffcc66 !important;
-font-style: italic;
-}
-.z-markup.z-list.z-numbered.z-bullet, .z-markup.z-list .z-punctuation.z-definition.z-list_item {
- color: #95e6cb !important;
-}
-.z-markup.z-inserted {
- color: #bae67e !important;
-}
-.z-markup.z-changed {
- color: #5ccfe6 !important;
-}
-.z-markup.z-deleted {
- color: #f28779 !important;
-}
-.z-markup.z-strike {
- color: #ffc44c !important;
-}
-.z-markup.z-table {
- color: #5ccfe6 !important;
- background-color: #ccc9c2 !important;
-}
-.z-text.z-html.z-markdown .z-markup.z-raw.z-inline {
- color: #f29e74 !important;
-}
-.z-text.z-html.z-markdown .z-meta.z-dummy.z-line-break {
- color: #5c6773 !important;
-}
-.z-markup.z-raw.z-block.z-fenced.z-markdown {
- color: #ccc9c2 !important;
- background-color: #ccc9c2 !important;
-}
-.z-punctuation.z-definition.z-fenced.z-markdown, .z-variable.z-language.z-fenced.z-markdown {
- color: #5c6773 !important;
- background-color: #ccc9c2 !important;
-}
-.z-variable.z-language.z-fenced.z-markdown {
- color: #5c6773 !important;
-}
-.z-markup.z-inserted.z-git_gutter {
- color: #bae67e !important;
-}
-.z-markup.z-changed.z-git_gutter {
- color: #5ccfe6 !important;
-}
-.z-markup.z-deleted.z-git_gutter {
- color: #ff3333 !important;
-}
-.z-markup.z-ignored.z-git_gutter {
- color: #363e4a !important;
-}
-.z-markup.z-untracked.z-git_gutter {
- color: #363e4a !important;
-}
-.z-gutter_color {
- color: #ffffff !important;
-}
-.z-acejump.z-label.z-blue {
- color: #ffffff !important;
- background-color: #5ccfe6 !important;
-}
-.z-acejump.z-label.z-green {
- color: #ffffff !important;
- background-color: #bae67e !important;
-}
-.z-acejump.z-label.z-orange {
- color: #ffffff !important;
- background-color: #ffa759 !important;
-}
-.z-acejump.z-label.z-purple {
- color: #ffffff !important;
- background-color: #f28779 !important;
-}
-.z-sublimelinter.z-mark.z-warning {
- color: #5ccfe6 !important;
-}
-.z-sublimelinter.z-gutter-mark {
- color: #ffffff !important;
-}
-.z-sublimelinter.z-mark.z-error {
- color: #ff3333 !important;
+/* Shell commands inherit color */
+pre.z-code .language-sh * {
+  color: inherit;
+}
+
+pre.z-code .z-inherited-class {
+  text-decoration: none;
+}
+
+/* Base text color */
+pre.z-code {
+  color: #ccc9c2;
+  background-color: #212733;
+}
+
+pre.z-code .z-comment,
+pre.z-code .z-punctuation.z-definition.z-comment {
+  color: #909eac;
+  font-style: italic;
+}
+
+pre.z-code .z-variable {
+  color: #ccc9c2;
+}
+
+pre.z-code .z-string,
+pre.z-code .z-constant.z-other.z-symbol {
+  color: #bae67e;
+}
+
+pre.z-code .z-constant.z-numeric {
+  color: #ffcc66;
+}
+
+pre.z-code .z-string.z-regexp,
+pre.z-code .z-constant.z-character.z-escape {
+  color: #95e6cb;
+}
+
+pre.z-code .z-constant.z-language {
+  color: #ffcc66;
+}
+
+pre.z-code .z-constant.z-character,
+pre.z-code .z-constant.z-other {
+  color: #ffcc66;
+}
+
+pre.z-code .z-variable.z-member {
+  color: #ec5f67;
+}
+
+pre.z-code .z-keyword,
+pre.z-code .z-keyword.z-operator.z-word {
+  color: #ffa759;
+}
+
+pre.z-code .z-keyword.z-operator {
+  color: #f29e74;
+}
+
+pre.z-code .z-punctuation.z-separator,
+pre.z-code .z-punctuation.z-terminator {
+  color: #ccc9c2;
+}
+
+pre.z-code .z-punctuation.z-section {
+  color: #ccc9c2;
+}
+
+pre.z-code .z-punctuation.z-accessor {
+  color: #f29e74;
+}
+
+pre.z-code .z-punctuation.z-definition.z-annotation {
+  color: #ccc9c2;
+}
+
+pre.z-code .z-variable.z-other.z-dollar.z-only.z-js,
+pre.z-code .z-variable.z-other.z-object.z-dollar.z-only.z-js,
+pre.z-code .z-variable.z-type.z-dollar.z-only.z-js,
+pre.z-code .z-support.z-class.z-dollar.z-only.z-js {
+  color: #ffc44c;
+}
+
+pre.z-code .z-storage {
+  color: #ffa759;
+}
+
+pre.z-code .z-storage.z-type {
+  color: #ffa759;
+}
+
+pre.z-code .z-entity.z-name.z-function {
+  color: #ffd580;
+}
+
+pre.z-code .z-entity.z-name,
+pre.z-code .z-entity.z-name.z-tag,
+pre.z-code .z-entity.z-name.z-label {
+  color: #73d0ff;
+}
+
+pre.z-code .z-entity.z-other.z-inherited-class {
+  color: #73d0ff;
+  text-decoration: underline;
+}
+
+pre.z-code .z-variable.z-parameter {
+  color: #ffcc66;
+}
+
+pre.z-code .z-variable.z-language {
+  color: #5ccfe6;
+  font-style: italic;
+}
+
+pre.z-code .z-entity.z-name.z-tag,
+pre.z-code .z-meta.z-tag.z-sgml {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-punctuation.z-definition.z-tag.z-end,
+pre.z-code .z-punctuation.z-definition.z-tag.z-begin,
+pre.z-code .z-punctuation.z-definition.z-tag {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-entity.z-other.z-attribute-name {
+  color: #ffd580;
+}
+
+pre.z-code .z-variable.z-function,
+pre.z-code .z-variable.z-annotation {
+  color: #ffd580;
+}
+
+pre.z-code .z-support.z-function,
+pre.z-code .z-support.z-macro {
+  color: #f28779;
+}
+
+pre.z-code .z-support.z-constant {
+  color: #f29e74;
+  font-style: italic;
+}
+
+pre.z-code .z-support.z-type,
+pre.z-code .z-support.z-class {
+  color: #5ccfe6;
+  font-style: italic;
+}
+
+pre.z-code .z-invalid {
+  color: #ff3333;
+}
+
+pre.z-code .z-invalid.z-deprecated {
+  color: #ffffff;
+  background-color: #ffa759;
+}
+
+pre.z-code .z-meta.z-diff,
+pre.z-code .z-meta.z-diff.z-header {
+  color: #c594c5;
+}
+
+pre.z-code .z-source.z-ruby .z-variable.z-other.z-readwrite {
+  color: #ffd580;
+}
+
+pre.z-code .z-source.z-css .z-entity.z-name.z-tag,
+pre.z-code .z-source.z-sass .z-entity.z-name.z-tag,
+pre.z-code .z-source.z-scss .z-entity.z-name.z-tag,
+pre.z-code .z-source.z-less .z-entity.z-name.z-tag,
+pre.z-code .z-source.z-stylus .z-entity.z-name.z-tag {
+  color: #73d0ff;
+}
+
+pre.z-code .z-source.z-css .z-support.z-type,
+pre.z-code .z-source.z-sass .z-support.z-type,
+pre.z-code .z-source.z-scss .z-support.z-type,
+pre.z-code .z-source.z-less .z-support.z-type,
+pre.z-code .z-source.z-stylus .z-support.z-type {
+  color: #5c6773;
+}
+
+pre.z-code .z-support.z-type.z-property-name {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-constant.z-numeric.z-line-number.z-find-in-files {
+  color: #5c6773;
+}
+
+pre.z-code .z-constant.z-numeric.z-line-number.z-match {
+  color: #ffa759;
+}
+
+pre.z-code .z-entity.z-name.z-filename.z-find-in-files {
+  color: #bae67e;
+}
+
+pre.z-code .z-message.z-error {
+  color: #ff3333;
+}
+
+/* JSON nested structures */
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json,
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json,
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json,
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json,
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json,
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json,
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json,
+pre.z-code .z-source.z-json .z-meta .z-meta .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-source.z-json .z-meta .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json,
+pre.z-code .z-source.z-json .z-meta .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-source.z-json .z-meta.z-structure.z-dictionary.z-json .z-string.z-quoted.z-double.z-json,
+pre.z-code .z-source.z-json .z-meta.z-structure.z-dictionary.z-json .z-punctuation.z-definition.z-string {
+  color: #5ccfe6;
+}
+
+/* Markdown */
+pre.z-code .z-markup.z-heading {
+  color: #ffa759;
+  font-weight: bold;
+}
+
+pre.z-code .z-string.z-other.z-link,
+pre.z-code .z-markup.z-underline.z-link {
+  color: #95e6cb;
+  text-decoration: underline;
+  font-style: italic;
+}
+
+pre.z-code .z-punctuation.z-definition.z-image {
+  color: #ffd580;
+}
+
+pre.z-code .z-markup.z-italic {
+  color: #f28779;
+  font-style: italic;
+}
+
+pre.z-code .z-markup.z-bold {
+  color: #f28779;
+  font-weight: bold;
+}
+
+pre.z-code .z-markup.z-italic .z-markup.z-bold,
+pre.z-code .z-markup.z-bold .z-markup.z-italic {
+  font-weight: bold;
+  font-style: italic;
+}
+
+pre.z-code .z-markup.z-raw {
+  background-color: #ccc9c2;
+}
+
+pre.z-code .z-markup.z-raw.z-inline {
+  background-color: #ccc9c2;
+}
+
+pre.z-code .z-meta.z-separator {
+  color: #5c6773;
+  background-color: #ccc9c2;
+  font-weight: bold;
+}
+
+pre.z-code .z-markup.z-quote {
+  color: #ffcc66;
+  font-style: italic;
+}
+
+pre.z-code .z-markup.z-list.z-numbered.z-bullet,
+pre.z-code .z-markup.z-list .z-punctuation.z-definition.z-list_item {
+  color: #95e6cb;
+}
+
+pre.z-code .z-markup.z-inserted {
+  color: #bae67e;
+}
+
+pre.z-code .z-markup.z-changed {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-markup.z-deleted {
+  color: #f28779;
+}
+
+pre.z-code .z-markup.z-strike {
+  color: #ffc44c;
+}
+
+pre.z-code .z-markup.z-table {
+  color: #5ccfe6;
+  background-color: #ccc9c2;
+}
+
+pre.z-code .z-text.z-html.z-markdown .z-markup.z-raw.z-inline {
+  color: #f29e74;
+}
+
+pre.z-code .z-text.z-html.z-markdown .z-meta.z-dummy.z-line-break {
+  color: #5c6773;
+}
+
+pre.z-code .z-markup.z-raw.z-block.z-fenced.z-markdown {
+  color: #ccc9c2;
+  background-color: #ccc9c2;
+}
+
+pre.z-code .z-punctuation.z-definition.z-fenced.z-markdown,
+pre.z-code .z-variable.z-language.z-fenced.z-markdown {
+  color: #5c6773;
+  background-color: #ccc9c2;
+}
+
+pre.z-code .z-variable.z-language.z-fenced.z-markdown {
+  color: #5c6773;
+}
+
+/* Git gutter */
+pre.z-code .z-markup.z-inserted.z-git_gutter {
+  color: #bae67e;
+}
+
+pre.z-code .z-markup.z-changed.z-git_gutter {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-markup.z-deleted.z-git_gutter {
+  color: #ff3333;
+}
+
+pre.z-code .z-markup.z-ignored.z-git_gutter {
+  color: #363e4a;
+}
+
+pre.z-code .z-markup.z-untracked.z-git_gutter {
+  color: #363e4a;
+}
+
+pre.z-code .z-gutter_color {
+  color: #ffffff;
+}
+
+/* Acejump labels */
+pre.z-code .z-acejump.z-label.z-blue {
+  color: #ffffff;
+  background-color: #5ccfe6;
+}
+
+pre.z-code .z-acejump.z-label.z-green {
+  color: #ffffff;
+  background-color: #bae67e;
+}
+
+pre.z-code .z-acejump.z-label.z-orange {
+  color: #ffffff;
+  background-color: #ffa759;
+}
+
+pre.z-code .z-acejump.z-label.z-purple {
+  color: #ffffff;
+  background-color: #f28779;
+}
+
+/* Sublime linter */
+pre.z-code .z-sublimelinter.z-mark.z-warning {
+  color: #5ccfe6;
+}
+
+pre.z-code .z-sublimelinter.z-gutter-mark {
+  color: #ffffff;
+}
+
+pre.z-code .z-sublimelinter.z-mark.z-error {
+  color: #ff3333;
 }

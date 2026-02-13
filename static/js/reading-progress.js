@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
   var article = document.querySelector('article');
   if (!article) return;
 
+  var ticking = false;
+
   function updateProgress() {
     var articleRect = article.getBoundingClientRect();
     var articleTop = articleRect.top + window.scrollY;
@@ -15,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var start = articleTop;
     var end = articleTop + articleHeight - windowHeight;
 
-    // Hide progress bar if content fits in viewport (no scrolling needed)
     if (end <= start) {
       progressBar.style.transform = 'scaleX(0)';
       return;
@@ -26,6 +27,16 @@ document.addEventListener('DOMContentLoaded', function() {
     progressBar.style.transform = 'scaleX(' + progress + ')';
   }
 
-  window.addEventListener('scroll', updateProgress, { passive: true });
+  function onScroll() {
+    if (!ticking) {
+      requestAnimationFrame(function() {
+        updateProgress();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
   updateProgress();
 });
