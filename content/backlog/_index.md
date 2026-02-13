@@ -43,6 +43,10 @@ Things I want to read or watch next.
   </div>
 </div>
 
+## Series
+
+- Fallout
+
 ## Movies
 
 - Oppenheimer
