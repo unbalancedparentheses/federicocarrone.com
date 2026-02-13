@@ -34,6 +34,11 @@ Anime, animation, films, and series I recommend.
     <a href="https://en.wikipedia.org/wiki/Akira_(1988_film)">Akira</a>
     <span class="rating">8.0</span>
   </div>
+  <div class="watching-item">
+    <a href="https://en.wikipedia.org/wiki/Legend_of_the_Galactic_Heroes:_Die_Neue_These"><img src="/images/watching/legend-of-the-galactic-heroes-die-neue-these.jpg" alt="Legend of the Galactic Heroes: Die Neue These"></a>
+    <a href="https://en.wikipedia.org/wiki/Legend_of_the_Galactic_Heroes:_Die_Neue_These">Legend of the Galactic Heroes: Die Neue These</a>
+    <span class="rating">7.8</span>
+  </div>
 </div>
 
 ## Animation
