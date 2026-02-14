@@ -76,7 +76,7 @@
         <img class="timeline-thumb" src="{% if page.extra.header_image %}{{ page.extra.header_image }}{% else %}/images/talks/{{ page.extra.thumbnail }}{% endif %}" alt="" loading="lazy" />
         {% endif %}
         <div class="timeline-content">
-          <a href="{{ page.permalink | safe }}" property="url">
+          <a href="{% if item_type == 'talk' and page.extra.youtube_id %}https://www.youtube.com/watch?v={{ page.extra.youtube_id }}{% else %}{{ page.permalink | safe }}{% endif %}" property="url"{% if item_type == "talk" and page.extra.youtube_id %} target="_blank" rel="noopener"{% endif %}>
             <span property="name">{% if page.title %}{{ page.title | markdown(inline = true) | safe }}{% else %}{{ page.content | striptags | truncate(length=60) }}...{% endif %}</span>
           </a>
           <div class="timeline-meta">
