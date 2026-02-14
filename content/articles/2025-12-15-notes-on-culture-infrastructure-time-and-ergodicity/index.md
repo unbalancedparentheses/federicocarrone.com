@@ -8,9 +8,9 @@ keywords=["ergodic"]
 [extra]
 author = "Federico Carrone"
 pinned = true
-header_image = "/images/paintings/persistence-of-memory.webp"
-header_image_caption = "<em>The Persistence of Memory</em>, Salvador Dalí, 1931"
-header_image_alt = "Melting clocks draped over a barren landscape with a distant horizon"
+header_image = "/images/paintings/course-of-empire-desolation.webp"
+header_image_caption = "<em>The Course of Empire: Desolation</em>, Thomas Cole, 1836"
+header_image_alt = "Ruins of a once-great civilization overgrown with vegetation under a calm moonlit sky"
 +++
 
 [Ergodic Group](https://ergodicgroup.com/) is organized around the observation that certain systems change character through sustained engagement. In these systems, repetition refines execution, experience carries forward, and accumulated judgment reshapes future outcomes. Time is not neutral. It filters error, stabilizes standards, and reveals structural quality. Systems differ less in what they produce than in how they behave under repeated contact with reality.

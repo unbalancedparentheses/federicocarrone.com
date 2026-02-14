@@ -7,9 +7,9 @@ keywords=["consciousness", "coordination", "individuality"]
 [extra]
 author = "Federico Carrone"
 pinned = true
-header_image = "/images/paintings/son-of-man.webp"
-header_image_caption = "<em>The Son of Man</em>, René Magritte, 1964"
-header_image_alt = "A man in a bowler hat with his face obscured by a floating green apple"
+header_image = "/images/paintings/garden-of-earthly-delights.webp"
+header_image_caption = "<em>The Garden of Earthly Delights</em>, Hieronymus Bosch, 1510"
+header_image_alt = "A surreal triptych depicting paradise, earthly pleasures, and hell with fantastical creatures and figures"
 +++
 
 I am working on a series of articles that connect biology, computation, philosophy, the history of the West and the formation of individuality. The core argument is simple: many features of human life that appear stable and natural are historically produced. As society accelerates a number of these features begin to lose their function and their permanence. This is just a draft of what I'm working on.
