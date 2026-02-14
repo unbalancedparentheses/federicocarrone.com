@@ -7,6 +7,9 @@ keywords=["crypto"]
 [extra]
 author = "Federico Carrone"
 pinned = false
+header_image = "/images/paintings/tower-of-babel.webp"
+header_image_caption = "<em>The Tower of Babel</em>, Pieter Bruegel the Elder, 1563"
+header_image_alt = "A massive tower under construction rising toward the sky, surrounded by a sprawling landscape"
 +++
 
 # Crypto and the accelerated and chaotic 21st Century

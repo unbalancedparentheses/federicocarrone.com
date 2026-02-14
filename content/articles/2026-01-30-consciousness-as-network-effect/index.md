@@ -7,6 +7,9 @@ keywords = ["ai", "consciousness", "philosophy"]
 [extra]
 author = "Federico Carrone"
 pinned = false
+header_image = "/images/paintings/creation-of-adam.webp"
+header_image_caption = "<em>The Creation of Adam</em>, Michelangelo, 1512"
+header_image_alt = "Two hands nearly touching, God reaching toward Adam on the ceiling of the Sistine Chapel"
 +++
 
 What if, three thousand years ago, humans did not think the way we do? Julian Jaynes proposed that ancient peoples heard their own thoughts as voices from outside, commands they attributed to gods or kings or ancestors. In this theory, the mind was split between the part that spoke and the part that obeyed. There was no inner space where a self could step back and reflect, only commands and compliance.

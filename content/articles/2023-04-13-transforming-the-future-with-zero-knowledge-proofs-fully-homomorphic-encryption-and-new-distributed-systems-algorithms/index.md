@@ -7,6 +7,9 @@ keywords=["cryptography", "coordination", "trust"]
 [extra]
 author = "Federico Carrone"
 pinned = false
+header_image = "/images/paintings/wanderer-above-the-sea-of-fog.webp"
+header_image_caption = "<em>Wanderer above the Sea of Fog</em>, Caspar David Friedrich, 1818"
+header_image_alt = "A man standing on a rocky precipice gazing into a vast fog-covered landscape"
 +++
 
 The evolution of every scientific discipline or engineering field experiences cycles akin to those observed in economies. Incremental advancements are made daily by corporations, individuals, and academic institutions. Occasionally, a researcher or engineer makes a groundbreaking discovery that alters the course of the field. One such example is Sir Isaac Newton, who made significant contributions to calculus, motion, optics, and gravitation during the time of the bubonic plague, which claimed millions of lives. His relentless pursuit of knowledge throughout the pandemic proved instrumental in shaping the development of mathematics, physics, and engineering. Our comfortable modern lives stand upon the foundation of these monumental discoveries.

@@ -7,6 +7,9 @@ keywords = ["ai", "philosophy", "culture"]
 [extra]
 author = "Federico Carrone"
 pinned = false
+header_image = "/images/paintings/nighthawks.webp"
+header_image_caption = "<em>Nighthawks</em>, Edward Hopper, 1942"
+header_image_alt = "A late-night diner scene with a few isolated figures seen through large glass windows"
 +++
 
 ## The Last Scarcity

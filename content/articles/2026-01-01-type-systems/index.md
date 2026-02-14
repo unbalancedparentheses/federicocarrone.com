@@ -7,6 +7,9 @@ keywords=["programming languages", "type systems", "rust", "functional programmi
 [extra]
 author = "Federico Carrone"
 pinned = true
+header_image = "/images/paintings/architects-dream.webp"
+header_image_caption = "<em>The Architect's Dream</em>, Thomas Cole, 1840"
+header_image_alt = "An architect reclining on a massive column overlooking a grand vision of classical buildings"
 +++
 
 Every type error you've ever cursed at was a bug caught before production. Type systems reject nonsense at compile time so you don't discover it at 3 AM. But they vary wildly in what they can express and what guarantees they provide.

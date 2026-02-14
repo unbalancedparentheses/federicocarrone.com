@@ -7,6 +7,9 @@ keywords=["programming-languages", "formal-verification"]
 [extra]
 author = "Federico Carrone"
 pinned = false
+header_image = "/images/paintings/composition-mondrian.webp"
+header_image_caption = "<em>Tableau I</em>, Piet Mondrian, 1921"
+header_image_alt = "Abstract composition of black lines forming rectangles filled with primary colors on a white background"
 +++
 
 There's a tension at the heart of systems programming. We want languages expressive enough to build complex systems, yet simple enough to reason about with confidence. We want performance without sacrificing safety. We want the freedom to write low-level code and the guarantees that come from formal verification.

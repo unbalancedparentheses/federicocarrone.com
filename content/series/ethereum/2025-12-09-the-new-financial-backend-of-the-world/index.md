@@ -7,6 +7,9 @@ keywords=["ethereum", "economy", "crypto"]
 [extra]
 authors = ["Federico Carrone", "Roberto Catalan"]
 pinned = false
+header_image = "/images/paintings/money-changer.webp"
+header_image_caption = "<em>The Moneylender and His Wife</em>, Quentin Matsys, 1514"
+header_image_alt = "A moneylender weighing coins while his wife watches beside him, with a mirror reflecting the room"
 +++
 
 **By Federico Carrone and Roberto Catalan**  

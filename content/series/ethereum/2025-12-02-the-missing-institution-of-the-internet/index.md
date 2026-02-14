@@ -7,6 +7,9 @@ keywords=["ethereum", "economy", "crypto"]
 [extra]
 authors = ["Federico Carrone", "Roberto Catalan"]
 pinned = true
+header_image = "/images/paintings/school-of-athens.webp"
+header_image_caption = "<em>The School of Athens</em>, Raphael, 1511"
+header_image_alt = "Philosophers gathered in a grand classical hall, with Plato and Aristotle at the center"
 +++
 
 **By Federico Carrone and Roberto Catalan**  

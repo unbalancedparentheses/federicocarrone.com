@@ -7,6 +7,9 @@ keywords=["ai", "geopolitics"]
 [extra]
 author = "Federico Carrone"
 pinned = false
+header_image = "/images/paintings/the-ambassadors.webp"
+header_image_caption = "<em>The Ambassadors</em>, Hans Holbein the Younger, 1533"
+header_image_alt = "Two richly dressed ambassadors standing beside a table of scientific instruments with a distorted skull at their feet"
 +++
 
 China is trying to win by commoditizing the complement and I believe they are close to succeeding.

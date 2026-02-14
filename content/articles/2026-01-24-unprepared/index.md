@@ -6,6 +6,9 @@ description = "Humanity is completely unprepared for what's coming. The pace of 
 keywords=["ai", "technology", "disruption"]
 [extra]
 author = "Federico Carrone"
+header_image = "/images/paintings/great-wave.webp"
+header_image_caption = "<em>The Great Wave off Kanagawa</em>, Katsushika Hokusai, 1831"
+header_image_alt = "A towering wave about to crash over small boats with Mount Fuji in the background"
 +++
 
 Humanity is completely unprepared for what's coming.

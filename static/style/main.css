@@ -1682,6 +1682,33 @@ article {
   box-shadow: 0 0 10px var(--glow-accent-subtle);
 }
 
+/* Article header image (painting) */
+.article-header-image {
+  margin-block-end: var(--space-large);
+  padding: 0;
+  background: var(--color-lighter);
+  border: var(--border-width) var(--border-color) solid;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+  }
+
+  figcaption {
+    padding: var(--space-small) var(--space);
+    font-size: 0.85em;
+    color: var(--color-light-darker);
+    text-align: center;
+    text-wrap: balance;
+  }
+}
+
+[data-theme="ghost"] .article-header-image {
+  border-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
 /* Article entry point */
 .entry-point {
   margin-block: var(--space-large);

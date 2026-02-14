@@ -58,6 +58,15 @@
 
   <article class="series-episode" typeof="Article">
     <header>
+      {% if page.extra.header_image %}
+      <figure class="article-header-image">
+        <img src="{{ page.extra.header_image }}" alt="{{ page.extra.header_image_alt | default(value='') }}" loading="lazy" />
+        {% if page.extra.header_image_caption %}
+        <figcaption>{{ page.extra.header_image_caption | safe }}</figcaption>
+        {% endif %}
+      </figure>
+      {% endif %}
+
       <h1 property="name">{{ page.title | markdown(inline = true) | safe }}</h1>
 
       <nav property="isPartOf" typeof="CreativeWorkSeries">
