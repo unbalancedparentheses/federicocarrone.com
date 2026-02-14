@@ -29,6 +29,24 @@ All `make` targets that need zola/lightningcss run through `nix develop` automat
 - **Reading**: `content/reading/_index.md` — book recommendations grouped by theme
 - **About**: `content/about/_index.md`
 
+## Thumbnails
+
+Every article and series episode **must** have a `header_image` in its `[extra]` frontmatter (a painting stored in `static/images/paintings/`). Talks use a `thumbnail` field instead (stored in `static/images/talks/`). These images are displayed on the homepage timeline, `/articles/` listing, and `/series/` listing.
+
+Example article/series episode frontmatter:
+```toml
+[extra]
+header_image = "/images/paintings/nighthawks.webp"
+header_image_caption = "<em>Nighthawks</em>, Edward Hopper, 1942"
+header_image_alt = "Description of the painting"
+```
+
+Example talk frontmatter:
+```toml
+[extra]
+thumbnail = "talk-name.jpg"
+```
+
 ## Navbar Order
 
 Home — Articles — Series — Talks — Watching — Listening — Reading — About

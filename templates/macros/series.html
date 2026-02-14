@@ -1,6 +1,14 @@
 {% import "macros/article.html" as article %}
 
 {% macro poster(section) %}
+  {% if section.pages | length > 0 and section.pages | first %}
+    {% set first_page = section.pages | first %}
+    {% if first_page.extra.header_image %}
+  <a href="{{ section.permalink | safe }}">
+    <img class="poster-thumb" src="{{ first_page.extra.header_image }}" alt="" loading="lazy" />
+  </a>
+    {% endif %}
+  {% endif %}
   <a href="{{ section.permalink | safe }}" class="h2" property="url"><span property="name">{{ section.title | markdown(inline = true) | safe }}</span></a>
   <span class="label">
   {%- if section.extra.complete -%}
