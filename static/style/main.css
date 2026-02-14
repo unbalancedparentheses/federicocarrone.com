@@ -387,6 +387,15 @@ figure {
     }
   }
 
+  :is(.article, .series-episode) &:not(.article-header-image):has(img, picture) {
+    background: none;
+    padding: 0;
+
+    img {
+      border-radius: var(--space-very-small);
+    }
+  }
+
   .youtube-player {
     aspect-ratio: 16 / 9;
     width: 100%;
@@ -1683,12 +1692,11 @@ article {
 }
 
 /* Article header image (painting) */
-.article-header-image {
+figure.article-header-image {
+  margin-inline: calc(-1 * var(--breakout-size, 0px));
   margin-block-end: var(--space-large);
+  background: none;
   padding: 0;
-  background: var(--color-lighter);
-  border: var(--border-width) var(--border-color) solid;
-  overflow: hidden;
 
   img {
     width: 100%;
@@ -1697,16 +1705,12 @@ article {
   }
 
   figcaption {
-    padding: var(--space-small) var(--space);
+    margin-block-start: var(--space-small);
     font-size: 0.85em;
     color: var(--color-light-darker);
     text-align: center;
     text-wrap: balance;
   }
-}
-
-[data-theme="ghost"] .article-header-image {
-  border-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
 /* Article entry point */

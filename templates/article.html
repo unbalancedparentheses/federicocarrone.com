@@ -14,19 +14,19 @@
 {% block body %}
   <article class="article" typeof="Article">
     <header>
-      {% if page.extra.header_image %}
-      <figure class="article-header-image">
-        <img src="{{ page.extra.header_image }}" alt="{{ page.extra.header_image_alt | default(value='') }}" loading="lazy" />
-        {% if page.extra.header_image_caption %}
-        <figcaption>{{ page.extra.header_image_caption | safe }}</figcaption>
-        {% endif %}
-      </figure>
-      {% endif %}
-
       <h1 property="name">{{ page.title | markdown(inline = true) | safe }}</h1>
 
       {{ article::metadata(page = page, full = true) }}
     </header>
+
+    {% if page.extra.header_image %}
+    <figure class="article-header-image">
+      <img src="{{ page.extra.header_image }}" alt="{{ page.extra.header_image_alt | default(value='') }}" loading="lazy" />
+      {% if page.extra.header_image_caption %}
+      <figcaption>{{ page.extra.header_image_caption | safe }}</figcaption>
+      {% endif %}
+    </figure>
+    {% endif %}
 
     {% if page.extra.entry_point %}
     <p class="entry-point"><em>{{ page.extra.entry_point }}</em></p>
